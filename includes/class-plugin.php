@@ -841,12 +841,22 @@ class SEO_Agent_AI_Plugin {
 			// Always record via decision engine — applies when autopilot+auto_apply, queues otherwise.
 			$decision = $this->decision_engine->process( (int) $post->ID, $decision_rec, $min_conf, false );
 
-			if ( $autopilot && 'auto_apply' === $decision['tier'] && $applied_today < $max_daily ) {
-				$result = $this->apply_auto_decision( (int) $post->ID, $rec, $decision, $gsc_safe, $signal_data );
-				if ( ! is_wp_error( $result ) ) {
-					++$applied_today;
-					set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
-				}
+			$rec_type = $rec['type'] ?? '';
+			if ( ! $autopilot
+				|| 'auto_apply' !== $decision['tier']
+				|| ! in_array( $rec_type, self::$autopilot_executable_types, true ) ) {
+				continue;
+			}
+
+			$is_safe = ( 'safe' === ( $decision['risk_level'] ?? 'risky' ) );
+			if ( ! $is_safe && $applied_today >= $max_daily ) {
+				continue;
+			}
+
+			$result = $this->apply_auto_decision( (int) $post->ID, $rec, $decision, $gsc_safe, $signal_data );
+			if ( ! is_wp_error( $result ) && ! $is_safe ) {
+				++$applied_today;
+				set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
 			}
 		}
 	}
@@ -915,6 +925,9 @@ class SEO_Agent_AI_Plugin {
 			if ( $log_retention > 0 ) {
 				$this->activity_log->purge_old_entries( $log_retention );
 			}
+
+			// Heal any decisions stuck at STATUS_APPROVED.
+			$this->drain_approved_decisions();
 
 			update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_DAILY, current_time( 'mysql' ), false );
 
@@ -1251,6 +1264,18 @@ class SEO_Agent_AI_Plugin {
 	 * @param array $analysis     Analyzer output (for signal_data).
 	 * @param bool  $autopilot
 	 */
+	/**
+	 * Types the plugin can actually execute automatically.
+	 * Content-generation types (content_expansion, content_refresh_plan, …)
+	 * need human review and must never be included here.
+	 */
+	private static $autopilot_executable_types = array(
+		'meta_update',
+		'monitor_decline',
+		'schema_update',
+		'internal_link_needed',
+	);
+
 	private function route_recommendations( $post_id, array $recommendations, array $gsc_metrics, array $analysis, $autopilot ) {
 		$autopilot_threshold = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
 		$max_daily           = (int) get_option( 'seo_agent_ai_autopilot_max_daily', 5 );
@@ -1263,15 +1288,32 @@ class SEO_Agent_AI_Plugin {
 		);
 
 		foreach ( $recommendations as $rec ) {
-			// Record every rec in ai_decisions and get its classified tier.
+			// Record every rec in ai_decisions and classify it.
 			$decision = $this->decision_engine->process( $post_id, $rec, $autopilot_threshold );
 
-			if ( $autopilot && 'auto_apply' === $decision['tier'] && $applied_today < $max_daily ) {
-				$result = $this->apply_auto_decision( $post_id, $rec, $decision, $gsc_metrics, $signal_data );
-				if ( ! is_wp_error( $result ) ) {
-					++$applied_today;
-					set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
-				}
+			if ( ! $autopilot || 'auto_apply' !== $decision['tier'] ) {
+				continue;
+			}
+
+			$type = $rec['type'] ?? '';
+
+			// Skip types that require content generation — they stay as pending_approval.
+			if ( ! in_array( $type, self::$autopilot_executable_types, true ) ) {
+				continue;
+			}
+
+			$is_safe = ( 'safe' === ( $decision['risk_level'] ?? 'risky' ) );
+
+			// SAFE decisions are applied without counting against the daily budget.
+			// RISKY decisions are gated by the daily budget to avoid over-changing.
+			if ( ! $is_safe && $applied_today >= $max_daily ) {
+				continue;
+			}
+
+			$result = $this->apply_auto_decision( $post_id, $rec, $decision, $gsc_metrics, $signal_data );
+			if ( ! is_wp_error( $result ) && ! $is_safe ) {
+				++$applied_today;
+				set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
 			}
 		}
 	}
@@ -1321,6 +1363,83 @@ class SEO_Agent_AI_Plugin {
 
 	// -------------------------------------------------------------------
 	// Manual "Approve & Apply" handler
+	// -------------------------------------------------------------------
+	// -------------------------------------------------------------------
+	// Autopilot: drain approved-but-not-yet-executed decisions
+	// -------------------------------------------------------------------
+
+	/**
+	 * Find decisions stuck in STATUS_APPROVED and execute them.
+	 *
+	 * This heals a stuck state that can occur when the approve step
+	 * succeeded but the execute step did not (e.g. a DB timeout, a PHP
+	 * exception, or the decision being approved via WP-CLI without the
+	 * execute call). Called at the end of every daily analysis run.
+	 */
+	private function drain_approved_decisions() {
+		$approved = SEO_Agent_AI_DB_Manager::get_decisions(
+			array(
+				'status' => SEO_Agent_AI_DB_Manager::STATUS_APPROVED,
+				'limit'  => 100,
+			)
+		);
+
+		foreach ( $approved as $dec ) {
+			$post_id = (int) $dec['post_id'];
+			$type    = $dec['decision_type'] ?? '';
+			$field   = $dec['field'] ?? '';
+			$value   = $dec['proposed_value'] ?? '';
+			$dec_id  = (int) $dec['id'];
+
+			if ( 'schema_update' === $type ) {
+				update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+				$this->decision_engine->mark_applied( $dec_id );
+
+			} elseif ( 'internal_link_needed' === $type ) {
+				$this->internal_link_engine->run_for_post( $post_id );
+				$this->decision_engine->mark_applied( $dec_id );
+
+			} elseif ( in_array( $type, array( 'meta_update', 'monitor_decline' ), true ) ) {
+				$proposed = array();
+				if ( 'meta_title' === $field ) {
+					$proposed['meta_title'] = $value;
+				} elseif ( 'meta_description' === $field ) {
+					$proposed['meta_description'] = $value;
+				} else {
+					$decoded = json_decode( $value, true );
+					if ( is_array( $decoded ) ) {
+						$proposed = $decoded;
+					}
+				}
+
+				if ( ! empty( $proposed ) ) {
+					$result = $this->fix_executor->apply(
+						$post_id,
+						array(
+							'type'       => $type,
+							'risk'       => 'safe',
+							'proposed'   => $proposed,
+							'reason'     => $dec['reasoning'] ?? '',
+							'confidence' => (float) ( $dec['confidence'] ?? 0.7 ),
+						),
+						SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT
+					);
+					if ( ! is_wp_error( $result ) ) {
+						$this->decision_engine->mark_applied( $dec_id );
+					}
+				}
+
+			} else {
+				// Unknown/unexecutable type — mark applied so it doesn't block the queue.
+				$this->decision_engine->mark_applied( $dec_id );
+			}
+		}
+
+		if ( ! empty( $approved ) ) {
+			$this->logger->info( sprintf( 'Drained %d approved-but-unexecuted decisions.', count( $approved ) ) );
+		}
+	}
+
 	// -------------------------------------------------------------------
 	// Autopilot: drain existing pending decisions
 	// -------------------------------------------------------------------
