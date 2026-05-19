@@ -35,6 +35,7 @@ class SEO_Agent_AI_Plugin {
 	const CRON_HOOK_IMPROVE         = 'seo_agent_score_and_improve';
 	const CRON_HOOK_ORPHAN          = 'seo_agent_detect_orphans';
 	const CRON_HOOK_IMAGE_ALTS      = 'seo_agent_generate_image_alts';
+	const CRON_HOOK_OBSERVE         = 'seo_agent_observe_results';
 
 	private static $instance = null;
 
@@ -249,6 +250,9 @@ class SEO_Agent_AI_Plugin {
 		// Cron hook — daily image alt text generation (autopilot only).
 		add_action( self::CRON_HOOK_IMAGE_ALTS, array( $this, 'run_generate_image_alts' ) );
 
+		// Cron hook — weekly observation pass: compare GSC metrics before/after applied changes.
+		add_action( self::CRON_HOOK_OBSERVE, array( $this, 'run_observe_results' ) );
+
 		$this->image_seo->init_hooks();
 		$this->social_meta->init_hooks();
 		$this->meta_box->init_hooks();
@@ -293,6 +297,7 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_CANNIBAL,
 			self::CRON_HOOK_IMPROVE,
 			self::CRON_HOOK_ORPHAN,
+			self::CRON_HOOK_OBSERVE,
 		);
 		foreach ( $weekly_hooks as $hook ) {
 			if ( ! wp_next_scheduled( $hook ) ) {
@@ -318,6 +323,7 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_IMPROVE,
 			self::CRON_HOOK_ORPHAN,
 			self::CRON_HOOK_IMAGE_ALTS,
+			self::CRON_HOOK_OBSERVE,
 		);
 		foreach ( $all_hooks as $hook ) {
 			wp_clear_scheduled_hook( $hook );
@@ -376,6 +382,9 @@ class SEO_Agent_AI_Plugin {
 		}
 		if ( ! wp_next_scheduled( self::CRON_HOOK_IMAGE_ALTS ) ) {
 			wp_schedule_event( time() + 2 * HOUR_IN_SECONDS + 30 * MINUTE_IN_SECONDS, 'daily', self::CRON_HOOK_IMAGE_ALTS );
+		}
+		if ( ! wp_next_scheduled( self::CRON_HOOK_OBSERVE ) ) {
+			wp_schedule_event( time() + DAY_IN_SECONDS + 5 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_OBSERVE );
 		}
 
 		set_transient( 'seo_agent_ai_cron_checked', 1, HOUR_IN_SECONDS );
@@ -612,6 +621,74 @@ class SEO_Agent_AI_Plugin {
 	}
 
 	/**
+	 * Weekly observation pass.
+	 *
+	 * For every decision that was auto-applied 7–28 days ago with a before-metrics
+	 * snapshot, fetch the current GSC page metrics and record the after-snapshot.
+	 * Posts where CTR or clicks declined are re-flagged for priority re-analysis so
+	 * the plugin can course-correct on the next daily analysis run.
+	 */
+	public function run_observe_results() {
+		$this->logger->info( 'Starting results observation pass.' );
+
+		$since = gmdate( 'Y-m-d H:i:s', strtotime( '-28 days' ) );
+		$until = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+
+		$decisions = SEO_Agent_AI_DB_Manager::get_applied_decisions_for_observation( $since, $until );
+
+		$observed = 0;
+		$improved = 0;
+		$declined = 0;
+
+		foreach ( $decisions as $dec ) {
+			$post_id = (int) $dec['post_id'];
+			$post    = get_post( $post_id );
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+
+			$url         = get_permalink( $post_id );
+			$current_gsc = $this->gsc_client->get_page_metrics( $url );
+			if ( is_wp_error( $current_gsc ) ) {
+				continue;
+			}
+
+			SEO_Agent_AI_DB_Manager::update_decision_metrics( (int) $dec['id'], null, $current_gsc );
+
+			$before_raw    = $dec['metrics_before'];
+			$before        = is_string( $before_raw ) ? json_decode( $before_raw, true ) : array();
+			$before        = is_array( $before ) ? $before : array();
+			$ctr_before    = (float) ( $before['ctr'] ?? 0.0 );
+			$clicks_before = (int) ( $before['clicks'] ?? 0 );
+			$ctr_after     = (float) ( $current_gsc['ctr'] ?? 0.0 );
+			$clicks_after  = (int) ( $current_gsc['clicks'] ?? 0 );
+
+			++$observed;
+			if ( $ctr_after > $ctr_before || $clicks_after > $clicks_before ) {
+				++$improved;
+			} else {
+				++$declined;
+				// Flag the post so get_posts_for_analysis() picks it up as
+				// a priority target on the next daily analysis run.
+				update_post_meta( $post_id, '_seo_agent_ai_needs_reanalysis', '1' );
+				$this->logger->info(
+					sprintf( 'Post %d showed no improvement after optimization — re-queued.', $post_id )
+				);
+			}
+		}
+
+		$this->logger->info(
+			sprintf(
+				'Observation pass complete. Observed: %d, Improved: %d, Declined/stalled: %d.',
+				$observed,
+				$improved,
+				$declined
+			)
+		);
+		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_OBSERVE, current_time( 'mysql' ), false );
+	}
+
+	/**
 	 * Weekly cron: find posts scoring below the target threshold and generate
 	 * targeted improvements for the weakest SEO dimensions.
 	 *
@@ -736,8 +813,11 @@ class SEO_Agent_AI_Plugin {
 			'score_target' => $target,
 		);
 
+		$date_key      = self::DAILY_AP_TRANSIENT_PREFIX . gmdate( 'Y-m-d' );
+		$max_daily     = (int) get_option( 'seo_agent_ai_autopilot_max_daily', 5 );
+		$applied_today = (int) get_transient( $date_key );
+
 		foreach ( $recommendations as $rec ) {
-			$risk       = $rec['risk'] ?? 'risky';
 			$confidence = (float) ( $rec['confidence'] ?? 0.0 );
 			$reasoning  = $rec['reasoning'] ?? sprintf(
 				/* translators: 1: current score, 2: target score, 3: dimension name. */
@@ -755,22 +835,18 @@ class SEO_Agent_AI_Plugin {
 				'confidence'      => $confidence,
 				'reasoning'       => $reasoning,
 				'expected_impact' => $rec['expected_impact'] ?? __( 'Score improvement.', 'seo-agent-ai' ),
-				'risk_level'      => $risk,
+				'risk_level'      => $rec['risk'] ?? 'risky',
 			);
 
-			if ( $autopilot && $risk === 'safe' && $confidence >= $min_conf ) {
-				$result = $this->fix_executor->apply(
-					(int) $post->ID,
-					$rec,
-					SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT,
-					$signal_data
-				);
-				if ( ! is_wp_error( $result ) && ! empty( $rec['decision_id'] ) ) {
-					$this->decision_engine->mark_applied( (int) $rec['decision_id'] );
+			// Always record via decision engine — applies when autopilot+auto_apply, queues otherwise.
+			$decision = $this->decision_engine->process( (int) $post->ID, $decision_rec, $min_conf, false );
+
+			if ( $autopilot && 'auto_apply' === $decision['tier'] && $applied_today < $max_daily ) {
+				$result = $this->apply_auto_decision( (int) $post->ID, $rec, $decision, $gsc_safe, $signal_data );
+				if ( ! is_wp_error( $result ) ) {
+					++$applied_today;
+					set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
 				}
-			} else {
-				// Route to pending-approval queue (risky, low-confidence, or autopilot off).
-				$this->decision_engine->process( (int) $post->ID, $decision_rec, $min_conf, false );
 			}
 		}
 	}
@@ -907,9 +983,14 @@ class SEO_Agent_AI_Plugin {
 		update_post_meta( (int) $post->ID, '_seo_agent_ai_last_analyzed', current_time( 'mysql' ) );
 
 		$had_recs = ! empty( $recommendations );
-		if ( $autopilot && $had_recs ) {
-			$this->maybe_autopilot_apply( (int) $post->ID, $recommendations, $analysis );
+		if ( $had_recs ) {
+			// Route ALL recommendations through the decision engine so they are
+			// recorded in ai_decisions and — when autopilot is on — auto-applied.
+			$this->route_recommendations( (int) $post->ID, $recommendations, $gsc_safe, $analysis, $autopilot );
 		}
+
+		// Clear the re-analysis flag set by the observation pass.
+		delete_post_meta( (int) $post->ID, '_seo_agent_ai_needs_reanalysis' );
 
 		return array(
 			'had_recommendations' => $had_recs,
@@ -965,6 +1046,24 @@ class SEO_Agent_AI_Plugin {
 			}
 			$priority_ids = array_unique( $priority_ids );
 		}
+
+		// Also prioritise posts flagged by the observation pass as needing re-analysis.
+		$reanalysis_posts = get_posts(
+			array(
+				'post_type'      => 'any',
+				'post_status'    => 'publish',
+				'numberposts'    => 20,
+				'no_found_rows'  => true,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_key'       => '_seo_agent_ai_needs_reanalysis',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'meta_value'     => '1',
+			)
+		);
+		foreach ( $reanalysis_posts as $rp ) {
+			$priority_ids[] = (int) $rp->ID;
+		}
+		$priority_ids = array_unique( $priority_ids );
 
 		$priority_posts = array();
 		$priority_slots = (int) floor( $count / 2 );
@@ -1138,57 +1237,86 @@ class SEO_Agent_AI_Plugin {
 	}
 
 	// -------------------------------------------------------------------
-	// Autopilot: auto-apply safe recommendations
+	// Autopilot: route recommendations through the decision engine
 	// -------------------------------------------------------------------
 
-	private function maybe_autopilot_apply( $post_id, array $recommendations, array $analysis ) {
-		$max_daily      = (int) get_option( 'seo_agent_ai_autopilot_max_daily', 5 );
-		$min_confidence = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
-		$date_key       = self::DAILY_AP_TRANSIENT_PREFIX . gmdate( 'Y-m-d' );
-		$applied_today  = (int) get_transient( $date_key );
+	/**
+	 * Route every recommendation through the decision engine so it is recorded
+	 * in ai_decisions. When autopilot is on and the engine classifies a rec as
+	 * auto_apply, the change is executed immediately within the daily budget.
+	 *
+	 * @param int   $post_id
+	 * @param array $recommendations
+	 * @param array $gsc_metrics  Current GSC page metrics (stored as before-snapshot).
+	 * @param array $analysis     Analyzer output (for signal_data).
+	 * @param bool  $autopilot
+	 */
+	private function route_recommendations( $post_id, array $recommendations, array $gsc_metrics, array $analysis, $autopilot ) {
+		$autopilot_threshold = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
+		$max_daily           = (int) get_option( 'seo_agent_ai_autopilot_max_daily', 5 );
+		$date_key            = self::DAILY_AP_TRANSIENT_PREFIX . gmdate( 'Y-m-d' );
+		$applied_today       = (int) get_transient( $date_key );
 
 		$signal_data = array(
-			'signals'  => isset( $analysis['signals'] ) ? $analysis['signals'] : array(),
-			'evidence' => isset( $analysis['evidence'] ) ? $analysis['evidence'] : array(),
+			'signals'  => $analysis['signals'] ?? array(),
+			'evidence' => $analysis['evidence'] ?? array(),
 		);
 
 		foreach ( $recommendations as $rec ) {
-			if ( $applied_today >= $max_daily ) {
-				break;
+			// Record every rec in ai_decisions and get its classified tier.
+			$decision = $this->decision_engine->process( $post_id, $rec, $autopilot_threshold );
+
+			if ( $autopilot && 'auto_apply' === $decision['tier'] && $applied_today < $max_daily ) {
+				$result = $this->apply_auto_decision( $post_id, $rec, $decision, $gsc_metrics, $signal_data );
+				if ( ! is_wp_error( $result ) ) {
+					++$applied_today;
+					set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
+				}
 			}
+		}
+	}
 
-			$risk       = isset( $rec['risk'] ) ? $rec['risk'] : 'risky';
-			$confidence = isset( $rec['confidence'] ) ? (float) $rec['confidence'] : 0.0;
+	/**
+	 * Execute an auto_apply decision: run the appropriate action for the rec
+	 * type, mark the decision as applied, and snapshot the before-metrics.
+	 *
+	 * @param int   $post_id
+	 * @param array $rec       Full recommendation array.
+	 * @param array $decision  Result from decision_engine->process().
+	 * @param array $gsc_metrics GSC snapshot to store as before-metrics.
+	 * @param array $signal_data Analyzer evidence for the activity log.
+	 * @return true|WP_Error
+	 */
+	private function apply_auto_decision( $post_id, array $rec, array $decision, array $gsc_metrics, array $signal_data ) {
+		$type = $rec['type'] ?? '';
 
-			if ( $risk !== 'safe' ) {
-				continue;
-			}
-
-			if ( $confidence < $min_confidence ) {
-				continue;
-			}
-
-			// Skip if this rec was already routed to decision engine as pending.
-			if ( isset( $rec['decision_tier'] ) && $rec['decision_tier'] === 'pending_approval' ) {
-				continue;
-			}
-
+		if ( 'internal_link_needed' === $type ) {
+			$result = $this->internal_link_engine->run_for_post( $post_id );
+		} elseif ( 'schema_update' === $type ) {
+			update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+			$result = true;
+		} else {
 			$result = $this->fix_executor->apply(
 				$post_id,
 				$rec,
 				SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT,
 				$signal_data
 			);
+		}
 
-			if ( ! is_wp_error( $result ) ) {
-				++$applied_today;
-				set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
-				// Mark the queued decision as applied so it doesn't re-appear as pending.
-				if ( ! empty( $rec['decision_id'] ) ) {
-					$this->decision_engine->mark_applied( (int) $rec['decision_id'] );
+		if ( ! is_wp_error( $result ) ) {
+			$decision_id = (int) ( $decision['decision_id'] ?? 0 );
+			if ( $decision_id > 0 ) {
+				$this->decision_engine->mark_applied( $decision_id );
+				// Store current GSC metrics as the before-snapshot for the
+				// observation pass that will run 7–28 days later.
+				if ( ! empty( $gsc_metrics ) ) {
+					SEO_Agent_AI_DB_Manager::update_decision_metrics( $decision_id, $gsc_metrics, null );
 				}
 			}
 		}
+
+		return $result;
 	}
 
 	// -------------------------------------------------------------------
@@ -1722,8 +1850,8 @@ class SEO_Agent_AI_Plugin {
 			$this->data_store->save_recommendations( (int) $post->ID, $recommendations );
 			update_post_meta( (int) $post->ID, '_seo_agent_ai_last_analyzed', current_time( 'mysql' ) );
 
-			if ( $autopilot && ! empty( $recommendations ) ) {
-				$this->maybe_autopilot_apply( (int) $post->ID, $recommendations, $analysis );
+			if ( ! empty( $recommendations ) ) {
+				$this->route_recommendations( (int) $post->ID, $recommendations, $gsc_safe, $analysis, $autopilot );
 			}
 		}
 
