@@ -45,9 +45,11 @@ class SEO_Agent_AI_Dashboard_Page {
 
 		$recent_changes = $this->activity_log->get_entries( array(), 1, 15 );
 		$total_changes  = $this->activity_log->get_count( array() );
-		$gsc_connected  = '' !== (string) get_option( 'seo_agent_ai_gsc_site', '' );
 		$sitekit_active = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
-		$is_first_run   = 0 === $total_changes && empty( $report ) && ! $gsc_connected && ! $sitekit_active;
+		$gsc_connected  = $sitekit_active
+			|| '' !== (string) get_option( 'seo_agent_ai_gsc_site_url', '' )
+			|| '' !== (string) get_option( 'seo_agent_ai_gsc_site', '' );
+		$is_first_run   = 0 === $total_changes && empty( $report ) && ! $gsc_connected;
 
 		?>
 		<div class="wrap seo-agent-ai-dashboard">
@@ -110,7 +112,10 @@ class SEO_Agent_AI_Dashboard_Page {
 	}
 
 	private function render_onboarding_banner() {
-		$google_connected = (bool) get_option( 'seo_agent_ai_gsc_site', '' );
+		$sitekit_on       = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
+		$google_connected = $sitekit_on
+			|| '' !== (string) get_option( 'seo_agent_ai_gsc_site_url', '' )
+			|| '' !== (string) get_option( 'seo_agent_ai_gsc_site', '' );
 		?>
 		<div style="background:#fff;border:2px solid #2271b1;border-radius:6px;padding:28px 32px;margin-bottom:24px;display:flex;gap:28px;align-items:flex-start">
 			<div style="flex-shrink:0;width:48px;height:48px;background:#2271b1;border-radius:50%;display:flex;align-items:center;justify-content:center">
