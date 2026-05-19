@@ -48,11 +48,36 @@ class SEO_Agent_AI_Rankings_Page {
 		<?php
 	}
 
+	/**
+	 * Resolve the GSC property URL using the same fallback chain as the GSC client:
+	 * 1. Site Kit bridge (if active)
+	 * 2. Plugin's own GSC site URL option
+	 * 3. Legacy option key
+	 *
+	 * @return string Property URL or empty string when not connected.
+	 */
+	private function resolve_gsc_site() {
+		if ( class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active() ) {
+			$sk_url = SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url();
+			if ( $sk_url !== '' ) {
+				return $sk_url;
+			}
+		}
+
+		$url = (string) get_option( 'seo_agent_ai_gsc_site_url', '' );
+		if ( $url !== '' ) {
+			return $url;
+		}
+
+		// Legacy option written by older settings save handlers.
+		return (string) get_option( 'seo_agent_ai_gsc_site', '' );
+	}
+
 	private function render_gsc_status_bar() {
-		$gsc_site    = (string) get_option( 'seo_agent_ai_gsc_site', '' );
-		$last_sync   = (string) get_option( 'seo_agent_ai_last_run_seo_agent_fetch_gsc_data', '' );
-		$gsc_hook    = 'seo_agent_fetch_gsc_data';
-		$nonce_val   = wp_create_nonce( 'seo_agent_ai_trigger_' . $gsc_hook );
+		$gsc_site  = $this->resolve_gsc_site();
+		$last_sync = (string) get_option( 'seo_agent_ai_last_run_seo_agent_fetch_gsc_data', '' );
+		$gsc_hook  = 'seo_agent_fetch_gsc_data';
+		$nonce_val = wp_create_nonce( 'seo_agent_ai_trigger_' . $gsc_hook );
 
 		if ( $gsc_site === '' ) {
 			echo '<div class="notice notice-warning inline" style="margin:0 0 16px;padding:12px 16px">';
