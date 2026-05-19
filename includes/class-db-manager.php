@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SEO_Agent_AI_DB_Manager {
 
-	const DB_VERSION        = 1;
+	const DB_VERSION        = 2;
 	const DB_VERSION_OPTION = 'seo_agent_ai_db_manager_v';
 
 	// Table suffixes (no prefix).
@@ -97,6 +97,8 @@ class SEO_Agent_AI_DB_Manager {
 			approved_by bigint(20) unsigned DEFAULT NULL,
 			reviewed_at datetime DEFAULT NULL,
 			created_at datetime NOT NULL,
+			metrics_before longtext DEFAULT NULL,
+			metrics_after longtext DEFAULT NULL,
 			PRIMARY KEY  (id),
 			KEY post_id (post_id),
 			KEY status (status),
@@ -331,6 +333,66 @@ class SEO_Agent_AI_DB_Manager {
 			return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", $status ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
 		}
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+	}
+
+	/**
+	 * Store before/after GSC metric snapshots on an applied decision.
+	 *
+	 * Pass null for either argument to skip updating that column.
+	 *
+	 * @param int        $id     Decision row ID.
+	 * @param array|null $before GSC metrics at the moment the change was applied.
+	 * @param array|null $after  GSC metrics captured during the observation pass.
+	 */
+	public static function update_decision_metrics( $id, $before, $after ) {
+		global $wpdb;
+
+		$update = array();
+		if ( null !== $before ) {
+			$update['metrics_before'] = wp_json_encode( $before );
+		}
+		if ( null !== $after ) {
+			$update['metrics_after'] = wp_json_encode( $after );
+		}
+		if ( empty( $update ) ) {
+			return;
+		}
+
+		$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			self::ai_decisions_table(),
+			$update,
+			array( 'id' => (int) $id )
+		);
+	}
+
+	/**
+	 * Fetch applied decisions that have before-metrics but no after-metrics yet,
+	 * applied within the given datetime window.
+	 *
+	 * @param string $since MySQL datetime — start of window.
+	 * @param string $until MySQL datetime — end of window.
+	 * @return array
+	 */
+	public static function get_applied_decisions_for_observation( $since, $until ) {
+		global $wpdb;
+
+		$table = self::ai_decisions_table();
+
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare(
+				"SELECT * FROM {$table}
+				 WHERE status = %s
+				   AND metrics_before IS NOT NULL
+				   AND metrics_after IS NULL
+				   AND reviewed_at BETWEEN %s AND %s
+				 ORDER BY reviewed_at ASC
+				 LIMIT 100",
+				self::STATUS_APPLIED,
+				$since,
+				$until
+			),
+			ARRAY_A
+		) ?: array();
 	}
 
 	// -------------------------------------------------------------------
