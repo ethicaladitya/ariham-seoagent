@@ -168,11 +168,11 @@ class SEO_Agent_AI_OpenAI_Client {
 
 		$image_url = (string) $image_url;
 
-		// Vision is only reliable on standard OpenAI and Azure /openai/v1 endpoints.
-		// For Azure legacy deployments (deployment-specific URLs) skip vision.
-		$can_use_vision = ! ( $this->is_azure && ! $this->is_azure_v1 ) && ! $this->is_azure_foundry;
-
-		if ( $image_url !== '' && $can_use_vision ) {
+		// Always attempt vision when an image URL is provided — the configured
+		// model/endpoint decides capability. If vision fails for any reason
+		// (unsupported model, Azure deployment mismatch, etc.) we fall back to
+		// text-only automatically.
+		if ( $image_url !== '' ) {
 			$result = $this->chat_with_image( (string) $prompt, $image_url );
 			if ( ! is_wp_error( $result ) && $result !== null ) {
 				return $result;
@@ -381,26 +381,11 @@ class SEO_Agent_AI_OpenAI_Client {
 		$endpoint = $this->build_endpoint();
 		$headers  = $this->build_headers();
 
-		// Determine a vision-capable model.
-		$vision_capable = array( 'gpt-4o', 'gpt-4-turbo', 'gpt-4-vision' );
-		$model          = $this->model;
-		$is_vision      = false;
-		foreach ( $vision_capable as $vm ) {
-			if ( strpos( $model, $vm ) !== false ) {
-				$is_vision = true;
-				break;
-			}
-		}
-		// gpt-4o-mini also supports vision.
-		if ( ! $is_vision && strpos( $model, 'gpt-4o-mini' ) !== false ) {
-			$is_vision = true;
-		}
-		if ( ! $is_vision ) {
-			$model = 'gpt-4o-mini';
-		}
-
+		// Always use the configured model — never override to a hardcoded name.
+		// On Azure the model field must match the deployment name exactly; on
+		// standard OpenAI any vision-capable model works fine with its own name.
 		$body = array(
-			'model'       => $model,
+			'model'       => $this->model,
 			'messages'    => array(
 				array(
 					'role'    => 'system',
