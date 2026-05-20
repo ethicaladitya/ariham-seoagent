@@ -234,7 +234,7 @@ class SEO_Agent_AI_Admin_Page {
 		wp_enqueue_script(
 			'seo-agent-ai-admin',
 			SEO_AGENT_AI_PLUGIN_URL . 'assets/js/admin.js',
-			array(),
+			array( 'jquery' ),
 			SEO_AGENT_AI_VERSION,
 			true
 		);
@@ -595,8 +595,6 @@ class SEO_Agent_AI_Admin_Page {
 		$log_retention   = (int) get_option( 'seo_agent_ai_log_retention_days', 90 );
 		$score_target    = (int) get_option( 'seo_agent_ai_score_target', 70 );
 		$ai_provider     = (string) get_option( 'seo_agent_ai_ai_provider', 'gemini' );
-		$openai_base     = (string) get_option( SEO_Agent_AI_OpenAI_Client::OPTION_BASE_URL, '' );
-		$openai_model    = (string) get_option( SEO_Agent_AI_OpenAI_Client::OPTION_MODEL, '' );
 		$email_reports   = (bool) get_option( 'seo_agent_ai_email_reports', false );
 		$conn_result     = get_transient( SEO_Agent_AI_Plugin::CONNECTION_TEST_TRANSIENT );
 		$is_connected    = $this->oauth->is_connected();
@@ -809,20 +807,6 @@ class SEO_Agent_AI_Admin_Page {
 											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
 										<?php endif; ?>
 										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'seo-agent-ai' ); ?></p>
-									</div>
-								</div>
-								<div class="sai-field">
-									<label class="sai-field-label" for="openai_base_url"><?php esc_html_e( 'OpenAI Base URL', 'seo-agent-ai' ); ?></label>
-									<div class="sai-field-control">
-										<input type="url" id="openai_base_url" name="openai_base_url" value="<?php echo esc_attr( $openai_base ); ?>" class="regular-text" placeholder="https://api.openai.com/v1">
-										<p class="description"><?php esc_html_e( 'Leave blank for default. Change to use a custom endpoint.', 'seo-agent-ai' ); ?></p>
-									</div>
-								</div>
-								<div class="sai-field">
-									<label class="sai-field-label" for="openai_model"><?php esc_html_e( 'OpenAI Model', 'seo-agent-ai' ); ?></label>
-									<div class="sai-field-control">
-										<input type="text" id="openai_model" name="openai_model" value="<?php echo esc_attr( $openai_model ); ?>" class="regular-text" placeholder="gpt-4o-mini">
-										<p class="description"><?php esc_html_e( 'Leave blank for default (gpt-4o-mini).', 'seo-agent-ai' ); ?></p>
 									</div>
 								</div>
 							</div>
