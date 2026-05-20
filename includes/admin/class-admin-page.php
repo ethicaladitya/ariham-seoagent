@@ -221,7 +221,7 @@ class SEO_Agent_AI_Admin_Page {
 	}
 
 	public function enqueue_assets( $hook ) {
-		if ( strpos( $hook, 'seo-agent-ai' ) === false ) {
+		if ( strpos( $hook, 'seo-agent' ) === false ) {
 			return;
 		}
 		wp_enqueue_style(
@@ -230,6 +230,28 @@ class SEO_Agent_AI_Admin_Page {
 			array(),
 			SEO_AGENT_AI_VERSION
 		);
+		wp_enqueue_script(
+			'seo-agent-ai-admin',
+			SEO_AGENT_AI_PLUGIN_URL . 'assets/js/admin.js',
+			array(),
+			SEO_AGENT_AI_VERSION,
+			true
+		);
+		wp_localize_script( 'seo-agent-ai-admin', 'seoAgentAI', array(
+			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+			'nonce'        => wp_create_nonce( 'seo_agent_ai_analyze_batch' ),
+			'nonceApprove' => wp_create_nonce( 'seo_agent_ai_bulk_apply_safe' ),
+			'i18n'         => array(
+				'loading'        => __( 'Working…', 'seo-agent-ai' ),
+				'scanning'       => __( 'Scanning', 'seo-agent-ai' ),
+				'scan_done'      => __( 'Scan complete!', 'seo-agent-ai' ),
+				'scan_error'     => __( 'Scan failed. Please try again.', 'seo-agent-ai' ),
+				'network_error'  => __( 'Network error. Please try again.', 'seo-agent-ai' ),
+				'recommendations' => __( 'recommendation(s) generated.', 'seo-agent-ai' ),
+				'saved'          => __( 'Settings saved!', 'seo-agent-ai' ),
+				'bulk_confirm'   => __( 'Apply all safe pending decisions now? This cannot be undone.', 'seo-agent-ai' ),
+			),
+		) );
 	}
 
 	// -------------------------------------------------------------------
@@ -548,6 +570,11 @@ class SEO_Agent_AI_Admin_Page {
 	// Settings page
 	// -------------------------------------------------------------------
 
+
+	// -------------------------------------------------------------------
+	// Settings page
+	// -------------------------------------------------------------------
+
 	public function render_settings_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -566,341 +593,350 @@ class SEO_Agent_AI_Admin_Page {
 		$min_confidence  = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
 		$log_retention   = (int) get_option( 'seo_agent_ai_log_retention_days', 90 );
 		$score_target    = (int) get_option( 'seo_agent_ai_score_target', 70 );
+		$ai_provider     = (string) get_option( 'seo_agent_ai_ai_provider', 'gemini' );
+		$openai_base     = (string) get_option( SEO_Agent_AI_OpenAI_Client::OPTION_BASE_URL, '' );
+		$openai_model    = (string) get_option( SEO_Agent_AI_OpenAI_Client::OPTION_MODEL, '' );
+		$email_reports   = (bool) get_option( 'seo_agent_ai_email_reports', false );
 		$conn_result     = get_transient( SEO_Agent_AI_Plugin::CONNECTION_TEST_TRANSIENT );
 		$is_connected    = $this->oauth->is_connected();
+		$sitekit_active  = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
 
 		if ( $conn_result !== false ) {
 			delete_transient( SEO_Agent_AI_Plugin::CONNECTION_TEST_TRANSIENT );
 		}
 		?>
-		<div class="wrap seo-agent-wrap">
-			<h1><?php esc_html_e( 'SEO Agent AI Settings', 'seo-agent-ai' ); ?></h1>
-
-			<?php $this->render_notice( $notice ); ?>
-			<?php if ( is_array( $conn_result ) ) : ?>
-				<?php $this->render_connection_results( $conn_result ); ?>
-			<?php endif; ?>
-
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<?php wp_nonce_field( 'seo_agent_ai_save_settings' ); ?>
-				<input type="hidden" name="action" value="seo_agent_ai_save_settings" />
-
-				<?php
-				$sitekit_active = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
-				?>
-
-				<?php if ( $sitekit_active ) : ?>
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2>
-						<?php esc_html_e( 'Google Data Sources', 'seo-agent-ai' ); ?>
-						<span style="display:inline-flex;align-items:center;gap:6px;margin-left:10px;font-size:13px;font-weight:400;color:#1d7b2e;">
-							<span style="width:10px;height:10px;border-radius:50%;background:#1d7b2e;display:inline-block;"></span>
-							<?php esc_html_e( 'Connected via Google Site Kit', 'seo-agent-ai' ); ?>
-						</span>
-					</h2>
-					<p class="description" style="margin-bottom:14px;">
-						<?php esc_html_e( 'Google Site Kit is active and connected. SEO Agent AI is automatically using your existing Search Console and Analytics connection — no additional setup needed.', 'seo-agent-ai' ); ?>
-					</p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Search Console', 'seo-agent-ai' ); ?></th>
-							<td>
-								<code><?php echo esc_html( SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url() ); ?></code>
-								<p class="description"><?php esc_html_e( 'Pulled automatically from Site Kit. Change the property in the Site Kit plugin.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<?php if ( SEO_Agent_AI_SiteKit_Bridge::is_ga4_active() ) : ?>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Analytics (GA4)', 'seo-agent-ai' ); ?></th>
-							<td>
-								<code><?php echo esc_html( 'Property ' . SEO_Agent_AI_SiteKit_Bridge::get_ga4_property_id() ); ?></code>
-								<p class="description"><?php esc_html_e( 'Pulled automatically from Site Kit. Change the property in the Site Kit plugin.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<?php endif; ?>
-					</table>
+		<div class="wrap sai-page">
+			<div class="sai-header">
+				<div class="sai-header-left">
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Settings', 'seo-agent-ai' ); ?></h1>
 				</div>
-				<?php else : ?>
-
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'Google OAuth Credentials', 'seo-agent-ai' ); ?></h2>
-					<div class="notice notice-info inline" style="margin:0 0 14px;">
-						<p>
-							<?php
-							esc_html_e( 'Tip: Install the free Google Site Kit plugin to connect Search Console and Analytics automatically — no credentials needed.', 'seo-agent-ai' );
-							?>
-							<a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=google+site+kit&tab=search&type=term' ) ); ?>" style="margin-left:6px;">
-								<?php esc_html_e( 'Install Site Kit', 'seo-agent-ai' ); ?> &rarr;
-							</a>
-						</p>
-					</div>
-					<p class="description" style="margin-bottom:14px;">
-						<?php
-						printf(
-							/* translators: %s: Connect Google page link */
-							esc_html__( 'Enter credentials from Google Cloud Console, then %s to complete OAuth authorisation.', 'seo-agent-ai' ),
-							'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'seo-agent-ai' ) . '</a>'
-						);
-						?>
-					</p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><label for="google_client_id"><?php esc_html_e( 'Client ID', 'seo-agent-ai' ); ?></label></th>
-							<td><input type="text" id="google_client_id" name="google_client_id" value="<?php echo esc_attr( $client_id ); ?>" class="regular-text" /></td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="google_client_secret"><?php esc_html_e( 'Client Secret', 'seo-agent-ai' ); ?></label></th>
-							<td><input type="password" id="google_client_secret" name="google_client_secret" value="<?php echo esc_attr( $client_secret ); ?>" class="regular-text" autocomplete="off" /></td>
-						</tr>
-					</table>
+				<div class="sai-header-actions">
+					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+						<?php wp_nonce_field( 'seo_agent_ai_test_connection' ); ?>
+						<input type="hidden" name="action" value="seo_agent_ai_test_connection">
+						<button type="submit" class="sai-btn sai-btn-ghost"><span class="btn-label"><?php esc_html_e( 'Test Connection', 'seo-agent-ai' ); ?></span></button>
+					</form>
 				</div>
+			</div>
 
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'Data Sources', 'seo-agent-ai' ); ?></h2>
-					<?php if ( ! $is_connected ) : ?>
-						<div class="notice notice-warning inline" style="margin:0 0 14px;">
-							<p>
-								<?php
-								printf(
-									/* translators: %s: HTML link to the Connect Google page. */
-									esc_html__( 'Connect your Google account to load available properties automatically. %s', 'seo-agent-ai' ),
-									'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'seo-agent-ai' ) . '</a>'
-								);
-								?>
-							</p>
+			<div class="sai-body">
+				<?php $this->render_notice( $notice ); ?>
+				<?php if ( is_array( $conn_result ) ) : ?>
+					<?php $this->render_connection_results( $conn_result ); ?>
+				<?php endif; ?>
+
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<?php wp_nonce_field( 'seo_agent_ai_save_settings' ); ?>
+					<input type="hidden" name="action" value="seo_agent_ai_save_settings">
+
+					<?php // ------------------------------------------------------------------ ?>
+					<?php // Google Data Sources ?>
+					<?php // ------------------------------------------------------------------ ?>
+					<div class="sai-settings-section">
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Google Data Sources', 'seo-agent-ai' ); ?></h2>
+
+						<?php if ( $sitekit_active ) : ?>
+						<div class="sai-card accent-success" style="margin-bottom:16px">
+							<div class="sai-card-body">
+								<div class="sai-connect-status-row">
+									<div class="sai-connect-status-item csi-ok">
+										<div class="sai-connect-icon-wrap">&#10003;</div>
+										<div class="sai-connect-item-body">
+											<strong><?php esc_html_e( 'Connected via Google Site Kit', 'seo-agent-ai' ); ?></strong>
+											<span><?php esc_html_e( 'Search Console and Analytics data are being pulled automatically.', 'seo-agent-ai' ); ?></span>
+										</div>
+									</div>
+								</div>
+								<div class="sai-field" style="margin-top:12px">
+									<span class="sai-field-label"><?php esc_html_e( 'Search Console', 'seo-agent-ai' ); ?></span>
+									<div class="sai-field-control"><code><?php echo esc_html( SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url() ); ?></code></div>
+								</div>
+								<?php if ( SEO_Agent_AI_SiteKit_Bridge::is_ga4_active() ) : ?>
+								<div class="sai-field">
+									<span class="sai-field-label"><?php esc_html_e( 'Analytics (GA4)', 'seo-agent-ai' ); ?></span>
+									<div class="sai-field-control"><code><?php echo esc_html( 'Property ' . SEO_Agent_AI_SiteKit_Bridge::get_ga4_property_id() ); ?></code></div>
+								</div>
+								<?php endif; ?>
+							</div>
 						</div>
-					<?php endif; ?>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><label for="gsc_site_url"><?php esc_html_e( 'Search Console Property', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<div id="seo-gsc-property-wrap">
-									<input type="text" id="gsc_site_url" name="gsc_site_url" value="<?php echo esc_attr( $gsc_site_url ); ?>" class="regular-text" />
-									<p class="description"><?php esc_html_e( 'Full URL, sc-domain:example.com, or bare domain. Bare domains are auto-prefixed.', 'seo-agent-ai' ); ?></p>
+
+						<?php else : ?>
+
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-header"><h3 class="sai-card-title"><?php esc_html_e( 'Google OAuth Credentials', 'seo-agent-ai' ); ?></h3></div>
+							<div class="sai-card-body">
+								<div class="sai-notice n-info" style="margin-bottom:14px">
+									<p>
+										<?php esc_html_e( 'Tip: Install the free Google Site Kit plugin to connect automatically — no credentials needed.', 'seo-agent-ai' ); ?>
+										<a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=google+site+kit&tab=search&type=term' ) ); ?>" style="margin-left:6px">
+											<?php esc_html_e( 'Install Site Kit', 'seo-agent-ai' ); ?> &rarr;
+										</a>
+									</p>
 								</div>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="ga4_property_id"><?php esc_html_e( 'Analytics Property ID', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<div id="seo-ga4-property-wrap">
-									<input type="text" id="ga4_property_id" name="ga4_property_id" value="<?php echo esc_attr( $ga4_property_id ); ?>" class="regular-text" />
-									<p class="description"><?php esc_html_e( 'Numeric GA4 property ID. Universal Analytics (UA-*) is retired by Google.', 'seo-agent-ai' ); ?></p>
+								<div class="sai-field">
+									<label class="sai-field-label" for="google_client_id"><?php esc_html_e( 'Client ID', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="text" id="google_client_id" name="google_client_id" value="<?php echo esc_attr( $client_id ); ?>" class="regular-text">
+									</div>
 								</div>
-							</td>
-						</tr>
-					</table>
-				</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="google_client_secret"><?php esc_html_e( 'Client Secret', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<div class="sai-key-input-wrap">
+											<input type="password" id="google_client_secret" name="google_client_secret" value="<?php echo esc_attr( $client_secret ); ?>" class="regular-text" autocomplete="off">
+											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'seo-agent-ai' ); ?>">&#128065;</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-				<?php endif; // $sitekit_active ?>
-
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'SEO Plugin Integration', 'seo-agent-ai' ); ?></h2>
-					<?php
-					$detected_plugins = $this->bridge->get_detected_plugins();
-					if ( ! empty( $detected_plugins ) ) :
-						?>
-					<p class="description" style="margin-bottom:12px;">
-						<?php esc_html_e( 'SEO Agent AI is automatically syncing changes with the following active plugins. When you apply a recommendation, meta titles and descriptions will be written to all of them simultaneously.', 'seo-agent-ai' ); ?>
-					</p>
-					<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-						<?php foreach ( $detected_plugins as $slug ) : ?>
-							<span class="seo-agent-pill safe" style="font-size:13px;"><?php echo esc_html( $this->bridge->get_plugin_label( $slug ) ); ?></span>
-						<?php endforeach; ?>
-					</div>
-					<?php else : ?>
-					<div class="notice notice-info inline" style="margin:0;">
-						<p><?php esc_html_e( 'No supported SEO plugin detected. Install Yoast SEO, RankMath SEO, or SmartCrawl to automatically sync generated metadata.', 'seo-agent-ai' ); ?></p>
-					</div>
-					<?php endif; ?>
-				</div>
-
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'AI Enhancement (Gemini)', 'seo-agent-ai' ); ?></h2>
-					<p class="description" style="margin-bottom:14px;">
-						<?php
-						printf(
-							/* translators: %s: link to Google AI Studio */
-							esc_html__( 'Optional. Provide a Gemini API key to generate smarter, context-aware meta titles, descriptions and focus keywords. Without a key the agent uses rule-based generation. %s', 'seo-agent-ai' ),
-							'<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Get a free API key at Google AI Studio', 'seo-agent-ai' ) . '</a>'
-						);
-						?>
-					</p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><label for="gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="password" id="gemini_api_key" name="gemini_api_key" value="" class="regular-text" autocomplete="new-password" placeholder="<?php echo $gemini_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'seo-agent-ai' ) : esc_attr__( 'Enter Gemini API key', 'seo-agent-ai' ); ?>" />
-								<?php if ( $gemini_has_key ) : ?>
-								<span style="display:inline-block;margin-left:8px;color:#2d6a27;font-weight:600;"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-header"><h3 class="sai-card-title"><?php esc_html_e( 'Search Console &amp; Analytics Properties', 'seo-agent-ai' ); ?></h3></div>
+							<div class="sai-card-body">
+								<?php if ( ! $is_connected ) : ?>
+								<div class="sai-notice n-warning" style="margin-bottom:14px">
+									<p>
+										<?php
+										printf(
+											/* translators: %s: HTML link to the Connect Google page. */
+											esc_html__( 'Connect your Google account to load available properties automatically. %s', 'seo-agent-ai' ),
+											'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'seo-agent-ai' ) . '</a>'
+										);
+										?>
+									</p>
+								</div>
 								<?php endif; ?>
-								<p class="description"><?php esc_html_e( 'Stored encrypted (AES-256-CBC). Leave blank to keep the existing key. Enter a new key to replace it.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-					</table>
-				</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="gsc_site_url"><?php esc_html_e( 'Search Console Property', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control" id="seo-gsc-property-wrap">
+										<input type="text" id="gsc_site_url" name="gsc_site_url" value="<?php echo esc_attr( $gsc_site_url ); ?>" class="regular-text">
+										<p class="description"><?php esc_html_e( 'Full URL, sc-domain:example.com, or bare domain.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="ga4_property_id"><?php esc_html_e( 'Analytics Property ID', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control" id="seo-ga4-property-wrap">
+										<input type="text" id="ga4_property_id" name="ga4_property_id" value="<?php echo esc_attr( $ga4_property_id ); ?>" class="regular-text">
+										<p class="description"><?php esc_html_e( 'Numeric GA4 property ID.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+							</div>
+						</div>
 
-				<?php
-				$ai_provider      = (string) get_option( 'seo_agent_ai_ai_provider', 'gemini' );
-				$openai_base      = (string) get_option( SEO_Agent_AI_OpenAI_Client::OPTION_BASE_URL, '' );
-				$openai_model     = (string) get_option( SEO_Agent_AI_OpenAI_Client::OPTION_MODEL, '' );
-				$email_reports    = (bool) get_option( 'seo_agent_ai_email_reports', false );
-				?>
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'AI Provider', 'seo-agent-ai' ); ?></h2>
-					<p class="description" style="margin-bottom:14px;">
-						<?php esc_html_e( 'Choose which AI backend to use for generating meta titles, descriptions, and keyword suggestions. Both providers use the same interface — you can switch at any time.', 'seo-agent-ai' ); ?>
-					</p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Provider', 'seo-agent-ai' ); ?></th>
-							<td>
-								<fieldset>
-									<label style="display:block;margin-bottom:8px;">
-										<input type="radio" name="ai_provider" value="gemini" <?php checked( $ai_provider, 'gemini' ); ?> />
-										<?php esc_html_e( 'Gemini (Google AI)', 'seo-agent-ai' ); ?>
-									</label>
-									<label style="display:block;margin-bottom:8px;">
-										<input type="radio" name="ai_provider" value="openai" <?php checked( $ai_provider, 'openai' ); ?> />
-										<?php esc_html_e( 'OpenAI-compatible (default or custom endpoint)', 'seo-agent-ai' ); ?>
-									</label>
-									<label style="display:block;">
-										<input type="radio" name="ai_provider" value="auto" <?php checked( $ai_provider, 'auto' ); ?> />
-										<?php esc_html_e( 'Auto (try Gemini first, fall back to OpenAI, then rule-based)', 'seo-agent-ai' ); ?>
-									</label>
-								</fieldset>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="openai_api_key"><?php esc_html_e( 'API Key', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="password" id="openai_api_key" name="openai_api_key" value="" class="regular-text" autocomplete="new-password" placeholder="<?php echo $openai_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'seo-agent-ai' ) : esc_attr__( 'Enter API key', 'seo-agent-ai' ); ?>" />
-								<?php if ( $openai_has_key ) : ?>
-								<span style="display:inline-block;margin-left:8px;color:#2d6a27;font-weight:600;"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
-								<?php endif; ?>
-								<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep the existing key. Enter a new key to replace it.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="openai_base_url"><?php esc_html_e( 'Base URL', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="url" id="openai_base_url" name="openai_base_url" value="<?php echo esc_attr( $openai_base ); ?>" class="regular-text" placeholder="https://api.openai.com/v1" />
-								<p class="description"><?php esc_html_e( 'Leave blank for default. Change to use a custom endpoint.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="openai_model"><?php esc_html_e( 'Model', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="text" id="openai_model" name="openai_model" value="<?php echo esc_attr( $openai_model ); ?>" class="regular-text" placeholder="gpt-4o-mini" />
-								<p class="description"><?php esc_html_e( 'Leave blank for default (gpt-4o-mini). Change to match the model available at your endpoint.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-					</table>
-				</div>
+						<?php endif; // $sitekit_active ?>
+					</div>
 
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'Content &amp; Analysis', 'seo-agent-ai' ); ?></h2>
-					<p class="description" style="margin-bottom:14px;">
-						<?php esc_html_e( 'Choose which post types the agent scans and the minimum SEO score target for improvement suggestions.', 'seo-agent-ai' ); ?>
-					</p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><label for="score_target"><?php esc_html_e( 'Score Target', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="number" id="score_target" name="score_target" value="<?php echo esc_attr( (string) $score_target ); ?>" min="1" max="100" style="width:80px;" />
-								<p class="description"><?php esc_html_e( 'Posts scoring below this threshold (1–100) are queued for improvement suggestions each week.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Post Types to Scan', 'seo-agent-ai' ); ?></th>
-							<td>
+					<?php // ------------------------------------------------------------------ ?>
+					<?php // SEO Plugin Integration ?>
+					<?php // ------------------------------------------------------------------ ?>
+					<div class="sai-settings-section">
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'SEO Plugin Integration', 'seo-agent-ai' ); ?></h2>
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-body">
 								<?php
-								$all_post_types   = get_post_types( array( 'public' => true ), 'objects' );
-								$saved_post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
-								foreach ( $all_post_types as $pt ) :
-									if ( 'attachment' === $pt->name ) {
-										continue;
-									}
+								$detected_plugins = $this->bridge->get_detected_plugins();
+								if ( ! empty( $detected_plugins ) ) :
 									?>
-									<label style="display:block;margin-bottom:6px;">
-										<input type="checkbox" name="post_types[]" value="<?php echo esc_attr( $pt->name ); ?>" <?php checked( in_array( $pt->name, $saved_post_types, true ) ); ?> />
-										<?php echo esc_html( $pt->labels->singular_name ); ?>
-										<code style="font-size:11px;color:#888;margin-left:4px"><?php echo esc_html( $pt->name ); ?></code>
+								<p class="description" style="margin-bottom:12px">
+									<?php esc_html_e( 'SEO Agent AI is automatically syncing changes with the following active plugins.', 'seo-agent-ai' ); ?>
+								</p>
+								<div style="display:flex;flex-wrap:wrap;gap:8px">
+									<?php foreach ( $detected_plugins as $slug ) : ?>
+										<span class="sai-badge b-success"><?php echo esc_html( $this->bridge->get_plugin_label( $slug ) ); ?></span>
+									<?php endforeach; ?>
+								</div>
+								<?php else : ?>
+								<div class="sai-notice n-info">
+									<p><?php esc_html_e( 'No supported SEO plugin detected. Install Yoast SEO, RankMath SEO, or SmartCrawl to automatically sync generated metadata.', 'seo-agent-ai' ); ?></p>
+								</div>
+								<?php endif; ?>
+							</div>
+						</div>
+					</div>
+
+					<?php // ------------------------------------------------------------------ ?>
+					<?php // AI Provider ?>
+					<?php // ------------------------------------------------------------------ ?>
+					<div class="sai-settings-section">
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'AI Provider', 'seo-agent-ai' ); ?></h2>
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-body">
+								<div class="sai-field">
+									<span class="sai-field-label"><?php esc_html_e( 'Provider', 'seo-agent-ai' ); ?></span>
+									<div class="sai-field-control">
+										<fieldset>
+											<label style="display:block;margin-bottom:8px">
+												<input type="radio" name="ai_provider" value="gemini" <?php checked( $ai_provider, 'gemini' ); ?>>
+												<?php esc_html_e( 'Gemini (Google AI)', 'seo-agent-ai' ); ?>
+											</label>
+											<label style="display:block;margin-bottom:8px">
+												<input type="radio" name="ai_provider" value="openai" <?php checked( $ai_provider, 'openai' ); ?>>
+												<?php esc_html_e( 'OpenAI-compatible (default or custom endpoint)', 'seo-agent-ai' ); ?>
+											</label>
+											<label style="display:block">
+												<input type="radio" name="ai_provider" value="auto" <?php checked( $ai_provider, 'auto' ); ?>>
+												<?php esc_html_e( 'Auto (try Gemini first, fall back to OpenAI, then rule-based)', 'seo-agent-ai' ); ?>
+											</label>
+										</fieldset>
+									</div>
+								</div>
+								<div class="sai-field" style="margin-top:16px">
+									<label class="sai-field-label" for="gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<div class="sai-key-input-wrap">
+											<input type="password" id="gemini_api_key" name="gemini_api_key" value="" class="regular-text" autocomplete="new-password"
+												placeholder="<?php echo $gemini_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'seo-agent-ai' ) : esc_attr__( 'Enter Gemini API key', 'seo-agent-ai' ); ?>">
+											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'seo-agent-ai' ); ?>">&#128065;</button>
+										</div>
+										<?php if ( $gemini_has_key ) : ?>
+											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
+										<?php endif; ?>
+										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<div class="sai-key-input-wrap">
+											<input type="password" id="openai_api_key" name="openai_api_key" value="" class="regular-text" autocomplete="new-password"
+												placeholder="<?php echo $openai_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'seo-agent-ai' ) : esc_attr__( 'Enter API key', 'seo-agent-ai' ); ?>">
+											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'seo-agent-ai' ); ?>">&#128065;</button>
+										</div>
+										<?php if ( $openai_has_key ) : ?>
+											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
+										<?php endif; ?>
+										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="openai_base_url"><?php esc_html_e( 'OpenAI Base URL', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="url" id="openai_base_url" name="openai_base_url" value="<?php echo esc_attr( $openai_base ); ?>" class="regular-text" placeholder="https://api.openai.com/v1">
+										<p class="description"><?php esc_html_e( 'Leave blank for default. Change to use a custom endpoint.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="openai_model"><?php esc_html_e( 'OpenAI Model', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="text" id="openai_model" name="openai_model" value="<?php echo esc_attr( $openai_model ); ?>" class="regular-text" placeholder="gpt-4o-mini">
+										<p class="description"><?php esc_html_e( 'Leave blank for default (gpt-4o-mini).', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<?php // ------------------------------------------------------------------ ?>
+					<?php // Content & Analysis ?>
+					<?php // ------------------------------------------------------------------ ?>
+					<div class="sai-settings-section">
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Content &amp; Analysis', 'seo-agent-ai' ); ?></h2>
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-body">
+								<div class="sai-field">
+									<label class="sai-field-label" for="score_target"><?php esc_html_e( 'Score Target', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="number" id="score_target" name="score_target" value="<?php echo esc_attr( (string) $score_target ); ?>" min="1" max="100" style="width:80px">
+										<p class="description"><?php esc_html_e( 'Posts scoring below this threshold (1–100) are queued for improvement.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-field">
+									<span class="sai-field-label"><?php esc_html_e( 'Post Types to Scan', 'seo-agent-ai' ); ?></span>
+									<div class="sai-field-control">
+										<?php
+										$all_post_types   = get_post_types( array( 'public' => true ), 'objects' );
+										$saved_post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+										foreach ( $all_post_types as $pt ) :
+											if ( 'attachment' === $pt->name ) {
+												continue;
+											}
+											?>
+											<label style="display:block;margin-bottom:6px">
+												<input type="checkbox" name="post_types[]" value="<?php echo esc_attr( $pt->name ); ?>" <?php checked( in_array( $pt->name, $saved_post_types, true ) ); ?>>
+												<?php echo esc_html( $pt->labels->singular_name ); ?>
+												<code style="font-size:11px;color:#888;margin-left:4px"><?php echo esc_html( $pt->name ); ?></code>
+											</label>
+										<?php endforeach; ?>
+										<p class="description"><?php esc_html_e( 'Only selected post types are included in scans and scoring.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<?php // ------------------------------------------------------------------ ?>
+					<?php // Autopilot ?>
+					<?php // ------------------------------------------------------------------ ?>
+					<div class="sai-settings-section">
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Autopilot Mode', 'seo-agent-ai' ); ?></h2>
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-body">
+								<div class="sai-toggle-wrap">
+									<label class="sai-toggle">
+										<input type="checkbox" name="autopilot_enabled" value="1" <?php checked( $autopilot ); ?> data-autopilot-toggle>
+										<span class="sai-toggle-slider"></span>
 									</label>
-								<?php endforeach; ?>
-								<p class="description"><?php esc_html_e( 'Only selected post types are included in scans, scoring, and cron analysis passes.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-					</table>
-				</div>
+									<div class="sai-toggle-info">
+										<strong><?php esc_html_e( 'Enable Autopilot', 'seo-agent-ai' ); ?></strong>
+										<span><?php esc_html_e( 'Allow the agent to apply safe, high-confidence changes automatically during scheduled analysis.', 'seo-agent-ai' ); ?></span>
+									</div>
+								</div>
+								<div class="sai-field" style="margin-top:16px">
+									<label class="sai-field-label" for="autopilot_max_daily"><?php esc_html_e( 'Max Changes Per Day', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="number" id="autopilot_max_daily" name="autopilot_max_daily" value="<?php echo esc_attr( (string) $max_daily ); ?>" min="1" max="50" style="width:80px">
+										<p class="description"><?php esc_html_e( 'Hard safety limit. Recommended: 5.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-field">
+									<label class="sai-field-label" for="autopilot_min_confidence"><?php esc_html_e( 'Minimum Confidence', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="number" id="autopilot_min_confidence" name="autopilot_min_confidence" value="<?php echo esc_attr( (string) $min_confidence ); ?>" min="0.1" max="1.0" step="0.05" style="width:80px">
+										<p class="description"><?php esc_html_e( 'Only apply changes at or above this score (0.0–1.0). Recommended: 0.70.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'Autopilot Mode', 'seo-agent-ai' ); ?></h2>
-					<p class="description" style="margin-bottom:14px;">
-						<?php esc_html_e( 'When enabled, the agent automatically applies safe, high-confidence changes during scheduled analysis.', 'seo-agent-ai' ); ?>
-					</p>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Enable Autopilot', 'seo-agent-ai' ); ?></th>
-							<td>
-								<label>
-									<input type="checkbox" name="autopilot_enabled" value="1" <?php checked( $autopilot ); ?> />
-									<?php esc_html_e( 'Allow the agent to apply safe changes automatically', 'seo-agent-ai' ); ?>
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="autopilot_max_daily"><?php esc_html_e( 'Max Changes Per Day', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="number" id="autopilot_max_daily" name="autopilot_max_daily" value="<?php echo esc_attr( (string) $max_daily ); ?>" min="1" max="50" style="width:80px;" />
-								<p class="description"><?php esc_html_e( 'Hard safety limit. The agent stops making changes after reaching this number per day.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><label for="autopilot_min_confidence"><?php esc_html_e( 'Minimum Confidence', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="number" id="autopilot_min_confidence" name="autopilot_min_confidence" value="<?php echo esc_attr( (string) $min_confidence ); ?>" min="0.1" max="1.0" step="0.05" style="width:80px;" />
-								<p class="description"><?php esc_html_e( 'Only apply changes at or above this confidence score (0.0–1.0). Recommended: 0.70.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-					</table>
-				</div>
+					<?php // ------------------------------------------------------------------ ?>
+					<?php // Maintenance ?>
+					<?php // ------------------------------------------------------------------ ?>
+					<div class="sai-settings-section">
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Maintenance', 'seo-agent-ai' ); ?></h2>
+						<div class="sai-card" style="margin-bottom:16px">
+							<div class="sai-card-body">
+								<div class="sai-field">
+									<label class="sai-field-label" for="log_retention_days"><?php esc_html_e( 'Log Retention (days)', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="number" id="log_retention_days" name="log_retention_days" value="<?php echo esc_attr( (string) $log_retention ); ?>" min="7" max="730" style="width:80px">
+										<p class="description"><?php esc_html_e( 'Log entries older than this many days are deleted automatically.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
+								<div class="sai-toggle-wrap" style="margin-top:12px">
+									<label class="sai-toggle">
+										<input type="checkbox" name="email_reports" value="1" <?php checked( $email_reports ); ?>>
+										<span class="sai-toggle-slider"></span>
+									</label>
+									<div class="sai-toggle-info">
+										<strong><?php esc_html_e( 'Email Daily Reports', 'seo-agent-ai' ); ?></strong>
+										<span><?php esc_html_e( 'Send the daily SEO summary report to the admin email address.', 'seo-agent-ai' ); ?></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-				<div class="seo-agent-card seo-agent-settings-section">
-					<h2><?php esc_html_e( 'Maintenance', 'seo-agent-ai' ); ?></h2>
-					<table class="form-table" role="presentation">
-						<tr>
-							<th scope="row"><label for="log_retention_days"><?php esc_html_e( 'Activity Log Retention (days)', 'seo-agent-ai' ); ?></label></th>
-							<td>
-								<input type="number" id="log_retention_days" name="log_retention_days" value="<?php echo esc_attr( (string) $log_retention ); ?>" min="7" max="730" style="width:80px;" />
-								<p class="description"><?php esc_html_e( 'Log entries older than this many days are deleted automatically.', 'seo-agent-ai' ); ?></p>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Email Daily Reports', 'seo-agent-ai' ); ?></th>
-							<td>
-								<label>
-									<input type="checkbox" name="email_reports" value="1" <?php checked( isset( $email_reports ) ? $email_reports : false ); ?> />
-									<?php esc_html_e( 'Send the daily SEO summary report to the admin email address', 'seo-agent-ai' ); ?>
-								</label>
-							</td>
-						</tr>
-					</table>
-				</div>
-
-				<p>
-					<button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'seo-agent-ai' ); ?></button>
-				</p>
-			</form>
-
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:12px;">
-				<?php wp_nonce_field( 'seo_agent_ai_test_connection' ); ?>
-				<input type="hidden" name="action" value="seo_agent_ai_test_connection" />
-				<button type="submit" class="button button-secondary"><?php esc_html_e( 'Test Connection', 'seo-agent-ai' ); ?></button>
-			</form>
+					<div style="margin-top:8px">
+						<button type="submit" class="sai-btn sai-btn-primary"><span class="btn-label"><?php esc_html_e( 'Save Settings', 'seo-agent-ai' ); ?></span></button>
+					</div>
+				</form>
+			</div>
 		</div>
 
-		<?php if ( $is_connected ) : ?>
+		<?php if ( $is_connected && ! $sitekit_active ) : ?>
 		<script>
 		(function($) {
 			'use strict';
@@ -927,7 +963,7 @@ class SEO_Agent_AI_Admin_Page {
 				function loadGSCSites() {
 					var $wrap = $('#seo-gsc-property-wrap');
 					var currentVal = <?php echo wp_json_encode( $gsc_site_url ); ?>;
-					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Search Console properties\u2026', 'seo-agent-ai' ) ); ?>'));
+					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Search Console properties…', 'seo-agent-ai' ) ); ?>'));
 
 					$.post(ajaxurl, { action: 'seo_agent_ai_list_gsc_sites', _ajax_nonce: nonce })
 						.done(function(response) {
@@ -964,7 +1000,7 @@ class SEO_Agent_AI_Admin_Page {
 				function loadGA4Properties() {
 					var $wrap = $('#seo-ga4-property-wrap');
 					var currentVal = <?php echo wp_json_encode( $ga4_property_id ); ?>;
-					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Analytics properties\u2026', 'seo-agent-ai' ) ); ?>'));
+					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Analytics properties…', 'seo-agent-ai' ) ); ?>'));
 
 					$.post(ajaxurl, { action: 'seo_agent_ai_list_ga4_properties', _ajax_nonce: nonce })
 						.done(function(response) {
@@ -1006,6 +1042,7 @@ class SEO_Agent_AI_Admin_Page {
 		<?php endif; ?>
 		<?php
 	}
+
 
 	// -------------------------------------------------------------------
 	// Helpers

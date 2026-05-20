@@ -39,6 +39,7 @@ require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-sitekit-bridge.ph
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-google-oauth.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-gsc-client.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-ga4-client.php';
+require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-pagespeed-client.php';
 
 // AI clients.
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-gemini-client.php';
@@ -59,9 +60,11 @@ require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-fix-executor.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-gsc-opportunity-analyzer.php';
 
 // Autonomous systems.
+require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-search-intent.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-internal-link-engine.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-report-engine.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-queue-manager.php';
+require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-content-expander.php';
 
 // Admin pages.
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/admin/class-connect-page.php';

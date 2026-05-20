@@ -35,28 +35,34 @@ class SEO_Agent_AI_Activity_Log_Page {
 
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'activity'; // phpcs:ignore WordPress.Security.NonceVerification
 		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'Audit & Debug Log', 'seo-agent-ai' ); ?></h1>
+		<div class="wrap sai-page">
+			<div class="sai-header">
+				<div class="sai-header-left">
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Audit &amp; Debug Log', 'seo-agent-ai' ); ?></h1>
+				</div>
+				<div class="sai-header-actions">
+					<nav class="sai-nav">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=activity' ) ); ?>"
+							class="sai-nav-tab<?php echo 'activity' === $tab ? ' active' : ''; ?>">
+							<?php esc_html_e( 'Activity Log', 'seo-agent-ai' ); ?>
+						</a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug' ) ); ?>"
+							class="sai-nav-tab<?php echo 'debug' === $tab ? ' active' : ''; ?>">
+							<?php esc_html_e( 'Debug Log', 'seo-agent-ai' ); ?>
+						</a>
+					</nav>
+				</div>
+			</div>
 
-			<nav class="nav-tab-wrapper" style="margin-bottom:0;">
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=activity' ) ); ?>"
-					class="nav-tab <?php echo 'activity' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Activity Log', 'seo-agent-ai' ); ?>
-				</a>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug' ) ); ?>"
-					class="nav-tab <?php echo 'debug' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Debug Log', 'seo-agent-ai' ); ?>
-				</a>
-			</nav>
-
-			<div style="background:#fff;border:1px solid #c3c4c7;border-top:none;padding:20px;">
-			<?php
-			if ( 'debug' === $tab ) {
-				$this->render_debug_tab();
-			} else {
-				$this->render_activity_tab();
-			}
-			?>
+			<div class="sai-body">
+				<?php
+				if ( 'debug' === $tab ) {
+					$this->render_debug_tab();
+				} else {
+					$this->render_activity_tab();
+				}
+				?>
 			</div>
 		</div>
 		<?php
@@ -84,97 +90,110 @@ class SEO_Agent_AI_Activity_Log_Page {
 		$total   = $this->activity_log->get_count( $filters );
 
 		// Filter bar.
-		echo '<form method="get" style="margin-bottom:12px;">';
+		echo '<form method="get" class="sai-filters" style="margin-bottom:16px">';
 		echo '<input type="hidden" name="page" value="seo-agent-log">';
 		echo '<input type="hidden" name="tab" value="activity">';
 
+		echo '<label>';
 		echo '<select name="status">';
 		echo '<option value=""' . selected( $status, '', false ) . '>' . esc_html__( 'All Statuses', 'seo-agent-ai' ) . '</option>';
 		echo '<option value="applied"' . selected( $status, 'applied', false ) . '>' . esc_html__( 'Applied', 'seo-agent-ai' ) . '</option>';
 		echo '<option value="rolled_back"' . selected( $status, 'rolled_back', false ) . '>' . esc_html__( 'Rolled Back', 'seo-agent-ai' ) . '</option>';
 		echo '<option value="skipped"' . selected( $status, 'skipped', false ) . '>' . esc_html__( 'Skipped', 'seo-agent-ai' ) . '</option>';
-		echo '</select>';
+		echo '</select></label>';
 
-		echo ' <select name="trigger">';
+		echo '<label>';
+		echo '<select name="trigger">';
 		echo '<option value=""' . selected( $trigger, '', false ) . '>' . esc_html__( 'All Triggers', 'seo-agent-ai' ) . '</option>';
 		echo '<option value="autopilot"' . selected( $trigger, 'autopilot', false ) . '>' . esc_html__( 'Autopilot', 'seo-agent-ai' ) . '</option>';
 		echo '<option value="manual"' . selected( $trigger, 'manual', false ) . '>' . esc_html__( 'Manual', 'seo-agent-ai' ) . '</option>';
 		echo '<option value="rollback"' . selected( $trigger, 'rollback', false ) . '>' . esc_html__( 'Rollback', 'seo-agent-ai' ) . '</option>';
-		echo '</select>';
+		echo '</select></label>';
 
-		echo ' ';
-		submit_button( __( 'Filter', 'seo-agent-ai' ), 'secondary', 'submit', false );
+		echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'Filter', 'seo-agent-ai' ) . '</span></button>';
 		echo '</form>';
 
 		if ( empty( $entries ) ) {
-			echo '<p>' . esc_html__( 'No activity logged yet. Changes made by SEO Agent AI will appear here.', 'seo-agent-ai' ) . '</p>';
+			echo '<div class="sai-empty">';
+			echo '<div class="sai-empty-icon">&#128203;</div>';
+			echo '<h3>' . esc_html__( 'No activity yet', 'seo-agent-ai' ) . '</h3>';
+			echo '<p>' . esc_html__( 'Changes made by SEO Agent AI will appear here.', 'seo-agent-ai' ) . '</p>';
+			echo '</div>';
 			return;
 		}
 
-		echo '<table class="wp-list-table widefat fixed striped">';
-		echo '<thead><tr>';
-		echo '<th style="width:40px;">ID</th>';
-		echo '<th>' . esc_html__( 'Post', 'seo-agent-ai' ) . '</th>';
-		echo '<th style="width:120px;">' . esc_html__( 'Change Type', 'seo-agent-ai' ) . '</th>';
-		echo '<th style="width:100px;">' . esc_html__( 'Field', 'seo-agent-ai' ) . '</th>';
-		echo '<th>' . esc_html__( 'Before → After', 'seo-agent-ai' ) . '</th>';
-		echo '<th style="width:70px;">' . esc_html__( 'Trigger', 'seo-agent-ai' ) . '</th>';
-		echo '<th style="width:70px;">' . esc_html__( 'Status', 'seo-agent-ai' ) . '</th>';
-		echo '<th style="width:130px;">' . esc_html__( 'When', 'seo-agent-ai' ) . '</th>';
-		echo '</tr></thead><tbody>';
-
+		echo '<div class="sai-timeline">';
 		foreach ( $entries as $e ) {
 			$post_id    = (int) $e['post_id'];
 			$post       = $post_id ? get_post( $post_id ) : null;
 			$post_title = $post instanceof WP_Post ? $post->post_title : ( $post_id ? "(#{$post_id})" : __( 'System', 'seo-agent-ai' ) );
 			$edit_url   = $post instanceof WP_Post ? get_edit_post_link( $post_id ) : '';
 
-			$status_colors = array(
-				'applied'     => '#00a32a',
-				'rolled_back' => '#d63638',
-				'skipped'     => '#646970',
-			);
-			$s_color       = $status_colors[ $e['status'] ] ?? '#646970';
-
-			echo '<tr>';
-			echo '<td>' . esc_html( $e['id'] ) . '</td>';
-			echo '<td>';
-			if ( $edit_url ) {
-				echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( $post_title ) . '</a>';
-			} else {
-				echo esc_html( $post_title );
+			$change_type = (string) $e['change_type'];
+			$icon_class  = 'default';
+			if ( false !== strpos( $change_type, 'meta' ) ) {
+				$icon_class = 't-meta';
+			} elseif ( false !== strpos( $change_type, 'link' ) ) {
+				$icon_class = 't-link';
+			} elseif ( false !== strpos( $change_type, 'schema' ) ) {
+				$icon_class = 't-schema';
+			} elseif ( false !== strpos( $change_type, 'image' ) ) {
+				$icon_class = 't-image';
 			}
-			echo '</td>';
-			echo '<td><code>' . esc_html( $e['change_type'] ) . '</code></td>';
-			echo '<td>' . esc_html( $e['field_changed'] ) . '</td>';
-			echo '<td style="font-size:11px;">';
-			echo '<span style="color:#646970;">' . esc_html( wp_trim_words( $e['value_before'], 8, '…' ) ) . '</span>';
-			echo ' → <strong>' . esc_html( wp_trim_words( $e['value_after'], 8, '…' ) ) . '</strong>';
-			echo '</td>';
-			echo '<td><span style="font-size:11px;">' . esc_html( $e['triggered_by'] ) . '</span></td>';
-			echo '<td><span style="color:' . esc_attr( $s_color ) . ';font-weight:600;font-size:11px;">' . esc_html( $e['status'] ) . '</span></td>';
-			echo '<td style="font-size:11px;">' . esc_html( $e['created_at'] ) . '</td>';
-			echo '</tr>';
-		}
 
-		echo '</tbody></table>';
+			echo '<div class="sai-timeline-item">';
+			echo '<div class="sai-timeline-icon ' . esc_attr( $icon_class ) . '"></div>';
+			echo '<div class="sai-timeline-body">';
+
+			echo '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">';
+			if ( $edit_url ) {
+				echo '<strong><a href="' . esc_url( $edit_url ) . '">' . esc_html( $post_title ) . '</a></strong>';
+			} else {
+				echo '<strong>' . esc_html( $post_title ) . '</strong>';
+			}
+			echo '<code style="font-size:11px">' . esc_html( $change_type ) . '</code>';
+			echo '<span class="sai-badge b-neutral">' . esc_html( $e['field_changed'] ) . '</span>';
+			echo '<span class="sai-status s-' . esc_attr( $e['status'] ) . '">' . esc_html( $e['status'] ) . '</span>';
+			echo '<span class="sai-badge b-primary">' . esc_html( $e['triggered_by'] ) . '</span>';
+			echo '</div>';
+
+			if ( '' !== $e['value_before'] || '' !== $e['value_after'] ) {
+				echo '<div class="sai-timeline-diff">';
+				echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $e['value_before'], 12, '…' ) ) . '</div>';
+				echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $e['value_after'], 12, '…' ) ) . '</div>';
+				echo '</div>';
+			}
+
+			echo '<div class="sai-timeline-meta">' . esc_html( $e['created_at'] ) . '</div>';
+			echo '</div>';
+			echo '</div>';
+		}
+		echo '</div>';
 
 		// Pagination.
 		$pages = (int) ceil( $total / $per_page );
 		if ( $pages > 1 ) {
-			echo '<div class="tablenav-pages" style="margin-top:8px;">';
-			echo paginate_links( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<div class="sai-pagination" style="margin-top:16px">';
+			$paginate = paginate_links( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				array(
-					'base'    => add_query_arg( 'paged', '%#%' ),
-					'format'  => '',
-					'current' => $paged,
-					'total'   => $pages,
+					'base'      => add_query_arg( 'paged', '%#%' ),
+					'format'    => '',
+					'current'   => $paged,
+					'total'     => $pages,
+					'type'      => 'array',
+					'prev_text' => '&laquo;',
+					'next_text' => '&raquo;',
 				)
 			);
+			if ( is_array( $paginate ) ) {
+				foreach ( $paginate as $link ) {
+					echo wp_kses_post( '<span class="sai-page-btn">' . $link . '</span>' );
+				}
+			}
 			echo '</div>';
 		}
 
-		echo '<p style="color:#646970;margin-top:8px;font-size:12px;">' .
+		echo '<p style="color:#787c82;margin-top:8px;font-size:12px">' .
 			esc_html(
 				sprintf(
 				/* translators: %d: total entries */
@@ -194,36 +213,39 @@ class SEO_Agent_AI_Activity_Log_Page {
 		$log_path    = $this->logger->get_log_path();
 		$log_entries = $this->logger->tail( $lines, $level );
 
-		echo '<form method="get" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;">';
+		echo '<div class="sai-card" style="margin-bottom:16px">';
+		echo '<div class="sai-card-body">';
+		echo '<form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
 		echo '<input type="hidden" name="page" value="seo-agent-log">';
 		echo '<input type="hidden" name="tab" value="debug">';
 
+		echo '<label>';
 		echo '<select name="level">';
 		echo '<option value=""' . selected( $level, '', false ) . '>' . esc_html__( 'All Levels', 'seo-agent-ai' ) . '</option>';
 		foreach ( array( 'ERROR', 'WARNING', 'INFO', 'DEBUG' ) as $l ) {
 			echo '<option value="' . esc_attr( strtolower( $l ) ) . '"' . selected( $level, strtolower( $l ), false ) . '>' . esc_html( $l ) . '</option>';
 		}
-		echo '</select>';
+		echo '</select></label>';
 
-		echo ' <label style="font-size:13px;">' . esc_html__( 'Lines:', 'seo-agent-ai' ) . ' ';
+		echo '<label style="font-size:13px">' . esc_html__( 'Lines:', 'seo-agent-ai' ) . ' ';
 		echo '<select name="lines">';
 		foreach ( array( 50, 100, 250, 500 ) as $n ) {
 			echo '<option value="' . esc_attr( $n ) . '"' . selected( $lines, $n, false ) . '>' . esc_html( $n ) . '</option>';
 		}
 		echo '</select></label>';
 
-		echo ' ';
-		submit_button( __( 'Apply', 'seo-agent-ai' ), 'secondary', 'submit', false );
+		echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'Apply', 'seo-agent-ai' ) . '</span></button>';
 		echo '</form>';
+		echo '</div></div>';
 
 		if ( ! file_exists( $log_path ) ) {
-			echo '<div class="notice notice-info inline"><p>' .
+			echo '<div class="sai-notice n-info"><p>' .
 				esc_html__( 'No debug log file yet — it will appear here once SEO Agent AI processes its first cron or analysis.', 'seo-agent-ai' ) .
 				'</p></div>';
 			return;
 		}
 
-		echo '<p style="color:#646970;font-size:12px;margin:0 0 8px;">' .
+		echo '<p style="color:#787c82;font-size:12px;margin:0 0 8px">' .
 			esc_html(
 				sprintf(
 				/* translators: 1: line count, 2: file path */
@@ -234,31 +256,34 @@ class SEO_Agent_AI_Activity_Log_Page {
 			) . '</p>';
 
 		if ( empty( $log_entries ) ) {
-			echo '<p>' . esc_html__( 'No log entries match the current filter.', 'seo-agent-ai' ) . '</p>';
+			echo '<div class="sai-empty"><p>' . esc_html__( 'No log entries match the current filter.', 'seo-agent-ai' ) . '</p></div>';
 			return;
 		}
 
-		echo '<div style="background:#1d2327;border-radius:4px;padding:12px 16px;overflow-x:auto;max-height:600px;overflow-y:auto;">';
-		echo '<pre style="margin:0;font-family:monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;">';
+		echo '<div class="sai-card">';
+		echo '<div class="sai-card-body">';
+		echo '<pre class="sai-code" style="background:#1d2327;color:#c3c4c7;border-radius:4px;padding:12px 16px;overflow-x:auto;max-height:600px;overflow-y:auto;margin:0;font-size:12px;line-height:1.6;white-space:pre-wrap">';
+
 		foreach ( array_reverse( $log_entries ) as $line ) {
 			$line  = esc_html( $line );
-			$color = '#c3c4c7'; // default.
-			if ( strpos( $line, '[ERROR]' ) !== false ) {
+			$color = '#c3c4c7';
+			if ( false !== strpos( $line, '[ERROR]' ) ) {
 				$color = '#f86368';
-			} elseif ( strpos( $line, '[WARNING]' ) !== false ) {
+			} elseif ( false !== strpos( $line, '[WARNING]' ) ) {
 				$color = '#f0c33c';
-			} elseif ( strpos( $line, '[INFO]' ) !== false ) {
+			} elseif ( false !== strpos( $line, '[INFO]' ) ) {
 				$color = '#72aee6';
-			} elseif ( strpos( $line, '[DEBUG]' ) !== false ) {
+			} elseif ( false !== strpos( $line, '[DEBUG]' ) ) {
 				$color = '#8c8f94';
 			}
-			echo '<span style="color:' . esc_attr( $color ) . ';">' . $line . '</span>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $line is already esc_html'd above.
+			echo '<span style="color:' . esc_attr( $color ) . '">' . $line . '</span>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $line is already esc_html'd above.
 		}
-		echo '</pre></div>';
+		echo '</pre>';
+		echo '</div></div>';
 
-		echo '<p style="margin-top:8px;">';
-		echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug&clear=1&_wpnonce=' . wp_create_nonce( 'seo_agent_ai_clear_log' ) ) ) . '" class="button button-small" onclick="return confirm(\'' . esc_js( __( 'Clear the debug log file?', 'seo-agent-ai' ) ) . '\')">';
-		esc_html_e( 'Clear Log', 'seo-agent-ai' );
+		echo '<p style="margin-top:8px">';
+		echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug&clear=1&_wpnonce=' . wp_create_nonce( 'seo_agent_ai_clear_log' ) ) ) . '" class="sai-btn sai-btn-danger sai-btn-sm" onclick="return confirm(\'' . esc_js( __( 'Clear the debug log file?', 'seo-agent-ai' ) ) . '\')">';
+		echo '<span class="btn-label">' . esc_html__( 'Clear Log', 'seo-agent-ai' ) . '</span>';
 		echo '</a>';
 		echo '</p>';
 

@@ -2,10 +2,10 @@
 /**
  * SEO Scoring Engine.
  *
- * Produces a multi-dimensional 0-100 score per page across 7 dimensions,
+ * Produces a multi-dimensional 0-100 score per page across 8 dimensions,
  * saves snapshots to the page_insights table, and tracks trends over time.
  *
- * Dimensions (max points):
+ * Dimensions (max points, raw total = 110):
  *   metadata      — 20
  *   content       — 20
  *   internal_links— 15
@@ -13,6 +13,9 @@
  *   engagement    — 15
  *   freshness     — 10
  *   ctr           — 10
+ *   cwv           — 10  (Core Web Vitals — cached PageSpeed Insights data)
+ *
+ * Raw totals are normalised: final = min(100, round(raw * 100 / 110)).
  *
  * @package SEO_Agent_AI
  */
@@ -91,7 +94,16 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 		$signals      = array_merge( $signals, $s );
 		$improvements = array_merge( $improvements, $i );
 
-		$overall = min( 100, array_sum( $dim_scores ) );
+		// 8. Core Web Vitals (0-10) — reads cached PageSpeed transient only, no live fetch.
+		$cwv_url = get_permalink( $post->ID );
+		list( $dim_scores['cwv'], $s, $i ) = $this->score_cwv( $post->ID, $cwv_url ? $cwv_url : '' );
+		$signals      = array_merge( $signals, $s );
+		$improvements = array_merge( $improvements, $i );
+
+		// Raw max is 110 (7 original dims summing to 100 + 10 for CWV).
+		// Normalise to a 0-100 scale so existing score targets remain meaningful.
+		$raw_total = array_sum( $dim_scores );
+		$overall   = min( 100, (int) round( $raw_total * 100 / 110 ) );
 
 		$result = array(
 			'overall'      => $overall,
@@ -380,6 +392,100 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 		}
 
 		return array( min( 10, $score ), $s, $i );
+	}
+
+	/**
+	 * Score based on Core Web Vitals (cached PageSpeed data only — no live fetch during scoring).
+	 * If no cached data exists, returns a neutral mid-score (5/10) so it does not unfairly penalise.
+	 *
+	 * @param int    $post_id
+	 * @param string $url
+	 * @return array [score (0-10), signals[], improvements[]]
+	 */
+	private function score_cwv( $post_id, $url ) {
+		$s = array();
+		$i = array();
+
+		if ( '' === $url ) {
+			return array( 5, $s, $i );
+		}
+
+		$cache_key = 'sai_psi_' . md5( $url . 'mobile' );
+		$metrics   = get_transient( $cache_key );
+
+		if ( ! is_array( $metrics ) ) {
+			// No cached data — neutral score, do not penalise.
+			return array( 5, array( 'No cached Core Web Vitals data yet — neutral CWV score applied.' ), $i );
+		}
+
+		$lcp  = (int) ( $metrics['lcp_ms'] ?? 0 );
+		$cls  = (float) ( $metrics['cls'] ?? 0 );
+		$perf = (int) ( $metrics['performance'] ?? 0 );
+
+		// Base score on Lighthouse performance (0-100 → 0-10).
+		$score = (int) round( $perf / 10 );
+
+		// Penalty for poor LCP.
+		if ( $lcp >= 4000 ) {
+			$score -= 4;
+			$i[]    = sprintf(
+				/* translators: %d: LCP time in milliseconds. */
+				__( 'LCP is poor (%dms — threshold 4,000ms). Optimise largest image or text block above the fold.', 'seo-agent-ai' ),
+				$lcp
+			);
+		} elseif ( $lcp >= 2500 ) {
+			$score -= 2;
+			$i[]    = sprintf(
+				/* translators: %d: LCP time in milliseconds. */
+				__( 'LCP needs improvement (%dms — threshold 2,500ms). Consider lazy-loading below-fold images and preloading the LCP element.', 'seo-agent-ai' ),
+				$lcp
+			);
+		} else {
+			$s[] = sprintf(
+				/* translators: %d: LCP time in milliseconds. */
+				__( 'Good LCP (%dms).', 'seo-agent-ai' ),
+				$lcp
+			);
+		}
+
+		// Penalty for poor CLS.
+		if ( $cls >= 0.25 ) {
+			$score -= 3;
+			$i[]    = sprintf(
+				/* translators: %.2f: CLS score. */
+				__( 'CLS is poor (%.2f — threshold 0.25). Reserve space for ads and images to prevent layout shifts.', 'seo-agent-ai' ),
+				$cls
+			);
+		} elseif ( $cls >= 0.1 ) {
+			$score -= 1;
+			$i[]    = sprintf(
+				/* translators: %.2f: CLS score. */
+				__( 'CLS needs improvement (%.2f — threshold 0.1). Ensure embedded media has explicit width/height attributes.', 'seo-agent-ai' ),
+				$cls
+			);
+		} else {
+			$s[] = sprintf(
+				/* translators: %.2f: CLS score. */
+				__( 'Good CLS (%.2f).', 'seo-agent-ai' ),
+				$cls
+			);
+		}
+
+		if ( $perf >= 90 ) {
+			$s[] = sprintf(
+				/* translators: %d: Lighthouse performance score. */
+				__( 'Excellent Lighthouse performance score (%d/100).', 'seo-agent-ai' ),
+				$perf
+			);
+		} elseif ( $perf < 50 ) {
+			$i[] = sprintf(
+				/* translators: %d: Lighthouse performance score. */
+				__( 'Low Lighthouse performance score (%d/100). Review PageSpeed Insights for actionable opportunities.', 'seo-agent-ai' ),
+				$perf
+			);
+		}
+
+		return array( max( 0, min( 10, $score ) ), $s, $i );
 	}
 
 	// -------------------------------------------------------------------

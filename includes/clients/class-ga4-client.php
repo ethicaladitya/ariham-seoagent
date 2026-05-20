@@ -13,7 +13,7 @@ class SEO_Agent_AI_GA4_Client {
 
 	private $google_auth;
 
-	public function __construct( SEO_Agent_AI_Google_OAuth $google_auth = null ) {
+	public function __construct( ?SEO_Agent_AI_Google_OAuth $google_auth = null ) {
 		$this->google_auth = $google_auth ? $google_auth : new SEO_Agent_AI_Google_OAuth();
 	}
 

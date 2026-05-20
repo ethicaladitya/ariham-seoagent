@@ -130,6 +130,24 @@ class SEO_Agent_AI_OpenAI_Client {
 	}
 
 	/**
+	 * Complete a prompt allowing a larger token output (for content generation).
+	 *
+	 * @param string $prompt
+	 * @param int    $max_tokens  Maximum tokens in the response (default 800).
+	 * @return string|WP_Error  Response text or WP_Error on failure.
+	 */
+	public function complete_long( $prompt, $max_tokens = 800 ) {
+		if ( ! $this->is_configured() ) {
+			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'seo-agent-ai' ) );
+		}
+		$result = $this->chat( (string) $prompt, (int) $max_tokens );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		return is_string( $result ) ? $result : '';
+	}
+
+	/**
 	 * Send a prompt WITH an image URL for vision-based generation (e.g., alt text).
 	 *
 	 * Uses the configured model if it supports vision, otherwise upgrades to

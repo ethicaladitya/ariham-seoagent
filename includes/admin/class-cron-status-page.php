@@ -90,89 +90,123 @@ class SEO_Agent_AI_Cron_Status_Page {
 
 		if ( ! empty( $_GET['triggered'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			$hook = sanitize_key( $_GET['triggered'] ); // phpcs:ignore WordPress.Security.NonceVerification
-			echo '<div class="notice notice-success is-dismissible"><p>';
+			echo '<div class="sai-notice n-success" style="margin-bottom:16px"><p>';
 			echo esc_html( sprintf( __( 'Hook "%s" triggered manually.', 'seo-agent-ai' ), $hook ) );
 			echo '</p></div>';
 		}
 
 		?>
-		<div class="wrap seo-agent-ai-cron">
-			<h1><?php esc_html_e( 'Cron Status', 'seo-agent-ai' ); ?></h1>
-			<p class="description">
-				<?php esc_html_e( 'All scheduled SEO Agent cron jobs. Use "Run Now" to trigger any job immediately.', 'seo-agent-ai' ); ?>
-			</p>
-
-			<table class="widefat striped seo-agent-table">
-				<thead><tr>
-					<th><?php esc_html_e( 'Hook', 'seo-agent-ai' ); ?></th>
-					<th><?php esc_html_e( 'Schedule', 'seo-agent-ai' ); ?></th>
-					<th><?php esc_html_e( 'Next Run', 'seo-agent-ai' ); ?></th>
-					<th><?php esc_html_e( 'Last Run', 'seo-agent-ai' ); ?></th>
-					<th><?php esc_html_e( 'Status', 'seo-agent-ai' ); ?></th>
-					<th><?php esc_html_e( 'Description', 'seo-agent-ai' ); ?></th>
-					<th><?php esc_html_e( 'Action', 'seo-agent-ai' ); ?></th>
-				</tr></thead>
-				<tbody>
-				<?php foreach ( self::cron_hooks() as $hook => $info ) : ?>
+		<div class="wrap sai-page">
+			<div class="sai-header">
+				<div class="sai-header-left">
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Cron Status', 'seo-agent-ai' ); ?></h1>
+				</div>
+				<div class="sai-header-actions">
 					<?php
-					$next_run  = wp_next_scheduled( $hook );
-					$last_run  = (string) get_option( 'seo_agent_ai_last_run_' . $hook, '' );
-					$scheduled = $next_run !== false;
-					$next_str  = $scheduled ? $this->human_time( $next_run ) : __( 'Not scheduled', 'seo-agent-ai' );
-					$last_str  = $last_run !== '' ? $last_run : __( 'Never', 'seo-agent-ai' );
-					$status_cls = $scheduled ? 'cron-ok' : 'cron-error';
-					$status_lbl = $scheduled ? __( 'Scheduled', 'seo-agent-ai' ) : __( 'Missing', 'seo-agent-ai' );
+					// Trigger-all: loop and emit one button that triggers the main daily analysis.
+					$main_hook  = 'seo_agent_ai_daily_analysis';
+					$main_nonce = wp_create_nonce( 'seo_agent_ai_trigger_' . $main_hook );
 					?>
-					<tr>
-						<td><code><?php echo esc_html( $hook ); ?></code></td>
-						<td><?php echo esc_html( $info['schedule'] ); ?></td>
-						<td><?php echo esc_html( $next_str ); ?></td>
-						<td><?php echo esc_html( $last_str ); ?></td>
-						<td><span class="cron-status <?php echo esc_attr( $status_cls ); ?>"><?php echo esc_html( $status_lbl ); ?></span></td>
-						<td class="description"><?php echo esc_html( $info['description'] ); ?></td>
-						<td>
-							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-								<input type="hidden" name="action" value="seo_agent_ai_trigger_cron">
-								<input type="hidden" name="hook" value="<?php echo esc_attr( $hook ); ?>">
-								<?php wp_nonce_field( 'seo_agent_ai_trigger_' . $hook ); ?>
-								<button type="submit" class="button button-small"><?php esc_html_e( 'Run Now', 'seo-agent-ai' ); ?></button>
-							</form>
-						</td>
-					</tr>
-				<?php endforeach; ?>
-				</tbody>
-			</table>
+					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+						<input type="hidden" name="action" value="seo_agent_ai_trigger_cron">
+						<input type="hidden" name="hook" value="<?php echo esc_attr( $main_hook ); ?>">
+						<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $main_nonce ); ?>">
+						<button type="submit" class="sai-btn sai-btn-primary">
+							<span class="btn-label"><?php esc_html_e( 'Run Daily Analysis Now', 'seo-agent-ai' ); ?></span>
+						</button>
+					</form>
+				</div>
+			</div>
 
-			<h2><?php esc_html_e( 'Queue Status', 'seo-agent-ai' ); ?></h2>
-			<?php $this->render_queue_status(); ?>
+			<div class="sai-body">
+				<p class="description" style="margin-bottom:16px">
+					<?php esc_html_e( 'All scheduled SEO Agent cron jobs. Use "Run Now" to trigger any job immediately.', 'seo-agent-ai' ); ?>
+				</p>
+
+				<div class="sai-cron-grid">
+					<?php foreach ( self::cron_hooks() as $hook => $info ) : ?>
+						<?php
+						$next_run  = wp_next_scheduled( $hook );
+						$last_run  = (string) get_option( 'seo_agent_ai_last_run_' . $hook, '' );
+						$scheduled = $next_run !== false;
+
+						// Determine indicator class.
+						if ( ! $scheduled ) {
+							$indicator = 'ci-miss';
+						} elseif ( $next_run < time() - 3600 ) {
+							$indicator = 'ci-late'; // overdue by more than an hour.
+						} else {
+							$indicator = 'ci-ok';
+						}
+
+						$next_str = $scheduled ? $this->human_time( $next_run ) : __( 'Not scheduled', 'seo-agent-ai' );
+						$last_str = $last_run !== '' ? $last_run : __( 'Never', 'seo-agent-ai' );
+						$nonce    = wp_create_nonce( 'seo_agent_ai_trigger_' . $hook );
+						?>
+						<div class="sai-cron-job">
+							<div class="sai-cron-indicator <?php echo esc_attr( $indicator ); ?>"></div>
+							<div class="sai-cron-body">
+								<div class="sai-cron-name"><?php echo esc_html( $hook ); ?></div>
+								<div class="sai-cron-next">
+									<?php echo esc_html( $next_str ); ?>
+									<?php if ( $last_run !== '' ) : ?>
+										<span style="color:#787c82;font-size:11px"> &mdash; <?php echo esc_html__( 'Last:', 'seo-agent-ai' ) . ' ' . esc_html( $last_str ); ?></span>
+									<?php endif; ?>
+								</div>
+								<div class="sai-cron-schedule"><?php echo esc_html( $info['schedule'] ); ?></div>
+								<div style="margin-top:8px;font-size:12px;color:#787c82"><?php echo esc_html( $info['description'] ); ?></div>
+							</div>
+							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:auto">
+								<input type="hidden" name="action" value="seo_agent_ai_trigger_cron">
+								<input type="hidden" name="hook" value="<?php echo esc_attr( $hook ); ?>" data-cron-hook="<?php echo esc_attr( $hook ); ?>">
+								<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>">
+								<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm">
+									<span class="btn-label"><?php esc_html_e( 'Run Now', 'seo-agent-ai' ); ?></span>
+								</button>
+							</form>
+						</div>
+					<?php endforeach; ?>
+				</div>
+
+				<div class="sai-card" style="margin-top:24px">
+					<div class="sai-card-header"><h2 class="sai-card-title"><?php esc_html_e( 'Queue Status', 'seo-agent-ai' ); ?></h2></div>
+					<div class="sai-card-body">
+						<?php $this->render_queue_status(); ?>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
 
 	private function render_queue_status() {
-		$raw    = get_option( SEO_Agent_AI_Queue_Manager::OPTION_KEY, '' );
-		$queue  = $raw !== '' ? json_decode( $raw, true ) : null;
+		$raw   = get_option( SEO_Agent_AI_Queue_Manager::OPTION_KEY, '' );
+		$queue = $raw !== '' ? json_decode( $raw, true ) : null;
 
 		if ( ! is_array( $queue ) ) {
-			echo '<p>' . esc_html__( 'Queue not initialized.', 'seo-agent-ai' ) . '</p>';
+			echo '<p style="color:#787c82">' . esc_html__( 'Queue not initialized.', 'seo-agent-ai' ) . '</p>';
 			return;
 		}
 
-		echo '<table class="form-table">';
 		$fields = array(
-			'pending'               => __( 'Posts in queue', 'seo-agent-ai' ),
-			'total_queued'          => __( 'Total ever queued', 'seo-agent-ai' ),
-			'total_processed'       => __( 'Total processed', 'seo-agent-ai' ),
-			'total_errors'          => __( 'Total errors', 'seo-agent-ai' ),
-			'last_run'              => __( 'Last batch run', 'seo-agent-ai' ),
-			'last_batch_processed'  => __( 'Posts in last batch', 'seo-agent-ai' ),
+			'pending'              => __( 'Posts in queue', 'seo-agent-ai' ),
+			'total_queued'         => __( 'Total ever queued', 'seo-agent-ai' ),
+			'total_processed'      => __( 'Total processed', 'seo-agent-ai' ),
+			'total_errors'         => __( 'Total errors', 'seo-agent-ai' ),
+			'last_run'             => __( 'Last batch run', 'seo-agent-ai' ),
+			'last_batch_processed' => __( 'Posts in last batch', 'seo-agent-ai' ),
 		);
 
+		echo '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">';
 		foreach ( $fields as $key => $label ) {
-			$val = $key === 'pending' ? count( $queue['items'] ?? array() ) : ( $queue[ $key ] ?? '—' );
-			echo '<tr><th>' . esc_html( $label ) . '</th><td>' . esc_html( (string) $val ) . '</td></tr>';
+			$val = 'pending' === $key ? count( $queue['items'] ?? array() ) : ( $queue[ $key ] ?? '—' );
+			echo '<div style="background:#f6f7f7;border-radius:4px;padding:10px 14px">';
+			echo '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#787c82;margin-bottom:4px">' . esc_html( $label ) . '</div>';
+			echo '<div style="font-size:18px;font-weight:700;color:#1d2327">' . esc_html( (string) $val ) . '</div>';
+			echo '</div>';
 		}
-		echo '</table>';
+		echo '</div>';
 	}
 
 	private function human_time( $timestamp ) {

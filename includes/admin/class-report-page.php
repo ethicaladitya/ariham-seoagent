@@ -40,146 +40,159 @@ class SEO_Agent_AI_Report_Page {
 			return;
 		}
 
-		$notice   = filter_input( INPUT_GET, 'seo_agent_ai_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$notice   = is_string( $notice ) ? sanitize_key( wp_unslash( $notice ) ) : '';
-		$filters  = $this->get_filters_from_request();
-		$page     = max( 1, (int) filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) );
-		$total    = $this->activity_log->get_count( $filters );
-		$entries  = $this->activity_log->get_entries( $filters, $page, self::PER_PAGE );
-		$pages    = (int) ceil( $total / self::PER_PAGE );
+		$notice  = filter_input( INPUT_GET, 'seo_agent_ai_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$notice  = is_string( $notice ) ? sanitize_key( wp_unslash( $notice ) ) : '';
+		$filters = $this->get_filters_from_request();
+		$page    = max( 1, (int) filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) );
+		$total   = $this->activity_log->get_count( $filters );
+		$entries = $this->activity_log->get_entries( $filters, $page, self::PER_PAGE );
+		$pages   = (int) ceil( $total / self::PER_PAGE );
 
 		// Summary stats (always without filters).
-		$applied_count    = $this->activity_log->get_count( array( 'status' => SEO_Agent_AI_Activity_Log::STATUS_APPLIED ) );
-		$rolled_back      = $this->activity_log->get_count( array( 'status' => SEO_Agent_AI_Activity_Log::STATUS_ROLLED_BACK ) );
-		$autopilot_count  = $this->activity_log->get_count( array( 'triggered_by' => SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT ) );
+		$applied_count   = $this->activity_log->get_count( array( 'status' => SEO_Agent_AI_Activity_Log::STATUS_APPLIED ) );
+		$rolled_back     = $this->activity_log->get_count( array( 'status' => SEO_Agent_AI_Activity_Log::STATUS_ROLLED_BACK ) );
+		$autopilot_count = $this->activity_log->get_count( array( 'triggered_by' => SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT ) );
 		?>
-		<div class="wrap seo-agent-wrap">
-			<h1><?php esc_html_e( 'SEO Agent Activity Report', 'seo-agent-ai' ); ?></h1>
-			<p class="description">
-				<?php esc_html_e( 'A complete audit trail of changes made by the agent — what was changed, why, and the data behind each decision.', 'seo-agent-ai' ); ?>
-			</p>
-
-			<?php if ( 'rollback_done' === $notice ) : ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Change rolled back successfully.', 'seo-agent-ai' ); ?></p></div>
-			<?php endif; ?>
-
-			<!-- Summary stats -->
-			<div class="seo-agent-stats-row">
-				<div class="seo-agent-stat-box">
-					<div class="stat-value"><?php echo esc_html( (string) $total ); ?></div>
-					<div class="stat-label"><?php esc_html_e( 'Total Changes', 'seo-agent-ai' ); ?></div>
-				</div>
-				<div class="seo-agent-stat-box">
-					<div class="stat-value"><?php echo esc_html( (string) $applied_count ); ?></div>
-					<div class="stat-label"><?php esc_html_e( 'Active', 'seo-agent-ai' ); ?></div>
-				</div>
-				<div class="seo-agent-stat-box">
-					<div class="stat-value"><?php echo esc_html( (string) $autopilot_count ); ?></div>
-					<div class="stat-label"><?php esc_html_e( 'Autopilot', 'seo-agent-ai' ); ?></div>
-				</div>
-				<div class="seo-agent-stat-box">
-					<div class="stat-value"><?php echo esc_html( (string) $rolled_back ); ?></div>
-					<div class="stat-label"><?php esc_html_e( 'Rolled Back', 'seo-agent-ai' ); ?></div>
+		<div class="wrap sai-page">
+			<div class="sai-header">
+				<div class="sai-header-left">
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Analysis Report', 'seo-agent-ai' ); ?></h1>
 				</div>
 			</div>
 
-			<!-- Filters -->
-			<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="seo-agent-report-filters">
-				<input type="hidden" name="page" value="seo-agent-ai-report" />
+			<div class="sai-body">
+				<?php if ( 'rollback_done' === $notice ) : ?>
+					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php esc_html_e( 'Change rolled back successfully.', 'seo-agent-ai' ); ?></p></div>
+				<?php endif; ?>
 
-				<label>
-					<?php esc_html_e( 'Change Type', 'seo-agent-ai' ); ?>
-					<select name="change_type">
-						<option value=""><?php esc_html_e( 'All Types', 'seo-agent-ai' ); ?></option>
-						<?php foreach ( $this->get_change_type_options() as $val => $label ) : ?>
-							<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $filters['change_type'] ?? '', $val ); ?>>
-								<?php echo esc_html( $label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-				</label>
-
-				<label>
-					<?php esc_html_e( 'Triggered By', 'seo-agent-ai' ); ?>
-					<select name="triggered_by">
-						<option value=""><?php esc_html_e( 'Any Source', 'seo-agent-ai' ); ?></option>
-						<option value="manual" <?php selected( $filters['triggered_by'] ?? '', 'manual' ); ?>><?php esc_html_e( 'Manual', 'seo-agent-ai' ); ?></option>
-						<option value="autopilot" <?php selected( $filters['triggered_by'] ?? '', 'autopilot' ); ?>><?php esc_html_e( 'Autopilot', 'seo-agent-ai' ); ?></option>
-					</select>
-				</label>
-
-				<label>
-					<?php esc_html_e( 'Status', 'seo-agent-ai' ); ?>
-					<select name="status">
-						<option value=""><?php esc_html_e( 'Any Status', 'seo-agent-ai' ); ?></option>
-						<option value="applied" <?php selected( $filters['status'] ?? '', 'applied' ); ?>><?php esc_html_e( 'Active', 'seo-agent-ai' ); ?></option>
-						<option value="rolled_back" <?php selected( $filters['status'] ?? '', 'rolled_back' ); ?>><?php esc_html_e( 'Rolled Back', 'seo-agent-ai' ); ?></option>
-					</select>
-				</label>
-
-				<label>
-					<?php esc_html_e( 'From', 'seo-agent-ai' ); ?>
-					<input type="date" name="date_from" value="<?php echo esc_attr( $filters['date_from'] ?? '' ); ?>" />
-				</label>
-
-				<label>
-					<?php esc_html_e( 'To', 'seo-agent-ai' ); ?>
-					<input type="date" name="date_to" value="<?php echo esc_attr( $filters['date_to'] ?? '' ); ?>" />
-				</label>
-
-				<div>
-					<button type="submit" class="button"><?php esc_html_e( 'Filter', 'seo-agent-ai' ); ?></button>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-report' ) ); ?>" class="button button-link" style="margin-left:6px;"><?php esc_html_e( 'Reset', 'seo-agent-ai' ); ?></a>
+				<!-- Metrics row -->
+				<div class="sai-metrics" style="margin-bottom:20px">
+					<div class="sai-metric m-neutral">
+						<div class="sai-metric-stripe"></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Total Changes', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-value"><?php echo esc_html( (string) $total ); ?></div>
+					</div>
+					<div class="sai-metric m-success">
+						<div class="sai-metric-stripe"></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Active', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-value"><?php echo esc_html( (string) $applied_count ); ?></div>
+					</div>
+					<div class="sai-metric m-primary">
+						<div class="sai-metric-stripe"></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Autopilot', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-value"><?php echo esc_html( (string) $autopilot_count ); ?></div>
+					</div>
+					<div class="sai-metric m-warning">
+						<div class="sai-metric-stripe"></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Rolled Back', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-value"><?php echo esc_html( (string) $rolled_back ); ?></div>
+					</div>
 				</div>
-			</form>
 
-			<?php if ( empty( $entries ) ) : ?>
-				<p><em><?php esc_html_e( 'No activity logged yet. Run an analysis and apply (or enable autopilot) to see history here.', 'seo-agent-ai' ); ?></em></p>
-			<?php else : ?>
+				<!-- Filters -->
+				<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="sai-filters" style="margin-bottom:16px">
+					<input type="hidden" name="page" value="seo-agent-ai-report">
 
-				<table class="widefat striped" style="margin-top:0;">
-					<thead>
-						<tr>
-							<th style="width:20%"><?php esc_html_e( 'Post', 'seo-agent-ai' ); ?></th>
-							<th style="width:12%"><?php esc_html_e( 'Change', 'seo-agent-ai' ); ?></th>
-							<th style="width:30%"><?php esc_html_e( 'Before → After', 'seo-agent-ai' ); ?></th>
-							<th><?php esc_html_e( 'Why', 'seo-agent-ai' ); ?></th>
-							<th style="width:8%"><?php esc_html_e( 'Confidence', 'seo-agent-ai' ); ?></th>
-							<th style="width:8%"><?php esc_html_e( 'Source', 'seo-agent-ai' ); ?></th>
-							<th style="width:7%"><?php esc_html_e( 'Status', 'seo-agent-ai' ); ?></th>
-							<th style="width:10%"><?php esc_html_e( 'Date', 'seo-agent-ai' ); ?></th>
-							<th style="width:6%"><?php esc_html_e( 'Actions', 'seo-agent-ai' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ( $entries as $entry ) : ?>
-							<?php $this->render_row( $entry ); ?>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
+					<label>
+						<select name="change_type">
+							<option value=""><?php esc_html_e( 'All Types', 'seo-agent-ai' ); ?></option>
+							<?php foreach ( $this->get_change_type_options() as $val => $label ) : ?>
+								<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $filters['change_type'] ?? '', $val ); ?>>
+									<?php echo esc_html( $label ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+					</label>
 
-				<?php if ( $pages > 1 ) : ?>
-					<div class="tablenav bottom" style="margin-top:12px;">
-						<div class="tablenav-pages">
+					<label>
+						<select name="triggered_by">
+							<option value=""><?php esc_html_e( 'Any Source', 'seo-agent-ai' ); ?></option>
+							<option value="manual" <?php selected( $filters['triggered_by'] ?? '', 'manual' ); ?>><?php esc_html_e( 'Manual', 'seo-agent-ai' ); ?></option>
+							<option value="autopilot" <?php selected( $filters['triggered_by'] ?? '', 'autopilot' ); ?>><?php esc_html_e( 'Autopilot', 'seo-agent-ai' ); ?></option>
+						</select>
+					</label>
+
+					<label>
+						<select name="status">
+							<option value=""><?php esc_html_e( 'Any Status', 'seo-agent-ai' ); ?></option>
+							<option value="applied" <?php selected( $filters['status'] ?? '', 'applied' ); ?>><?php esc_html_e( 'Active', 'seo-agent-ai' ); ?></option>
+							<option value="rolled_back" <?php selected( $filters['status'] ?? '', 'rolled_back' ); ?>><?php esc_html_e( 'Rolled Back', 'seo-agent-ai' ); ?></option>
+						</select>
+					</label>
+
+					<label>
+						<?php esc_html_e( 'From', 'seo-agent-ai' ); ?>
+						<input type="date" name="date_from" value="<?php echo esc_attr( $filters['date_from'] ?? '' ); ?>">
+					</label>
+
+					<label>
+						<?php esc_html_e( 'To', 'seo-agent-ai' ); ?>
+						<input type="date" name="date_to" value="<?php echo esc_attr( $filters['date_to'] ?? '' ); ?>">
+					</label>
+
+					<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Filter', 'seo-agent-ai' ); ?></span></button>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-report' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Reset', 'seo-agent-ai' ); ?></span></a>
+				</form>
+
+				<?php if ( empty( $entries ) ) : ?>
+					<div class="sai-empty">
+						<div class="sai-empty-icon">&#128203;</div>
+						<h3><?php esc_html_e( 'No activity yet', 'seo-agent-ai' ); ?></h3>
+						<p><?php esc_html_e( 'Run an analysis and apply (or enable autopilot) to see history here.', 'seo-agent-ai' ); ?></p>
+					</div>
+				<?php else : ?>
+
+					<div class="sai-table-wrap">
+						<table class="sai-table">
+							<thead>
+								<tr>
+									<th><?php esc_html_e( 'Post', 'seo-agent-ai' ); ?></th>
+									<th><?php esc_html_e( 'Change', 'seo-agent-ai' ); ?></th>
+									<th><?php esc_html_e( 'Before / After', 'seo-agent-ai' ); ?></th>
+									<th><?php esc_html_e( 'Why', 'seo-agent-ai' ); ?></th>
+									<th class="col-center"><?php esc_html_e( 'Conf.', 'seo-agent-ai' ); ?></th>
+									<th class="col-center"><?php esc_html_e( 'Source', 'seo-agent-ai' ); ?></th>
+									<th class="col-center"><?php esc_html_e( 'Status', 'seo-agent-ai' ); ?></th>
+									<th><?php esc_html_e( 'Date', 'seo-agent-ai' ); ?></th>
+									<th><?php esc_html_e( 'Actions', 'seo-agent-ai' ); ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ( $entries as $entry ) : ?>
+									<?php $this->render_row( $entry ); ?>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
+
+					<?php if ( $pages > 1 ) : ?>
+						<div class="sai-pagination" style="margin-top:12px">
 							<?php
 							$base_url = add_query_arg(
 								array_merge( $filters, array( 'page' => 'seo-agent-ai-report' ) ),
 								admin_url( 'admin.php' )
 							);
-							echo wp_kses_post( paginate_links( array(
+							$paginate = paginate_links( array(
 								'base'      => add_query_arg( 'paged', '%#%', $base_url ),
 								'format'    => '',
 								'current'   => $page,
 								'total'     => $pages,
-								'prev_text' => '&laquo; ' . __( 'Previous', 'seo-agent-ai' ),
-								'next_text' => __( 'Next', 'seo-agent-ai' ) . ' &raquo;',
-							) ) );
+								'type'      => 'array',
+								'prev_text' => '&laquo;',
+								'next_text' => '&raquo;',
+							) );
+							if ( is_array( $paginate ) ) {
+								foreach ( $paginate as $link ) {
+									echo wp_kses_post( '<span class="sai-page-btn">' . $link . '</span>' );
+								}
+							}
 							?>
 						</div>
-					</div>
-				<?php endif; ?>
+					<?php endif; ?>
 
-			<?php endif; ?>
+				<?php endif; ?>
+			</div>
 		</div>
 		<?php
 	}
@@ -189,7 +202,6 @@ class SEO_Agent_AI_Report_Page {
 	// -----------------------------------------------------------------------
 
 	private function render_row( array $entry ) {
-		$post_id      = (int) $entry['id'];
 		$entry_id     = (int) $entry['id'];
 		$entry_post   = (int) $entry['post_id'];
 		$change_type  = (string) $entry['change_type'];
@@ -197,7 +209,7 @@ class SEO_Agent_AI_Report_Page {
 		$before       = (string) $entry['value_before'];
 		$after        = (string) $entry['value_after'];
 		$reason       = (string) $entry['reason'];
-		$confidence   = (float)  $entry['confidence'];
+		$confidence   = (float) $entry['confidence'];
 		$triggered_by = (string) $entry['triggered_by'];
 		$status       = (string) $entry['status'];
 		$created_at   = (string) $entry['created_at'];
@@ -210,7 +222,7 @@ class SEO_Agent_AI_Report_Page {
 
 		echo '<tr>';
 
-		// Post
+		// Post.
 		echo '<td>';
 		if ( $edit_link ) {
 			echo '<a href="' . esc_url( $edit_link ) . '">' . esc_html( $post_title ) . '</a>';
@@ -218,40 +230,40 @@ class SEO_Agent_AI_Report_Page {
 			echo esc_html( $post_title );
 		}
 		if ( $field ) {
-			echo '<br/><span class="seo-agent-muted seo-agent-mono">' . esc_html( $field ) . '</span>';
+			echo '<br><span style="font-size:11px;color:#787c82;font-family:monospace">' . esc_html( $field ) . '</span>';
 		}
 		echo '</td>';
 
-		// Change type
+		// Change type.
 		echo '<td>';
-		echo '<span class="seo-agent-pill ' . esc_attr( $this->change_type_class( $change_type ) ) . '">';
+		echo '<span class="sai-badge b-' . esc_attr( $this->change_type_badge_class( $change_type ) ) . '">';
 		echo esc_html( $this->change_type_label( $change_type ) );
 		echo '</span>';
 		echo '</td>';
 
-		// Before → After diff
+		// Before / After diff.
 		echo '<td>';
 		if ( $before !== '' || $after !== '' ) {
-			echo '<div class="seo-agent-diff-block">';
-			echo '<div class="seo-agent-diff-before"><span class="seo-agent-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( $before ?: '—' ) . '</div>';
-			echo '<div class="seo-agent-diff-after"><span class="seo-agent-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( $after ?: '—' ) . '</div>';
+			echo '<div class="sai-timeline-diff">';
+			echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $before, 10, '…' ) ?: '—' ) . '</div>';
+			echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $after, 10, '…' ) ?: '—' ) . '</div>';
 			echo '</div>';
 		} else {
-			echo '<span class="seo-agent-muted">—</span>';
+			echo '<span style="color:#787c82">—</span>';
 		}
 		echo '</td>';
 
-		// Reason / signals
+		// Reason / signals.
 		echo '<td>';
-		echo '<p style="margin:0 0 6px;font-size:12px;">' . esc_html( $reason ) . '</p>';
+		echo '<p style="margin:0 0 6px;font-size:12px">' . esc_html( $reason ) . '</p>';
 		if ( ! empty( $signal_data['evidence'] ) && is_array( $signal_data['evidence'] ) ) {
-			echo '<ul style="margin:0;padding:0 0 0 14px;font-size:11px;color:#646970;">';
+			echo '<ul style="margin:0;padding:0 0 0 14px;font-size:11px;color:#646970">';
 			$evidence_labels = array(
-				'impressions_total'      => __( 'Impressions', 'seo-agent-ai' ),
-				'ctr_avg'                => __( 'CTR', 'seo-agent-ai' ),
-				'position_avg'           => __( 'Avg Position', 'seo-agent-ai' ),
-				'engagement_rate'        => __( 'Engagement Rate', 'seo-agent-ai' ),
-				'avg_time_on_page_sec'   => __( 'Avg Time on Page', 'seo-agent-ai' ),
+				'impressions_total'         => __( 'Impressions', 'seo-agent-ai' ),
+				'ctr_avg'                   => __( 'CTR', 'seo-agent-ai' ),
+				'position_avg'              => __( 'Avg Position', 'seo-agent-ai' ),
+				'engagement_rate'           => __( 'Engagement Rate', 'seo-agent-ai' ),
+				'avg_time_on_page_sec'      => __( 'Avg Time on Page', 'seo-agent-ai' ),
 				'impressions_trend_28d_pct' => __( 'Impressions Trend (28d)', 'seo-agent-ai' ),
 				'sessions_trend_28d_pct'    => __( 'Sessions Trend (28d)', 'seo-agent-ai' ),
 			);
@@ -272,73 +284,56 @@ class SEO_Agent_AI_Report_Page {
 		}
 		echo '</td>';
 
-		// Confidence
-		echo '<td>';
-		$this->render_confidence( $confidence );
+		// Confidence.
+		echo '<td class="col-center">';
+		$pct   = round( $confidence * 100 );
+		$badge = $confidence >= 0.75 ? 'b-success' : ( $confidence >= 0.5 ? 'b-warning' : 'b-danger' );
+		echo '<span class="sai-badge ' . esc_attr( $badge ) . '">' . esc_html( $pct . '%' ) . '</span>';
 		echo '</td>';
 
-		// Source
-		echo '<td>';
+		// Source.
+		echo '<td class="col-center">';
 		$source_labels = array(
 			'manual'    => __( 'Manual', 'seo-agent-ai' ),
 			'autopilot' => __( 'Autopilot', 'seo-agent-ai' ),
 			'rollback'  => __( 'Rollback', 'seo-agent-ai' ),
 		);
-		echo '<span class="seo-agent-pill ' . esc_attr( $triggered_by ) . '" style="background:#e8f0fe;color:#1967d2;">';
+		$source_badge = 'autopilot' === $triggered_by ? 'b-purple' : 'b-neutral';
+		echo '<span class="sai-badge ' . esc_attr( $source_badge ) . '">';
 		echo esc_html( $source_labels[ $triggered_by ] ?? $triggered_by );
 		echo '</span>';
 		echo '</td>';
 
-		// Status
-		echo '<td>';
-		echo '<span class="seo-agent-status ' . esc_attr( $status ) . '">';
+		// Status.
+		echo '<td class="col-center"><span class="sai-status s-' . esc_attr( $status ) . '">';
 		$status_labels = array(
 			'applied'     => __( 'Active', 'seo-agent-ai' ),
 			'rolled_back' => __( 'Rolled back', 'seo-agent-ai' ),
 			'skipped'     => __( 'Skipped', 'seo-agent-ai' ),
 		);
 		echo esc_html( $status_labels[ $status ] ?? $status );
-		echo '</span>';
-		echo '</td>';
+		echo '</span></td>';
 
-		// Date
-		echo '<td><span class="seo-agent-muted">' . esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $created_at ) ) ) . '</span></td>';
+		// Date.
+		echo '<td style="font-size:12px;color:#787c82">' . esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $created_at ) ) ) . '</td>';
 
-		// Actions
+		// Actions.
 		echo '<td>';
 		if ( $is_applied && $entry_post ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 			wp_nonce_field( 'seo_agent_ai_rollback' );
-			echo '<input type="hidden" name="action" value="seo_agent_ai_rollback" />';
-			echo '<input type="hidden" name="log_id" value="' . esc_attr( (string) $entry_id ) . '" />';
-			echo '<input type="hidden" name="post_id" value="' . esc_attr( (string) $entry_post ) . '" />';
-			echo '<button type="submit" class="button button-small"'
+			echo '<input type="hidden" name="action" value="seo_agent_ai_rollback">';
+			echo '<input type="hidden" name="log_id" value="' . esc_attr( (string) $entry_id ) . '">';
+			echo '<input type="hidden" name="post_id" value="' . esc_attr( (string) $entry_post ) . '">';
+			echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"'
 				. ' onclick="return confirm(\'' . esc_js( __( 'Roll back this change?', 'seo-agent-ai' ) ) . '\')">'
-				. esc_html__( 'Rollback', 'seo-agent-ai' )
+				. '<span class="btn-label">' . esc_html__( 'Rollback', 'seo-agent-ai' ) . '</span>'
 				. '</button>';
 			echo '</form>';
 		}
 		echo '</td>';
 
 		echo '</tr>';
-	}
-
-	// -----------------------------------------------------------------------
-	// Confidence meter
-	// -----------------------------------------------------------------------
-
-	private function render_confidence( $confidence ) {
-		$pct   = round( $confidence * 100 );
-		$class = 'low';
-		if ( $confidence >= 0.75 ) {
-			$class = 'high';
-		} elseif ( $confidence >= 0.5 ) {
-			$class = 'medium';
-		}
-		echo '<div class="seo-agent-confidence">';
-		echo '<div class="seo-agent-confidence-bar"><div class="seo-agent-confidence-fill ' . esc_attr( $class ) . '" style="width:' . esc_attr( (string) $pct ) . '%"></div></div>';
-		echo '<span class="seo-agent-muted">' . esc_html( $pct . '%' ) . '</span>';
-		echo '</div>';
 	}
 
 	// -----------------------------------------------------------------------
@@ -392,12 +387,12 @@ class SEO_Agent_AI_Report_Page {
 		return $labels[ $type ] ?? ucwords( str_replace( '_', ' ', $type ) );
 	}
 
-	private function change_type_class( $type ) {
+	private function change_type_badge_class( $type ) {
 		$map = array(
-			'meta_update'     => 'safe',
-			'monitor_decline' => 'medium',
-			'rollback'        => 'low',
+			'meta_update'     => 'success',
+			'monitor_decline' => 'warning',
+			'rollback'        => 'neutral',
 		);
-		return $map[ $type ] ?? 'low';
+		return $map[ $type ] ?? 'neutral';
 	}
 }

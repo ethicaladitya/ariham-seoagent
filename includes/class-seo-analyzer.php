@@ -13,8 +13,8 @@ class SEO_Agent_AI_SEO_Analyzer {
 	private $keyword_cluster;
 
 	public function __construct(
-		SEO_Agent_AI_Content_Analyzer $content_analyzer = null,
-		SEO_Agent_AI_Keyword_Cluster $keyword_cluster = null
+		?SEO_Agent_AI_Content_Analyzer $content_analyzer = null,
+		?SEO_Agent_AI_Keyword_Cluster $keyword_cluster = null
 	) {
 		$this->content_analyzer = $content_analyzer;
 		$this->keyword_cluster  = $keyword_cluster;

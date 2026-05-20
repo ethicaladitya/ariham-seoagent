@@ -1,697 +1,1281 @@
 /* ==========================================================================
-   SEO Agent AI — Admin Stylesheet
+   SEO Agent AI — Claude Design System
+   Inspired by claude.ai: warm off-white, clean type, amber accent, dark rail.
    ========================================================================== */
 
 /* -----------------------------------------------------------------------
-   Layout: page wrapper / card
+   1. Design tokens — Claude palette
    ----------------------------------------------------------------------- */
-.seo-agent-wrap {
-    max-width: 1100px;
-}
+:root {
+	/* Core surfaces */
+	--cl-bg:         #f9f8f6;     /* warm off-white page background */
+	--cl-bg-2:       #f2f1ee;     /* slightly darker warm, for zebra rows */
+	--cl-surface:    #ffffff;     /* card / input surfaces */
+	--cl-rail:       #1a1918;     /* dark left-rail nav background */
+	--cl-rail-hover: #2d2c2a;
+	--cl-rail-active:#3d3c3a;
 
-.seo-agent-card {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-}
+	/* Borders */
+	--cl-border:     #e5e3df;     /* warm neutral border */
+	--cl-border-2:   #d4d2ce;     /* slightly stronger */
 
-.seo-agent-card h2 {
-    margin-top: 0;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    color: #50575e;
-    border-bottom: 1px solid #f0f0f1;
-    padding-bottom: 10px;
-    margin-bottom: 16px;
+	/* Typography */
+	--cl-text:       #1a1918;     /* near-black, warm */
+	--cl-text-soft:  #3d3c3a;
+	--cl-text-muted: #6b6967;     /* warm mid-gray */
+	--cl-text-faint: #9b9895;     /* light warm gray */
+
+	/* Accent — Claude orange/amber */
+	--cl-accent:     #d97706;     /* amber-600 */
+	--cl-accent-dark:#b45309;
+	--cl-accent-bg:  #fffbeb;     /* amber-50 */
+	--cl-accent-border: #fde68a; /* amber-200 */
+
+	/* Semantic colours */
+	--cl-success:       #059669;  /* emerald-600 */
+	--cl-success-bg:    #ecfdf5;
+	--cl-success-border:#a7f3d0;
+	--cl-warning:       #d97706;  /* same as accent */
+	--cl-warning-bg:    #fffbeb;
+	--cl-warning-border:#fde68a;
+	--cl-danger:        #dc2626;  /* red-600 */
+	--cl-danger-bg:     #fef2f2;
+	--cl-danger-border: #fecaca;
+	--cl-info:          #2563eb;  /* blue-600 */
+	--cl-info-bg:       #eff6ff;
+	--cl-info-border:   #bfdbfe;
+
+	/* Radius / shadow / motion */
+	--cl-radius-sm: 6px;
+	--cl-radius:    10px;
+	--cl-radius-lg: 16px;
+	--cl-shadow-xs: 0 1px 2px rgba(26,25,24,.05);
+	--cl-shadow:    0 1px 4px rgba(26,25,24,.07), 0 1px 2px rgba(26,25,24,.04);
+	--cl-shadow-md: 0 4px 16px rgba(26,25,24,.08), 0 2px 4px rgba(26,25,24,.04);
+	--cl-shadow-lg: 0 12px 40px rgba(26,25,24,.12), 0 4px 8px rgba(26,25,24,.05);
+	--cl-ease:      cubic-bezier(.4,0,.2,1);
+	--cl-dur:       150ms;
+
+	/* Font stacks */
+	--cl-font:      'Söhne', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--cl-mono:      'Söhne Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
 }
 
 /* -----------------------------------------------------------------------
-   Connect page
+   2. Page scaffold — warm background, pull flush against WP chrome
    ----------------------------------------------------------------------- */
-.seo-agent-connect-status {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    border-radius: 4px;
-    margin-bottom: 20px;
+body.wp-admin .sai-page {
+	font-family:            var(--cl-font);
+	background:             var(--cl-bg);
+	color:                  var(--cl-text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing:grayscale;
 }
 
-.seo-agent-connect-status.connected {
-    background: #edf7ed;
-    border: 1px solid #1e8e3e;
-}
-
-.seo-agent-connect-status.disconnected {
-    background: #fcf0f1;
-    border: 1px solid #c0392b;
-}
-
-.seo-agent-connect-status .dashicons {
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
-}
-
-.seo-agent-connect-status.connected .dashicons {
-    color: #1e8e3e;
-}
-
-.seo-agent-connect-status.disconnected .dashicons {
-    color: #c0392b;
-}
-
-.seo-agent-connect-status strong {
-    font-size: 14px;
-}
-
-.seo-agent-google-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #4285f4;
-    color: #fff !important;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 18px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background .15s;
-}
-
-.seo-agent-google-btn:hover {
-    background: #3367d6;
-    color: #fff !important;
-}
-
-.seo-agent-google-btn svg {
-    flex-shrink: 0;
-}
-
-.seo-agent-redirect-uri {
-    font-family: monospace;
-    font-size: 13px;
-    background: #f6f7f7;
-    border: 1px solid #c3c4c7;
-    border-radius: 3px;
-    padding: 6px 10px;
-    display: inline-block;
-    word-break: break-all;
+#wpbody-content > .sai-page {
+	margin-left:  -20px;
+	margin-right: -20px;
+	margin-top:   -8px;
 }
 
 /* -----------------------------------------------------------------------
-   Autopilot badge / toggle
+   3. Page header — clean white bar with warm underline
    ----------------------------------------------------------------------- */
-.seo-agent-autopilot-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: .04em;
+.sai-header {
+	background:    var(--cl-surface);
+	border-bottom: 1px solid var(--cl-border);
+	padding:       24px 32px 0;
+	display:       flex;
+	align-items:   flex-end;
+	gap:           24px;
+	position:      sticky;
+	top:           32px;
+	z-index:       200;
 }
 
-.seo-agent-autopilot-badge.on {
-    background: #e6f4ea;
-    color: #137333;
-    border: 1px solid #b7dfbe;
+.sai-header-left { flex: 1; min-width: 0; }
+
+.sai-header-eyebrow {
+	font-size:      11px;
+	font-weight:    600;
+	letter-spacing: .07em;
+	text-transform: uppercase;
+	color:          var(--cl-accent);
+	margin:         0 0 5px;
+	display:        flex;
+	align-items:    center;
+	gap:            7px;
 }
 
-.seo-agent-autopilot-badge.off {
-    background: #f0f0f1;
-    color: #50575e;
-    border: 1px solid #c3c4c7;
+.sai-dot {
+	width:         7px;
+	height:        7px;
+	border-radius: 50%;
+	background:    var(--cl-accent);
+	display:       inline-block;
+	animation:     cl-pulse 2.4s ease-in-out infinite;
 }
 
-.seo-agent-autopilot-badge .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
+.sai-dot.pulsing-green {
+	background: var(--cl-success);
+	animation:  cl-pulse-green 2.4s ease-in-out infinite;
 }
 
-.seo-agent-autopilot-badge.on .dot  { background: #137333; }
-.seo-agent-autopilot-badge.off .dot { background: #8c8f94; }
-
-/* -----------------------------------------------------------------------
-   Confidence meter
-   ----------------------------------------------------------------------- */
-.seo-agent-confidence {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
+.sai-header-title {
+	font-size:   22px;
+	font-weight: 700;
+	color:       var(--cl-text);
+	margin:      0 0 18px;
+	line-height: 1.2;
+	letter-spacing: -.01em;
 }
 
-.seo-agent-confidence-bar {
-    display: inline-block;
-    width: 60px;
-    height: 6px;
-    background: #dcdcde;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.seo-agent-confidence-fill {
-    height: 100%;
-    border-radius: 3px;
-    background: #2271b1;
-    transition: width .3s;
-}
-
-.seo-agent-confidence-fill.high   { background: #1e8e3e; }
-.seo-agent-confidence-fill.medium { background: #e1940a; }
-.seo-agent-confidence-fill.low    { background: #c0392b; }
-
-/* -----------------------------------------------------------------------
-   Recommendation cards on overview page
-   ----------------------------------------------------------------------- */
-.seo-agent-rec {
-    border: 1px solid #dcdcde;
-    border-radius: 4px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    background: #fafafa;
-}
-
-.seo-agent-rec-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.seo-agent-pill {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-}
-
-.seo-agent-pill.safe    { background: #e6f4ea; color: #137333; }
-.seo-agent-pill.risky   { background: #fce8e6; color: #c5221f; }
-.seo-agent-pill.high    { background: #fce8e6; color: #c5221f; }
-.seo-agent-pill.medium  { background: #fef7e0; color: #b06000; }
-.seo-agent-pill.low     { background: #e8f0fe; color: #1967d2; }
-.seo-agent-pill.none    { background: #f0f0f1; color: #50575e; }
-
-.seo-agent-rec-reason {
-    color: #3c434a;
-    font-size: 13px;
-    margin: 0 0 8px;
-}
-
-.seo-agent-rec-proposed {
-    background: #f0f6fc;
-    border-left: 3px solid #2271b1;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    border-radius: 0 3px 3px 0;
-    font-size: 13px;
-}
-
-.seo-agent-rec-proposed strong {
-    display: block;
-    margin-bottom: 2px;
-    color: #1d2327;
+.sai-header-actions {
+	display:     flex;
+	align-items: center;
+	gap:         8px;
+	padding-bottom: 18px;
+	flex-shrink: 0;
 }
 
 /* -----------------------------------------------------------------------
-   Activity report table
+   4. Navigation tabs inside header
    ----------------------------------------------------------------------- */
-.seo-agent-report-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-end;
-    margin-bottom: 16px;
-    padding: 14px 16px;
-    background: #f6f7f7;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
+.sai-nav { display: flex; margin-top: auto; }
+
+.sai-nav-tab {
+	display:         inline-flex;
+	align-items:     center;
+	gap:             6px;
+	padding:         10px 16px;
+	font-size:       13px;
+	font-weight:     500;
+	color:           var(--cl-text-muted);
+	text-decoration: none;
+	border-bottom:   2px solid transparent;
+	transition:      color var(--cl-dur) var(--cl-ease), border-color var(--cl-dur) var(--cl-ease);
+	white-space:     nowrap;
 }
 
-.seo-agent-report-filters label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #50575e;
-    text-transform: uppercase;
-    letter-spacing: .03em;
+.sai-nav-tab:hover { color: var(--cl-text); text-decoration: none; }
+
+.sai-nav-tab.active {
+	color:        var(--cl-text);
+	border-color: var(--cl-accent);
+	font-weight:  600;
 }
 
-.seo-agent-report-filters select,
-.seo-agent-report-filters input[type="date"] {
-    font-size: 13px;
-    min-width: 140px;
+.sai-tab-count {
+	background:    var(--cl-bg-2);
+	border:        1px solid var(--cl-border);
+	border-radius: 20px;
+	font-size:     10px;
+	font-weight:   700;
+	padding:       1px 6px;
+	color:         var(--cl-text-muted);
 }
 
-.seo-agent-diff-block {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 6px;
-}
-
-.seo-agent-diff-before,
-.seo-agent-diff-after {
-    padding: 6px 10px;
-    border-radius: 3px;
-    font-size: 12px;
-    word-break: break-word;
-}
-
-.seo-agent-diff-before {
-    background: #fce8e6;
-    border: 1px solid #f5c6c3;
-}
-
-.seo-agent-diff-after {
-    background: #e6f4ea;
-    border: 1px solid #b7dfbe;
-}
-
-.seo-agent-diff-label {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-bottom: 3px;
-    opacity: .7;
+.sai-nav-tab.active .sai-tab-count {
+	background:   var(--cl-accent-bg);
+	border-color: var(--cl-accent-border);
+	color:        var(--cl-accent-dark);
 }
 
 /* -----------------------------------------------------------------------
-   Status badges for report table
+   5. Body
    ----------------------------------------------------------------------- */
-.seo-agent-status {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
-}
+.sai-body { padding: 28px 32px; }
 
-.seo-agent-status.applied      { background: #e6f4ea; color: #137333; }
-.seo-agent-status.rolled_back  { background: #fef7e0; color: #b06000; }
-.seo-agent-status.skipped      { background: #f0f0f1; color: #50575e; }
+.sai-two-col      { display: grid; grid-template-columns: 1fr 1fr;   gap: 20px; }
+.sai-two-col-wide { display: grid; grid-template-columns: 2fr 1fr;   gap: 20px; }
+.sai-three-col    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 
-/* -----------------------------------------------------------------------
-   Stats header row
-   ----------------------------------------------------------------------- */
-.seo-agent-stats-row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.seo-agent-stat-box {
-    flex: 1;
-    min-width: 130px;
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 14px 18px;
-    text-align: center;
-}
-
-.seo-agent-stat-box .stat-value {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1d2327;
-    line-height: 1.2;
-}
-
-.seo-agent-stat-box .stat-label {
-    font-size: 11px;
-    color: #646970;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-top: 4px;
+@media (max-width: 1100px) {
+	.sai-two-col, .sai-two-col-wide, .sai-three-col { grid-template-columns: 1fr; }
 }
 
 /* -----------------------------------------------------------------------
-   Settings page — sections
+   6. Cards
    ----------------------------------------------------------------------- */
-.seo-agent-settings-section {
-    margin-bottom: 28px;
+.sai-card {
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow:    var(--cl-shadow);
+	overflow:      hidden;
 }
 
-.seo-agent-settings-section h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1d2327;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    border-bottom: 1px solid #f0f0f1;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
+.sai-card + .sai-card { margin-top: 20px; }
+
+.sai-card-header {
+	display:         flex;
+	align-items:     center;
+	justify-content: space-between;
+	padding:         18px 22px 0;
+	gap:             12px;
+}
+
+.sai-card-title {
+	font-size:   13px;
+	font-weight: 600;
+	color:       var(--cl-text);
+	margin:      0;
+	display:     flex;
+	align-items: center;
+	gap:         8px;
+	letter-spacing: -.01em;
+}
+
+.sai-card-body   { padding: 18px 22px 22px; }
+
+.sai-card-footer {
+	padding:    14px 22px;
+	background: var(--cl-bg);
+	border-top: 1px solid var(--cl-border);
+	display:    flex;
+	align-items: center;
+	gap:        12px;
+}
+
+/* Accent top-border variants */
+.sai-card.accent-accent  { border-top: 3px solid var(--cl-accent); }
+.sai-card.accent-success { border-top: 3px solid var(--cl-success); }
+.sai-card.accent-danger  { border-top: 3px solid var(--cl-danger); }
+.sai-card.accent-info    { border-top: 3px solid var(--cl-info); }
+
+/* -----------------------------------------------------------------------
+   7. Metric cards
+   ----------------------------------------------------------------------- */
+.sai-metrics {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+	gap:     14px;
+	margin-bottom: 24px;
+}
+
+.sai-metric {
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow:    var(--cl-shadow-xs);
+	padding:       18px 20px;
+	position:      relative;
+	overflow:      hidden;
+	transition:    box-shadow var(--cl-dur) var(--cl-ease), transform var(--cl-dur) var(--cl-ease);
+}
+
+.sai-metric:hover { box-shadow: var(--cl-shadow-md); transform: translateY(-1px); }
+
+.sai-metric a { text-decoration: none; color: inherit; display: block; }
+
+.sai-metric-stripe {
+	position:      absolute;
+	left: 0; top: 0; bottom: 0;
+	width:         3px;
+	border-radius: 0 2px 2px 0;
+}
+
+.sai-metric.m-accent  .sai-metric-stripe { background: var(--cl-accent); }
+.sai-metric.m-success .sai-metric-stripe { background: var(--cl-success); }
+.sai-metric.m-danger  .sai-metric-stripe { background: var(--cl-danger); }
+.sai-metric.m-info    .sai-metric-stripe { background: var(--cl-info); }
+.sai-metric.m-neutral .sai-metric-stripe { background: var(--cl-border-2); }
+
+.sai-metric-label {
+	font-size:      11px;
+	font-weight:    600;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	color:          var(--cl-text-muted);
+	margin-bottom:  8px;
+}
+
+.sai-metric-value {
+	font-size:     30px;
+	font-weight:   700;
+	line-height:   1;
+	color:         var(--cl-text);
+	margin-bottom: 5px;
+	letter-spacing: -.03em;
+	font-feature-settings: 'tnum';
+}
+
+.sai-metric-delta {
+	font-size:   12px;
+	font-weight: 500;
+	color:       var(--cl-text-muted);
+}
+
+.sai-metric-delta.up   { color: var(--cl-success); }
+.sai-metric-delta.down { color: var(--cl-danger); }
+
+/* -----------------------------------------------------------------------
+   8. Autopilot status bar
+   ----------------------------------------------------------------------- */
+.sai-autopilot-bar {
+	display:       flex;
+	align-items:   center;
+	gap:           14px;
+	padding:       12px 18px;
+	border-radius: var(--cl-radius);
+	margin-bottom: 20px;
+	border:        1px solid;
+	flex-wrap:     wrap;
+}
+
+.sai-autopilot-bar.ap-on  { background: var(--cl-success-bg); border-color: var(--cl-success-border); }
+.sai-autopilot-bar.ap-off { background: var(--cl-bg-2);       border-color: var(--cl-border); }
+
+.sai-ap-indicator { display: flex; align-items: center; gap: 10px; flex: 1; }
+
+.sai-ap-pulse {
+	width:         10px;
+	height:        10px;
+	border-radius: 50%;
+	flex-shrink:   0;
+	position:      relative;
+}
+
+.ap-on  .sai-ap-pulse { background: var(--cl-success); }
+.ap-off .sai-ap-pulse { background: var(--cl-text-faint); }
+
+.ap-on .sai-ap-pulse::after {
+	content:       '';
+	position:      absolute;
+	inset:         -4px;
+	border-radius: 50%;
+	background:    var(--cl-success);
+	opacity:       .22;
+	animation:     cl-pulse-ring 2s infinite;
+}
+
+.sai-ap-label { font-size: 13px; font-weight: 600; color: var(--cl-text); }
+.sai-ap-sub   { font-size: 12px; color: var(--cl-text-muted); }
+
+/* -----------------------------------------------------------------------
+   9. Activity timeline
+   ----------------------------------------------------------------------- */
+.sai-timeline { list-style: none; margin: 0; padding: 0; }
+
+.sai-timeline-item {
+	display:       flex;
+	gap:           12px;
+	padding:       14px 0;
+	border-bottom: 1px solid var(--cl-border);
+	animation:     cl-fade-in .25s ease forwards;
+}
+
+.sai-timeline-item:last-child { border-bottom: none; }
+
+.sai-timeline-icon {
+	width:         32px;
+	height:        32px;
+	border-radius: var(--cl-radius-sm);
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
+	flex-shrink:   0;
+	margin-top:    1px;
+}
+
+.sai-timeline-icon svg { width: 14px; height: 14px; }
+
+.sai-timeline-icon.t-meta    { background: var(--cl-accent-bg);  color: var(--cl-accent); border: 1px solid var(--cl-accent-border); }
+.sai-timeline-icon.t-link    { background: var(--cl-success-bg); color: var(--cl-success); border: 1px solid var(--cl-success-border); }
+.sai-timeline-icon.t-schema  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+.sai-timeline-icon.t-image   { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+.sai-timeline-icon.t-default { background: var(--cl-bg-2); color: var(--cl-text-muted); border: 1px solid var(--cl-border); }
+
+.sai-timeline-body { flex: 1; min-width: 0; }
+
+.sai-timeline-title {
+	font-size:   13px;
+	font-weight: 600;
+	color:       var(--cl-text);
+	margin:      0 0 3px;
+	display:     flex;
+	align-items: center;
+	gap:         7px;
+	flex-wrap:   wrap;
+}
+
+.sai-timeline-sub {
+	font-size:   12px;
+	color:       var(--cl-text-muted);
+	margin:      0;
+}
+
+.sai-timeline-diff {
+	margin-top:    10px;
+	display:       grid;
+	grid-template-columns: 1fr 1fr;
+	gap:           6px;
+	font-size:     12px;
+}
+
+.sai-diff-before,
+.sai-diff-after {
+	padding:       7px 10px;
+	border-radius: var(--cl-radius-sm);
+	word-break:    break-word;
+	line-height:   1.5;
+}
+
+.sai-diff-before { background: var(--cl-danger-bg);  border: 1px solid var(--cl-danger-border);  color: #991b1b; }
+.sai-diff-after  { background: var(--cl-success-bg); border: 1px solid var(--cl-success-border); color: #065f46; }
+
+.sai-diff-label {
+	font-size:      9px;
+	font-weight:    700;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+	display:        block;
+	margin-bottom:  4px;
+	opacity:        .6;
+}
+
+.sai-timeline-meta { font-size: 11px; color: var(--cl-text-faint); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+/* -----------------------------------------------------------------------
+   10. Decision / recommendation cards
+   ----------------------------------------------------------------------- */
+.sai-decision-list { display: flex; flex-direction: column; gap: 10px; }
+
+.sai-decision {
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow:    var(--cl-shadow-xs);
+	overflow:      hidden;
+	transition:    box-shadow var(--cl-dur) var(--cl-ease), border-color var(--cl-dur) var(--cl-ease);
+}
+
+.sai-decision:hover { box-shadow: var(--cl-shadow); border-color: var(--cl-border-2); }
+
+.sai-decision-header {
+	display:     flex;
+	align-items: flex-start;
+	gap:         12px;
+	padding:     14px 16px;
+	cursor:      pointer;
+}
+
+.sai-decision-type-icon {
+	width:         34px;
+	height:        34px;
+	border-radius: var(--cl-radius-sm);
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
+	flex-shrink:   0;
+	border:        1px solid transparent;
+}
+
+.sai-decision-type-icon svg { width: 15px; height: 15px; }
+
+.dt-meta    { background: var(--cl-accent-bg);  color: var(--cl-accent);  border-color: var(--cl-accent-border); }
+.dt-link    { background: var(--cl-success-bg); color: var(--cl-success); border-color: var(--cl-success-border); }
+.dt-schema  { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
+.dt-content { background: var(--cl-info-bg);    color: var(--cl-info);    border-color: var(--cl-info-border); }
+.dt-image   { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+.dt-redirect { background: var(--cl-danger-bg); color: var(--cl-danger);  border-color: var(--cl-danger-border); }
+.dt-default { background: var(--cl-bg-2); color: var(--cl-text-muted); border-color: var(--cl-border); }
+
+.sai-decision-info { flex: 1; min-width: 0; }
+
+.sai-decision-post {
+	font-size:     13px;
+	font-weight:   600;
+	color:         var(--cl-text);
+	margin:        0 0 3px;
+	white-space:   nowrap;
+	overflow:      hidden;
+	text-overflow: ellipsis;
+}
+
+.sai-decision-post a { color: inherit; text-decoration: none; }
+.sai-decision-post a:hover { color: var(--cl-accent); }
+
+.sai-decision-reason { font-size: 12px; color: var(--cl-text-muted); margin: 0 0 7px; line-height: 1.5; }
+
+.sai-decision-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.sai-decision-actions { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; padding-top: 1px; }
+
+.sai-decision-body {
+	padding:    0 16px 14px;
+	border-top: 1px solid var(--cl-border);
+	background: var(--cl-bg);
+}
+
+.sai-decision-proposed {
+	margin-top:    12px;
+	padding:       10px 13px;
+	background:    var(--cl-accent-bg);
+	border:        1px solid var(--cl-accent-border);
+	border-radius: var(--cl-radius-sm);
+	font-size:     12px;
+	color:         var(--cl-text-soft);
+	line-height:   1.5;
+}
+
+.sai-decision-proposed strong {
+	display:        block;
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color:          var(--cl-accent);
+	margin-bottom:  3px;
+}
+
+/* Confidence meter */
+.sai-conf { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--cl-text-muted); }
+
+.sai-conf-bar { width: 48px; height: 3px; background: var(--cl-border-2); border-radius: 2px; overflow: hidden; }
+
+.sai-conf-fill { height: 100%; border-radius: 2px; }
+.sai-conf-fill.high   { background: var(--cl-success); }
+.sai-conf-fill.medium { background: var(--cl-accent); }
+.sai-conf-fill.low    { background: var(--cl-danger); }
+
+/* -----------------------------------------------------------------------
+   11. Badges / pills
+   ----------------------------------------------------------------------- */
+.sai-badge {
+	display:        inline-flex;
+	align-items:    center;
+	font-size:      10px;
+	font-weight:    600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	padding:        2px 7px;
+	border-radius:  20px;
+	border:         1px solid transparent;
+	white-space:    nowrap;
+}
+
+.sai-badge.b-accent  { background: var(--cl-accent-bg);  color: var(--cl-accent-dark); border-color: var(--cl-accent-border); }
+.sai-badge.b-success { background: var(--cl-success-bg); color: #065f46; border-color: var(--cl-success-border); }
+.sai-badge.b-warning { background: var(--cl-warning-bg); color: #92400e; border-color: var(--cl-warning-border); }
+.sai-badge.b-danger  { background: var(--cl-danger-bg);  color: #991b1b; border-color: var(--cl-danger-border); }
+.sai-badge.b-info    { background: var(--cl-info-bg);    color: #1e40af; border-color: var(--cl-info-border); }
+.sai-badge.b-neutral { background: var(--cl-bg-2);       color: var(--cl-text-muted); border-color: var(--cl-border); }
+.sai-badge.b-purple  { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
+
+/* Mono tag */
+.sai-tag {
+	display:       inline-block;
+	font-family:   var(--cl-mono);
+	font-size:     10px;
+	font-weight:   500;
+	padding:       2px 6px;
+	background:    var(--cl-bg-2);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius-sm);
+	color:         var(--cl-text-muted);
+}
+
+/* Status dot + label */
+.sai-status {
+	display:        inline-flex;
+	align-items:    center;
+	gap:            5px;
+	font-size:      11px;
+	font-weight:    600;
+	letter-spacing: .03em;
+	text-transform: uppercase;
+}
+
+.sai-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.sai-status.s-applied    { color: var(--cl-success); }
+.sai-status.s-applied::before    { background: var(--cl-success); }
+.sai-status.s-pending    { color: var(--cl-accent); }
+.sai-status.s-pending::before    { background: var(--cl-accent); }
+.sai-status.s-discarded  { color: var(--cl-text-faint); }
+.sai-status.s-discarded::before  { background: var(--cl-text-faint); }
+.sai-status.s-rolled_back { color: var(--cl-danger); }
+.sai-status.s-rolled_back::before { background: var(--cl-danger); }
+.sai-status.s-approved   { color: var(--cl-info); }
+.sai-status.s-approved::before   { background: var(--cl-info); }
+
+/* -----------------------------------------------------------------------
+   12. Buttons
+   ----------------------------------------------------------------------- */
+.sai-btn {
+	display:         inline-flex;
+	align-items:     center;
+	justify-content: center;
+	gap:             6px;
+	font-family:     var(--cl-font);
+	font-size:       13px;
+	font-weight:     500;
+	padding:         7px 14px;
+	border-radius:   var(--cl-radius-sm);
+	border:          1px solid transparent;
+	cursor:          pointer;
+	text-decoration: none;
+	transition:      background var(--cl-dur) var(--cl-ease), box-shadow var(--cl-dur) var(--cl-ease), transform var(--cl-dur) var(--cl-ease);
+	line-height:     1;
+	white-space:     nowrap;
+}
+
+.sai-btn:hover  { transform: translateY(-1px); }
+.sai-btn:active { transform: translateY(0); }
+.sai-btn:focus-visible { outline: 2px solid var(--cl-accent); outline-offset: 2px; }
+.sai-btn svg    { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* Primary — dark, Claude style */
+.sai-btn-primary {
+	background: var(--cl-text);
+	color:      #fff;
+	border-color: var(--cl-text);
+	box-shadow: 0 1px 2px rgba(26,25,24,.25);
+}
+.sai-btn-primary:hover { background: var(--cl-text-soft); color: #fff; box-shadow: 0 3px 10px rgba(26,25,24,.25); }
+
+/* Accent — amber */
+.sai-btn-accent {
+	background: var(--cl-accent);
+	color:      #fff;
+	border-color: var(--cl-accent);
+	box-shadow: 0 1px 2px rgba(217,119,6,.3);
+}
+.sai-btn-accent:hover { background: var(--cl-accent-dark); color: #fff; }
+
+/* Success */
+.sai-btn-success {
+	background:  var(--cl-success-bg);
+	color:       var(--cl-success);
+	border-color: var(--cl-success-border);
+}
+.sai-btn-success:hover { background: var(--cl-success); color: #fff; border-color: var(--cl-success); }
+
+/* Danger */
+.sai-btn-danger {
+	background:  var(--cl-danger-bg);
+	color:       var(--cl-danger);
+	border-color: var(--cl-danger-border);
+}
+.sai-btn-danger:hover { background: var(--cl-danger); color: #fff; border-color: var(--cl-danger); }
+
+/* Ghost */
+.sai-btn-ghost {
+	background:  transparent;
+	color:       var(--cl-text-muted);
+	border-color: var(--cl-border);
+}
+.sai-btn-ghost:hover { background: var(--cl-bg-2); color: var(--cl-text); }
+
+/* Small */
+.sai-btn-sm { font-size: 11px; padding: 5px 10px; }
+.sai-btn-sm svg { width: 12px; height: 12px; }
+
+/* Disabled / loading */
+.sai-btn[disabled], .sai-btn.loading { opacity: .5; cursor: not-allowed; transform: none; }
+.sai-btn.loading::before {
+	content: '';
+	width: 11px; height: 11px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: cl-spin .5s linear infinite;
 }
 
 /* -----------------------------------------------------------------------
-   Rollback panel
+   13. Filter bar
    ----------------------------------------------------------------------- */
-.seo-agent-rollback-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.sai-filters {
+	display:       flex;
+	flex-wrap:     wrap;
+	align-items:   center;
+	gap:           10px;
+	padding:       12px 16px;
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow:    var(--cl-shadow-xs);
+	margin-bottom: 18px;
 }
 
-.seo-agent-rollback-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid #f0f0f1;
-    font-size: 13px;
+.sai-filters label {
+	font-size:      11px;
+	font-weight:    600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color:          var(--cl-text-muted);
+	display:        flex;
+	flex-direction: column;
+	gap:            4px;
 }
 
-.seo-agent-rollback-list li:last-child {
-    border-bottom: none;
+.sai-filters select,
+.sai-filters input[type="text"],
+.sai-filters input[type="search"],
+.sai-filters input[type="date"] {
+	font-family:   var(--cl-font);
+	font-size:     13px;
+	color:         var(--cl-text);
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius-sm);
+	padding:       6px 10px;
+	outline:       none;
+	transition:    border-color var(--cl-dur) var(--cl-ease), box-shadow var(--cl-dur) var(--cl-ease);
+	min-width:     120px;
+}
+
+.sai-filters select:focus,
+.sai-filters input:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 2px var(--cl-accent-bg); }
+
+.sai-search-wrap { flex: 1; min-width: 200px; position: relative; }
+.sai-search-wrap input { width: 100%; padding-left: 32px; box-sizing: border-box; }
+.sai-search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--cl-text-faint); }
+
+/* -----------------------------------------------------------------------
+   14. Tables
+   ----------------------------------------------------------------------- */
+.sai-table-wrap { overflow-x: auto; border-radius: var(--cl-radius); box-shadow: var(--cl-shadow); }
+
+.sai-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--cl-surface); }
+
+.sai-table thead { position: sticky; top: 0; z-index: 10; }
+
+.sai-table th {
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color:          var(--cl-text-muted);
+	background:     var(--cl-bg);
+	padding:        9px 14px;
+	text-align:     left;
+	border-bottom:  1px solid var(--cl-border);
+	white-space:    nowrap;
+}
+
+.sai-table td {
+	padding:        11px 14px;
+	vertical-align: middle;
+	border-bottom:  1px solid var(--cl-border);
+	color:          var(--cl-text-soft);
+}
+
+.sai-table tbody tr:last-child td { border-bottom: none; }
+.sai-table tbody tr:hover td { background: var(--cl-bg); }
+
+.sai-table .col-num    { text-align: right; font-feature-settings: 'tnum'; }
+.sai-table .col-trunc  { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sai-table .col-center { text-align: center; }
+
+/* -----------------------------------------------------------------------
+   15. Ranking position + delta
+   ----------------------------------------------------------------------- */
+.sai-position {
+	display:         inline-flex;
+	align-items:     center;
+	justify-content: center;
+	width:           32px;
+	height:          32px;
+	border-radius:   var(--cl-radius-sm);
+	font-size:       13px;
+	font-weight:     700;
+	font-feature-settings: 'tnum';
+}
+
+.sai-position.pos-top3  { background: #fef9c3; color: #713f12; }
+.sai-position.pos-top10 { background: var(--cl-success-bg); color: #065f46; }
+.sai-position.pos-top20 { background: var(--cl-accent-bg); color: var(--cl-accent-dark); }
+.sai-position.pos-lower { background: var(--cl-bg-2); color: var(--cl-text-muted); }
+
+.sai-delta {
+	display:     inline-flex;
+	align-items: center;
+	gap:         2px;
+	font-size:   11px;
+	font-weight: 700;
+	padding:     2px 6px;
+	border-radius: var(--cl-radius-sm);
+}
+
+.sai-delta.delta-up   { background: var(--cl-success-bg); color: var(--cl-success); }
+.sai-delta.delta-down { background: var(--cl-danger-bg);  color: var(--cl-danger); }
+.sai-delta.delta-flat { background: var(--cl-bg-2); color: var(--cl-text-faint); }
+
+/* -----------------------------------------------------------------------
+   16. Score ring
+   ----------------------------------------------------------------------- */
+.sai-score-ring {
+	position:        relative;
+	display:         inline-flex;
+	align-items:     center;
+	justify-content: center;
+}
+
+.sai-score-ring svg { transform: rotate(-90deg); }
+
+.sai-score-ring .ring-track {
+	fill:         none;
+	stroke:       var(--cl-border);
+	stroke-width: 6;
+}
+
+.sai-score-ring .ring-fill {
+	fill:           none;
+	stroke-width:   6;
+	stroke-linecap: round;
+	transition:     stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);
+}
+
+.ring-fill.score-excellent { stroke: var(--cl-success); }
+.ring-fill.score-good      { stroke: var(--cl-info); }
+.ring-fill.score-average   { stroke: var(--cl-accent); }
+.ring-fill.score-poor      { stroke: var(--cl-danger); }
+.ring-fill.score-critical  { stroke: #7f1d1d; }
+
+.sai-score-ring-center {
+	position:       absolute;
+	display:        flex;
+	flex-direction: column;
+	align-items:    center;
+	line-height:    1;
+}
+
+.sai-score-ring-num   { font-size: 24px; font-weight: 700; letter-spacing: -.03em; color: var(--cl-text); }
+.sai-score-ring-label { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--cl-text-muted); margin-top: 2px; }
+
+/* Score distribution bars */
+.sai-dist-bars { margin: 0; }
+
+.sai-dist-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 12px; }
+.sai-dist-label { width: 108px; color: var(--cl-text-muted); flex-shrink: 0; font-size: 11px; }
+.sai-dist-bar-track { flex: 1; height: 8px; background: var(--cl-border); border-radius: 4px; overflow: hidden; }
+.sai-dist-bar-fill { height: 100%; border-radius: 4px; transition: width .7s cubic-bezier(.4,0,.2,1); }
+.sai-dist-count { width: 32px; text-align: right; font-weight: 700; color: var(--cl-text); flex-shrink: 0; }
+
+/* -----------------------------------------------------------------------
+   17. Toggle switch (Claude settings style)
+   ----------------------------------------------------------------------- */
+.sai-toggle-wrap {
+	display:       flex;
+	align-items:   flex-start;
+	gap:           12px;
+	padding:       16px 0;
+	border-bottom: 1px solid var(--cl-border);
+}
+
+.sai-toggle-wrap:last-child { border-bottom: none; }
+
+.sai-toggle { position: relative; width: 38px; height: 21px; flex-shrink: 0; margin-top: 1px; }
+.sai-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+.sai-toggle-slider {
+	position:      absolute;
+	inset:         0;
+	background:    var(--cl-border-2);
+	border-radius: 10px;
+	cursor:        pointer;
+	transition:    background var(--cl-dur) var(--cl-ease);
+}
+
+.sai-toggle-slider::before {
+	content:       '';
+	position:      absolute;
+	height:        15px;
+	width:         15px;
+	left:          3px;
+	bottom:        3px;
+	background:    white;
+	border-radius: 50%;
+	box-shadow:    0 1px 3px rgba(26,25,24,.2);
+	transition:    transform var(--cl-dur) var(--cl-ease);
+}
+
+.sai-toggle input:checked + .sai-toggle-slider { background: var(--cl-text); }
+.sai-toggle input:checked + .sai-toggle-slider::before { transform: translateX(17px); }
+.sai-toggle input:focus-visible + .sai-toggle-slider { outline: 2px solid var(--cl-accent); outline-offset: 2px; }
+
+.sai-toggle-info { flex: 1; }
+.sai-toggle-title { font-size: 14px; font-weight: 600; color: var(--cl-text); margin: 0 0 3px; }
+.sai-toggle-desc  { font-size: 12px; color: var(--cl-text-muted); margin: 0; line-height: 1.5; }
+
+/* -----------------------------------------------------------------------
+   18. Settings fields
+   ----------------------------------------------------------------------- */
+.sai-settings-section { margin-bottom: 32px; }
+
+.sai-settings-section-title {
+	font-size:      11px;
+	font-weight:    700;
+	letter-spacing: .07em;
+	text-transform: uppercase;
+	color:          var(--cl-text-muted);
+	margin:         0 0 16px;
+	padding-bottom: 10px;
+	border-bottom:  2px solid var(--cl-border);
+}
+
+.sai-field {
+	display:       grid;
+	grid-template-columns: 190px 1fr;
+	gap:           16px 24px;
+	align-items:   start;
+	padding:       15px 0;
+	border-bottom: 1px solid var(--cl-border);
+}
+
+.sai-field:last-child { border-bottom: none; }
+
+.sai-field-label { font-size: 13px; font-weight: 600; color: var(--cl-text); padding-top: 6px; }
+.sai-field-desc  { font-size: 12px; color: var(--cl-text-muted); margin-top: 3px; line-height: 1.4; }
+
+.sai-field-control input,
+.sai-field-control textarea,
+.sai-field-control select {
+	font-family:   var(--cl-font);
+	font-size:     13px;
+	color:         var(--cl-text);
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius-sm);
+	padding:       8px 11px;
+	width:         100%;
+	box-sizing:    border-box;
+	outline:       none;
+	transition:    border-color var(--cl-dur), box-shadow var(--cl-dur);
+}
+
+.sai-field-control input:focus,
+.sai-field-control textarea:focus,
+.sai-field-control select:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 2px var(--cl-accent-bg); }
+
+.sai-key-input-wrap { position: relative; }
+.sai-key-input-wrap input { padding-right: 40px; font-family: var(--cl-mono); letter-spacing: .08em; }
+
+.sai-key-reveal {
+	position:  absolute; right: 8px; top: 50%; transform: translateY(-50%);
+	background: none; border: none; cursor: pointer; color: var(--cl-text-faint); padding: 4px; display: flex;
+}
+
+.sai-key-reveal:hover { color: var(--cl-accent); }
+.sai-key-reveal svg   { width: 14px; height: 14px; }
+
+/* -----------------------------------------------------------------------
+   19. Connect page
+   ----------------------------------------------------------------------- */
+.sai-connect-hero { text-align: center; padding: 48px 24px 36px; max-width: 520px; margin: 0 auto; }
+
+.sai-connect-hero-icon {
+	width:         56px; height: 56px;
+	border-radius: 14px;
+	background:    var(--cl-text);
+	display:       flex; align-items: center; justify-content: center;
+	margin:        0 auto 18px;
+	box-shadow:    0 8px 24px rgba(26,25,24,.2);
+}
+.sai-connect-hero-icon svg { width: 28px; height: 28px; color: white; }
+
+.sai-connect-hero h2 { font-size: 20px; font-weight: 700; color: var(--cl-text); margin: 0 0 8px; }
+.sai-connect-hero p  { font-size: 14px; color: var(--cl-text-muted); line-height: 1.6; margin: 0; }
+
+.sai-connect-status-row   { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+
+.sai-connect-status-item {
+	display:       flex; align-items: center; gap: 12px;
+	padding:       13px 16px; border-radius: var(--cl-radius); border: 1px solid;
+}
+
+.csi-ok  { background: var(--cl-success-bg); border-color: var(--cl-success-border); }
+.csi-err { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border); }
+.csi-warn{ background: var(--cl-warning-bg); border-color: var(--cl-warning-border); }
+
+.sai-connect-icon-wrap { width: 32px; height: 32px; border-radius: var(--cl-radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.csi-ok  .sai-connect-icon-wrap { background: var(--cl-success); }
+.csi-err .sai-connect-icon-wrap { background: var(--cl-danger); }
+.csi-warn .sai-connect-icon-wrap { background: var(--cl-accent); }
+.sai-connect-icon-wrap svg { width: 16px; height: 16px; color: white; }
+
+.sai-connect-item-body { flex: 1; }
+.sai-connect-item-title { font-size: 13px; font-weight: 600; color: var(--cl-text); margin: 0 0 2px; }
+.sai-connect-item-sub   { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
+
+/* Google auth button */
+.sai-google-btn {
+	display:         inline-flex; align-items: center; gap: 11px;
+	background:      var(--cl-surface); color: var(--cl-text);
+	border:          1px solid var(--cl-border); border-radius: var(--cl-radius-sm);
+	padding:         10px 16px;
+	font-family:     var(--cl-font); font-size: 14px; font-weight: 500;
+	text-decoration: none; cursor: pointer;
+	box-shadow:      var(--cl-shadow);
+	transition:      box-shadow var(--cl-dur), transform var(--cl-dur);
+}
+.sai-google-btn:hover { box-shadow: var(--cl-shadow-md); transform: translateY(-1px); color: var(--cl-text); text-decoration: none; }
+.sai-google-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* -----------------------------------------------------------------------
+   20. Cron job grid
+   ----------------------------------------------------------------------- */
+.sai-cron-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+
+.sai-cron-job {
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	padding:       15px 16px;
+	display:       flex; align-items: flex-start; gap: 11px;
+	box-shadow:    var(--cl-shadow-xs);
+}
+
+.sai-cron-indicator { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.ci-ok   { background: var(--cl-success); }
+.ci-late { background: var(--cl-accent); }
+.ci-miss { background: var(--cl-danger); }
+
+.sai-cron-body   { flex: 1; }
+.sai-cron-name   { font-size: 12px; font-weight: 600; color: var(--cl-text); margin: 0 0 3px; }
+.sai-cron-next   { font-size: 11px; color: var(--cl-text-muted); margin: 0; }
+.sai-cron-schedule { font-size: 10px; color: var(--cl-text-faint); margin: 2px 0 0; font-family: var(--cl-mono); }
+
+/* -----------------------------------------------------------------------
+   21. Empty states
+   ----------------------------------------------------------------------- */
+.sai-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 52px 24px; }
+
+.sai-empty-icon {
+	width:         52px; height: 52px; border-radius: var(--cl-radius);
+	background:    var(--cl-bg-2); border: 1px solid var(--cl-border);
+	display:       flex; align-items: center; justify-content: center; margin-bottom: 16px;
+}
+.sai-empty-icon svg { width: 24px; height: 24px; color: var(--cl-text-faint); }
+
+.sai-empty h3 { font-size: 16px; font-weight: 600; color: var(--cl-text); margin: 0 0 8px; }
+.sai-empty p  { font-size: 13px; color: var(--cl-text-muted); margin: 0 0 20px; max-width: 340px; line-height: 1.6; }
+
+/* Onboarding steps */
+.sai-onboarding-step { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--cl-border); }
+.sai-onboarding-step:last-child { border-bottom: none; }
+
+.sai-onboarding-num {
+	width: 28px; height: 28px; border-radius: 50%;
+	background:  var(--cl-bg-2); border: 2px solid var(--cl-border);
+	color: var(--cl-text-muted);
+	font-size: 12px; font-weight: 700;
+	display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.sai-onboarding-num.done { background: var(--cl-text); border-color: var(--cl-text); color: white; }
+
+.sai-onboarding-title { font-size: 13px; font-weight: 600; color: var(--cl-text); margin: 0 0 3px; }
+.sai-onboarding-desc  { font-size: 12px; color: var(--cl-text-muted); margin: 0 0 8px; line-height: 1.5; }
+
+/* -----------------------------------------------------------------------
+   22. Scan progress
+   ----------------------------------------------------------------------- */
+.sai-scan-progress {
+	display:       none; margin-top: 12px;
+	padding:       14px 16px;
+	background:    var(--cl-surface); border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius); box-shadow: var(--cl-shadow);
+}
+
+.sai-scan-progress.visible { display: block; }
+
+.sai-scan-bar-track { height: 6px; background: var(--cl-border); border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
+
+.sai-scan-bar-fill {
+	height: 100%; border-radius: 3px; width: 0%;
+	background: var(--cl-text);
+	transition: width .3s ease;
+}
+
+.sai-scan-bar-fill.complete { background: var(--cl-success); }
+.sai-scan-status { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
+
+/* -----------------------------------------------------------------------
+   23. Toast notifications
+   ----------------------------------------------------------------------- */
+#sai-toasts { position: fixed; bottom: 22px; right: 22px; z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+
+.sai-toast {
+	display:       flex; align-items: center; gap: 9px;
+	padding:       11px 15px;
+	background:    var(--cl-surface); border: 1px solid var(--cl-border);
+	border-radius: var(--cl-radius); box-shadow: var(--cl-shadow-lg);
+	font-size:     13px; font-weight: 500; color: var(--cl-text);
+	pointer-events: auto;
+	animation:     cl-toast-in .22s ease forwards;
+	min-width:     240px; max-width: 340px;
+}
+
+.sai-toast.toast-success { border-left: 3px solid var(--cl-success); }
+.sai-toast.toast-error   { border-left: 3px solid var(--cl-danger); }
+.sai-toast.toast-info    { border-left: 3px solid var(--cl-accent); }
+
+.sai-toast svg { width: 15px; height: 15px; flex-shrink: 0; }
+.sai-toast.toast-success svg { color: var(--cl-success); }
+.sai-toast.toast-error svg   { color: var(--cl-danger); }
+.sai-toast.toast-info svg    { color: var(--cl-accent); }
+.sai-toast.hiding { animation: cl-toast-out .18s ease forwards; }
+
+/* -----------------------------------------------------------------------
+   24. Notices
+   ----------------------------------------------------------------------- */
+.sai-notice { display: flex; align-items: flex-start; gap: 11px; padding: 13px 16px; border-radius: var(--cl-radius); border: 1px solid; margin-bottom: 18px; font-size: 13px; line-height: 1.5; }
+.sai-notice svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+.sai-notice.n-success { background: var(--cl-success-bg); border-color: var(--cl-success-border); color: #065f46; }
+.sai-notice.n-success svg { color: var(--cl-success); }
+.sai-notice.n-warning { background: var(--cl-warning-bg); border-color: var(--cl-warning-border); color: #92400e; }
+.sai-notice.n-warning svg { color: var(--cl-accent); }
+.sai-notice.n-error   { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border);  color: #991b1b; }
+.sai-notice.n-error svg { color: var(--cl-danger); }
+.sai-notice.n-info    { background: var(--cl-info-bg); border-color: var(--cl-info-border); color: #1e40af; }
+.sai-notice.n-info svg { color: var(--cl-info); }
+
+/* -----------------------------------------------------------------------
+   25. Pagination
+   ----------------------------------------------------------------------- */
+.sai-pagination { display: flex; align-items: center; justify-content: center; gap: 5px; padding-top: 20px; }
+
+.sai-page-btn {
+	display:         inline-flex; align-items: center; justify-content: center;
+	width:           32px; height: 32px; border-radius: var(--cl-radius-sm);
+	border:          1px solid var(--cl-border); background: var(--cl-surface);
+	font-size:       12px; font-weight: 500; color: var(--cl-text-muted);
+	text-decoration: none;
+	transition:      background var(--cl-dur), color var(--cl-dur);
+}
+.sai-page-btn:hover { background: var(--cl-bg-2); color: var(--cl-text); text-decoration: none; }
+.sai-page-btn.current { background: var(--cl-text); border-color: var(--cl-text); color: white; font-weight: 700; }
+
+/* -----------------------------------------------------------------------
+   26. Code / mono blocks
+   ----------------------------------------------------------------------- */
+.sai-code {
+	font-family:   var(--cl-mono);
+	font-size:     12px;
+	background:    var(--cl-bg-2);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius-sm);
+	padding:       8px 11px;
+	color:         var(--cl-text-soft);
+	word-break:    break-all;
+	display:       block;
 }
 
 /* -----------------------------------------------------------------------
-   Misc utilities
+   27. Rollback / redirects
    ----------------------------------------------------------------------- */
-.seo-agent-muted {
-    color: #8c8f94;
-    font-size: 12px;
+.sai-rollback-item {
+	display:       flex; gap: 13px; padding: 13px 16px; align-items: flex-start;
+	border-bottom: 1px solid var(--cl-border);
 }
+.sai-rollback-item:last-child { border-bottom: none; }
+.sai-rollback-title { font-size: 13px; font-weight: 600; margin: 0 0 2px; }
+.sai-rollback-meta  { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
 
-.seo-agent-mono {
-    font-family: monospace;
-    font-size: 12px;
-    color: #3c434a;
+.sai-redirect-type {
+	display:       inline-block;
+	font-family:   var(--cl-mono); font-size: 11px; font-weight: 700;
+	padding:       2px 7px; border-radius: var(--cl-radius-sm);
+	background:    var(--cl-accent-bg); color: var(--cl-accent-dark); border: 1px solid var(--cl-accent-border);
 }
 
 /* -----------------------------------------------------------------------
-   Interactive analysis progress bar
+   28. Utilities
    ----------------------------------------------------------------------- */
-.seo-agent-progress-track {
-    height: 8px;
-    background: #dcdcde;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
+.sai-mono  { font-family: var(--cl-mono); font-size: 12px; }
+.sai-muted { color: var(--cl-text-muted); }
+.sai-faint { color: var(--cl-text-faint); }
+.sai-small { font-size: 12px; }
+.sai-bold  { font-weight: 700; }
+.sai-flex  { display: flex; align-items: center; gap: 8px; }
+.sai-grow  { flex: 1; }
+.sai-divider { border: none; border-top: 1px solid var(--cl-border); margin: 20px 0; }
+.sai-mt-8  { margin-top: 8px; }
+.sai-mt-16 { margin-top: 16px; }
+.sai-mt-24 { margin-top: 24px; }
+.sai-mb-8  { margin-bottom: 8px; }
+.sai-mb-16 { margin-bottom: 16px; }
+.sai-mb-24 { margin-bottom: 24px; }
 
-.seo-agent-progress-fill {
-    height: 100%;
-    background: #2271b1;
-    border-radius: 4px;
-    width: 0;
-    transition: width 0.35s ease;
-}
-
-.seo-agent-progress-fill.complete {
-    background: #1e8e3e;
-}
-
-.seo-agent-progress-status {
-    font-size: 13px;
-    color: #50575e;
-    margin: 0;
-    line-height: 1.5;
+.sai-section-label {
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .07em;
+	text-transform: uppercase;
+	color:          var(--cl-text-muted);
+	margin:         0 0 10px;
 }
 
 /* -----------------------------------------------------------------------
-   v3.0 Dashboard — widget grid
+   29. Keyframes
    ----------------------------------------------------------------------- */
-.seo-agent-widget-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
+@keyframes cl-pulse {
+	0%, 100% { opacity: 1; }
+	50%       { opacity: .3; }
 }
 
-.seo-agent-widget {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 6px;
-    padding: 18px 20px;
-    text-align: center;
-    position: relative;
+@keyframes cl-pulse-green {
+	0%, 100% { opacity: 1; }
+	50%       { opacity: .35; }
 }
 
-.seo-agent-widget .widget-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1d2327;
-    line-height: 1.1;
-    margin-bottom: 6px;
+@keyframes cl-pulse-ring {
+	0%   { transform: scale(1);   opacity: .22; }
+	100% { transform: scale(2.5); opacity: 0; }
 }
 
-.seo-agent-widget .widget-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #646970;
-    text-transform: uppercase;
-    letter-spacing: .05em;
+@keyframes cl-spin {
+	to { transform: rotate(360deg); }
 }
 
-.seo-agent-widget.widget-pending { border-top: 3px solid #e1940a; }
-.seo-agent-widget.widget-ok      { border-top: 3px solid #1e8e3e; }
-.seo-agent-widget.widget-error   { border-top: 3px solid #c5221f; }
-.seo-agent-widget.widget-info    { border-top: 3px solid #2271b1; }
-
-/* -----------------------------------------------------------------------
-   v3.0 SEO Score meter ring
-   ----------------------------------------------------------------------- */
-.seo-score-ring {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
+@keyframes cl-fade-in {
+	from { opacity: 0; transform: translateY(3px); }
+	to   { opacity: 1; transform: translateY(0); }
 }
 
-.seo-score-ring svg {
-    transform: rotate(-90deg);
+@keyframes cl-toast-in {
+	from { opacity: 0; transform: translateX(16px); }
+	to   { opacity: 1; transform: translateX(0); }
 }
 
-.seo-score-ring .ring-track {
-    fill: none;
-    stroke: #dcdcde;
-    stroke-width: 8;
-}
-
-.seo-score-ring .ring-fill {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.6s ease;
-}
-
-.ring-fill.score-excellent { stroke: #1e8e3e; }
-.ring-fill.score-good      { stroke: #2271b1; }
-.ring-fill.score-average   { stroke: #e1940a; }
-.ring-fill.score-poor      { stroke: #c5221f; }
-.ring-fill.score-critical  { stroke: #8b0000; }
-
-.seo-score-ring .ring-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #646970;
-    text-transform: uppercase;
-    letter-spacing: .04em;
+@keyframes cl-toast-out {
+	from { opacity: 1; }
+	to   { opacity: 0; transform: translateX(16px); }
 }
 
 /* -----------------------------------------------------------------------
-   v3.0 Score distribution bar
+   29b. Metric variant aliases — support both old and new names
    ----------------------------------------------------------------------- */
-.seo-score-dist {
-    display: flex;
-    gap: 4px;
-    align-items: flex-end;
-    height: 60px;
-    margin-bottom: 8px;
-}
-
-.seo-score-dist-bar {
-    flex: 1;
-    border-radius: 3px 3px 0 0;
-    min-height: 4px;
-    position: relative;
-    cursor: default;
-}
-
-.seo-score-dist-bar span {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    color: #646970;
-    white-space: nowrap;
-}
-
-.seo-score-dist-bar.excellent { background: #1e8e3e; }
-.seo-score-dist-bar.good      { background: #2271b1; }
-.seo-score-dist-bar.average   { background: #e1940a; }
-.seo-score-dist-bar.poor      { background: #c5221f; }
-.seo-score-dist-bar.critical  { background: #8b0000; }
+.sai-metric.m-primary .sai-metric-stripe { background: var(--cl-accent); }
+.sai-metric.m-warning .sai-metric-stripe { background: var(--cl-accent); }
 
 /* -----------------------------------------------------------------------
-   v3.0 Opportunities page cards
+   30. Legacy shims — keep old class names working on pages not yet rewritten
    ----------------------------------------------------------------------- */
-.seo-agent-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 16px;
-    padding: 12px 14px;
-    background: #f6f7f7;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-}
-
-.seo-agent-filters select,
-.seo-agent-filters input[type="text"],
-.seo-agent-filters input[type="search"] {
-    font-size: 13px;
-}
-
-.opportunity-type {
-    font-size: 11px;
-    font-weight: 600;
-    font-family: monospace;
-    padding: 2px 6px;
-    background: #f0f6fc;
-    border: 1px solid #c3d9ef;
-    border-radius: 3px;
-    color: #1967d2;
-}
-
-.proposed-preview {
-    font-size: 12px;
-    color: #3c434a;
-    font-style: italic;
-}
-
-/* -----------------------------------------------------------------------
-   v3.0 Risk badges
-   ----------------------------------------------------------------------- */
-.risk-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-}
-
-.risk-badge.safe     { background: #e6f4ea; color: #137333; }
-.risk-badge.medium   { background: #fef7e0; color: #b06000; }
-.risk-badge.high     { background: #fce8e6; color: #c5221f; }
-.risk-badge.critical { background: #fce8e6; color: #8b0000; border: 1px solid #fca5a5; }
-
-/* -----------------------------------------------------------------------
-   v3.0 Keyword rankings trend colors
-   ----------------------------------------------------------------------- */
-.trend-change {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 3px;
-}
-
-.trend-change.positive { background: #e6f4ea; color: #137333; }
-.trend-change.negative { background: #fce8e6; color: #c5221f; }
-
-/* -----------------------------------------------------------------------
-   v3.0 Cron status page
-   ----------------------------------------------------------------------- */
-.cron-status {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 10px;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-}
-
-.cron-status.cron-ok    { background: #e6f4ea; color: #137333; }
-.cron-status.cron-error { background: #fce8e6; color: #c5221f; }
-
-/* -----------------------------------------------------------------------
-   v3.0 Dashboard: insights table score columns
-   ----------------------------------------------------------------------- */
-.score-cell {
-    text-align: center;
-    font-weight: 600;
-    font-size: 13px;
-}
-
-.score-cell.score-excellent { color: #137333; }
-.score-cell.score-good      { color: #2271b1; }
-.score-cell.score-average   { color: #b06000; }
-.score-cell.score-poor,
-.score-cell.score-critical  { color: #c5221f; }
-
-/* -----------------------------------------------------------------------
-   v3.0 Value cells in tables — truncate long text
-   ----------------------------------------------------------------------- */
-.value-cell {
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 12px;
-    color: #3c434a;
-}
-
-/* -----------------------------------------------------------------------
-   v3.0 Shared: wider page tables
-   ----------------------------------------------------------------------- */
-.seo-agent-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.seo-agent-table th {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-    color: #50575e;
-    background: #f6f7f7;
-    padding: 8px 12px;
-}
-
-.seo-agent-table td {
-    padding: 10px 12px;
-    font-size: 13px;
-    vertical-align: middle;
-}
-
-/* -----------------------------------------------------------------------
-   v3.0 Rollback center
-   ----------------------------------------------------------------------- */
-.seo-agent-ai-rollback .description,
-.seo-agent-ai-cron .description {
-    font-size: 13px;
-    color: #50575e;
-    margin-bottom: 16px;
-}
-
+.seo-agent-wrap        { max-width: 1200px; }
+.seo-agent-card        { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 20px 22px; margin-bottom: 20px; box-shadow: var(--cl-shadow); }
+.seo-agent-card h2     { margin-top: 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--cl-text-muted); border-bottom: 1px solid var(--cl-border); padding-bottom: 10px; margin-bottom: 14px; }
+.seo-agent-widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.seo-agent-widget      { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 18px 22px; box-shadow: var(--cl-shadow); }
+.seo-agent-stat-box    { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 14px 18px; text-align: center; }
+.seo-agent-stat-box .stat-value { font-size: 28px; font-weight: 700; color: var(--cl-text); }
+.seo-agent-stat-box .stat-label { font-size: 11px; color: var(--cl-text-muted); text-transform: uppercase; letter-spacing: .05em; }
+.seo-agent-stats-row   { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.seo-agent-pill.safe   { background: var(--cl-success-bg); color: #065f46; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.risky  { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.high   { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.medium { background: var(--cl-warning-bg); color: #92400e; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.low    { background: var(--cl-info-bg); color: #1e40af; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.risk-badge.safe  { background: var(--cl-success-bg); color: #065f46; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.risk-badge.medium { background: var(--cl-warning-bg); color: #92400e; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.risk-badge.high  { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.opportunity-type { font-size: 10px; font-weight: 700; font-family: var(--cl-mono); padding: 2px 6px; background: var(--cl-accent-bg); border: 1px solid var(--cl-accent-border); border-radius: var(--cl-radius-sm); color: var(--cl-accent-dark); }
+.cron-status.cron-ok    { background: var(--cl-success-bg); color: #065f46; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.cron-status.cron-error { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.trend-change.positive  { background: var(--cl-success-bg); color: #065f46; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
+.trend-change.negative  { background: var(--cl-danger-bg); color: #991b1b; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
+.seo-agent-table th { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; background: var(--cl-bg); color: var(--cl-text-muted); padding: 9px 14px; border-bottom: 1px solid var(--cl-border); }
