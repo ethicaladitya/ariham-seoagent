@@ -88,7 +88,7 @@ class SEO_Agent_AI_Schema_Engine {
 	}
 
 	public function inject_schema() {
-		if ( ! is_singular( 'post' ) ) {
+		if ( ! is_singular() ) {
 			return;
 		}
 
@@ -123,20 +123,35 @@ class SEO_Agent_AI_Schema_Engine {
 		$content        = $this->content_analyzer->analyze( $post );
 		$existing_types = array_map( 'strtolower', $content['schema_types'] ?? array() );
 		$blocks         = array();
+		$post_type      = $post->post_type;
 
-		// --- Article / BlogPosting ---
-		// Defer to the active SEO plugin (Yoast, RankMath, SmartCrawl, etc.) when one
-		// is present — they all output an Article/NewsArticle node in their schema graph.
+		// --- Primary entity block (Article / BlogPosting / WebPage / Product) ---
+		// Defer to the active SEO plugin when one is present — they all output an
+		// Article/NewsArticle or WebPage node in their schema graph.
 		// Only inject ourselves as a fallback when no SEO plugin is active.
 		if ( ! $this->seo_plugin_handles_post_schema() ) {
 			$has_article = array_filter(
 				$existing_types,
-				static fn( $t ) => str_contains( $t, 'article' ) || str_contains( $t, 'blogposting' )
+				static function ( $t ) {
+					return false !== strpos( $t, 'article' )
+						|| false !== strpos( $t, 'blogposting' )
+						|| false !== strpos( $t, 'webpage' )
+						|| false !== strpos( $t, 'product' );
+				}
 			);
 			if ( empty( $has_article ) ) {
-				$article = $this->build_article( $post, $content );
-				if ( $article ) {
-					$blocks[] = $article;
+				if ( 'post' === $post_type ) {
+					$primary = $this->build_article( $post, $content, 'BlogPosting' );
+				} elseif ( 'page' === $post_type ) {
+					$primary = $this->build_webpage( $post, $content );
+				} elseif ( 'product' === $post_type ) {
+					$primary = $this->build_product( $post, $content );
+				} else {
+					// Any other CPT falls back to Article.
+					$primary = $this->build_article( $post, $content, 'Article' );
+				}
+				if ( $primary ) {
+					$blocks[] = $primary;
 				}
 			}
 		}
@@ -146,7 +161,9 @@ class SEO_Agent_AI_Schema_Engine {
 		// value seo-agent-ai adds regardless of which SEO plugin is active.
 		$has_faq_schema = array_filter(
 			$existing_types,
-			static fn( $t ) => str_contains( $t, 'faq' )
+			static function ( $t ) {
+				return false !== strpos( $t, 'faq' );
+			}
 		);
 		if ( empty( $has_faq_schema ) && ! empty( $content['faq_items'] ) ) {
 			$faq = $this->build_faq( $content['faq_items'] );
@@ -182,7 +199,15 @@ class SEO_Agent_AI_Schema_Engine {
 	// Block builders
 	// -------------------------------------------------------------------
 
-	private function build_article( WP_Post $post, array $content ) {
+	/**
+	 * Build an Article or BlogPosting schema block.
+	 *
+	 * @param WP_Post $post
+	 * @param array   $content  Analyzed content data.
+	 * @param string  $type     Schema @type: 'BlogPosting' or 'Article'.
+	 * @return array
+	 */
+	private function build_article( WP_Post $post, array $content, $type = 'BlogPosting' ) {
 		$author_id    = (int) $post->post_author;
 		$author_name  = get_the_author_meta( 'display_name', $author_id );
 		$author_url   = get_author_posts_url( $author_id );
@@ -191,7 +216,7 @@ class SEO_Agent_AI_Schema_Engine {
 
 		$schema = array(
 			'@context'         => 'https://schema.org',
-			'@type'            => 'BlogPosting',
+			'@type'            => $type,
 			'headline'         => wp_strip_all_tags( $post->post_title ),
 			'datePublished'    => get_the_date( 'c', $post ),
 			'dateModified'     => get_the_modified_date( 'c', $post ),
@@ -210,7 +235,7 @@ class SEO_Agent_AI_Schema_Engine {
 				'@id'   => get_permalink( $post ),
 			),
 			'description'      => wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 ),
-			'wordCount'        => $content['word_count'] ?? 0,
+			'wordCount'        => isset( $content['word_count'] ) ? (int) $content['word_count'] : 0,
 			'url'              => get_permalink( $post ),
 		);
 
@@ -220,6 +245,71 @@ class SEO_Agent_AI_Schema_Engine {
 
 		if ( ! empty( $content['h2s'] ) ) {
 			$schema['articleSection'] = $content['h2s'][0] ?? '';
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Build a WebPage schema block for 'page' post type.
+	 *
+	 * @param WP_Post $post
+	 * @param array   $content  Analyzed content data.
+	 * @return array
+	 */
+	private function build_webpage( WP_Post $post, array $content ) {
+		$description = trim( wp_strip_all_tags( $post->post_excerpt ) );
+		if ( '' === $description ) {
+			$meta_desc = get_post_meta( $post->ID, '_seo_agent_ai_meta_description', true );
+			if ( $meta_desc ) {
+				$description = trim( wp_strip_all_tags( (string) $meta_desc ) );
+			}
+		}
+		if ( '' === $description ) {
+			$description = wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+		}
+
+		$schema = array(
+			'@context'    => 'https://schema.org',
+			'@type'       => 'WebPage',
+			'@id'         => get_permalink( $post ),
+			'name'        => wp_strip_all_tags( $post->post_title ),
+			'url'         => get_permalink( $post ),
+			'description' => $description,
+		);
+
+		return $schema;
+	}
+
+	/**
+	 * Build a basic Product schema block for WooCommerce 'product' post type.
+	 *
+	 * Intentionally minimal — no price injection to avoid stale data issues.
+	 * WooCommerce's own schema or a dedicated plugin handles pricing.
+	 *
+	 * @param WP_Post $post
+	 * @param array   $content  Analyzed content data.
+	 * @return array
+	 */
+	private function build_product( WP_Post $post, array $content ) {
+		$thumbnail_id = get_post_thumbnail_id( $post->ID );
+		$thumbnail    = $thumbnail_id ? wp_get_attachment_image_url( $thumbnail_id, 'large' ) : '';
+
+		$description = trim( wp_strip_all_tags( $post->post_excerpt ) );
+		if ( '' === $description ) {
+			$description = wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+		}
+
+		$schema = array(
+			'@context'    => 'https://schema.org',
+			'@type'       => 'Product',
+			'name'        => wp_strip_all_tags( $post->post_title ),
+			'url'         => get_permalink( $post ),
+			'description' => $description,
+		);
+
+		if ( $thumbnail ) {
+			$schema['image'] = $thumbnail;
 		}
 
 		return $schema;

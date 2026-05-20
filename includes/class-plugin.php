@@ -36,6 +36,7 @@ class SEO_Agent_AI_Plugin {
 	const CRON_HOOK_ORPHAN          = 'seo_agent_detect_orphans';
 	const CRON_HOOK_IMAGE_ALTS      = 'seo_agent_generate_image_alts';
 	const CRON_HOOK_OBSERVE         = 'seo_agent_observe_results';
+	const CRON_HOOK_CWV             = 'seo_agent_fetch_cwv_data';
 
 	private static $instance = null;
 
@@ -120,6 +121,12 @@ class SEO_Agent_AI_Plugin {
 	/** @var SEO_Agent_AI_Redirect_Manager */
 	private $redirect_manager;
 
+	/** @var SEO_Agent_AI_PageSpeed_Client */
+	private $pagespeed_client;
+
+	/** @var SEO_Agent_AI_Content_Expander */
+	private $content_expander;
+
 	// -------------------------------------------------------------------
 	// Singleton
 	// -------------------------------------------------------------------
@@ -140,10 +147,11 @@ class SEO_Agent_AI_Plugin {
 		$this->bridge       = new SEO_Agent_AI_SEO_Plugin_Bridge();
 
 		// API clients.
-		$this->gemini     = new SEO_Agent_AI_Gemini_Client();
-		$this->openai     = new SEO_Agent_AI_OpenAI_Client();
-		$this->gsc_client = new SEO_Agent_AI_GSC_Client( $this->oauth );
-		$this->ga4_client = new SEO_Agent_AI_GA4_Client( $this->oauth );
+		$this->gemini           = new SEO_Agent_AI_Gemini_Client();
+		$this->openai           = new SEO_Agent_AI_OpenAI_Client();
+		$this->gsc_client       = new SEO_Agent_AI_GSC_Client( $this->oauth );
+		$this->ga4_client       = new SEO_Agent_AI_GA4_Client( $this->oauth );
+		$this->pagespeed_client = new SEO_Agent_AI_PageSpeed_Client();
 
 		// Analysis engines.
 		$this->content_analyzer = new SEO_Agent_AI_Content_Analyzer();
@@ -164,6 +172,9 @@ class SEO_Agent_AI_Plugin {
 		$this->report_engine            = new SEO_Agent_AI_Report_Engine( $this->logger );
 		$this->queue_manager            = new SEO_Agent_AI_Queue_Manager( $this->logger );
 		$this->gsc_opportunity_analyzer = new SEO_Agent_AI_GSC_Opportunity_Analyzer( $this->gsc_client );
+
+		// Content generation.
+		$this->content_expander = new SEO_Agent_AI_Content_Expander( $this->openai, $this->gemini );
 
 		// Feature modules.
 		$this->image_seo        = new SEO_Agent_AI_Image_SEO( $this->gemini, $this->openai, $this->logger );
@@ -253,6 +264,9 @@ class SEO_Agent_AI_Plugin {
 		// Cron hook — weekly observation pass: compare GSC metrics before/after applied changes.
 		add_action( self::CRON_HOOK_OBSERVE, array( $this, 'run_observe_results' ) );
 
+		// Cron hook — weekly Core Web Vitals data prefetch via PageSpeed Insights API.
+		add_action( self::CRON_HOOK_CWV, array( $this, 'run_fetch_cwv_data' ) );
+
 		$this->image_seo->init_hooks();
 		$this->social_meta->init_hooks();
 		$this->meta_box->init_hooks();
@@ -298,6 +312,7 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_IMPROVE,
 			self::CRON_HOOK_ORPHAN,
 			self::CRON_HOOK_OBSERVE,
+			self::CRON_HOOK_CWV,
 		);
 		foreach ( $weekly_hooks as $hook ) {
 			if ( ! wp_next_scheduled( $hook ) ) {
@@ -324,6 +339,7 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_ORPHAN,
 			self::CRON_HOOK_IMAGE_ALTS,
 			self::CRON_HOOK_OBSERVE,
+			self::CRON_HOOK_CWV,
 		);
 		foreach ( $all_hooks as $hook ) {
 			wp_clear_scheduled_hook( $hook );
@@ -386,6 +402,9 @@ class SEO_Agent_AI_Plugin {
 		if ( ! wp_next_scheduled( self::CRON_HOOK_OBSERVE ) ) {
 			wp_schedule_event( time() + DAY_IN_SECONDS + 5 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_OBSERVE );
 		}
+		if ( ! wp_next_scheduled( self::CRON_HOOK_CWV ) ) {
+			wp_schedule_event( time() + DAY_IN_SECONDS + 6 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_CWV );
+		}
 
 		set_transient( 'seo_agent_ai_cron_checked', 1, HOUR_IN_SECONDS );
 	}
@@ -437,6 +456,44 @@ class SEO_Agent_AI_Plugin {
 		}
 		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_GA4, current_time( 'mysql' ), false );
 		$this->logger->info( 'GA4 engagement fetch complete.' );
+	}
+
+	/**
+	 * Weekly cron: pre-fetch Core Web Vitals data via PageSpeed Insights for the
+	 * top 50 published posts. Results are stored as transients (24h) and consumed
+	 * by the scoring engine and recommendation engine without making live API calls.
+	 *
+	 * A 0.2s sleep between requests avoids hitting the API rate limit.
+	 */
+	public function run_fetch_cwv_data() {
+		$this->logger->info( 'Starting weekly Core Web Vitals data fetch.' );
+
+		$posts   = $this->get_posts_for_analysis( 50 );
+		$fetched = 0;
+		$failed  = 0;
+
+		foreach ( $posts as $post ) {
+			$url = get_permalink( $post );
+			if ( ! $url ) {
+				continue;
+			}
+			$result = $this->pagespeed_client->get_metrics( $url, 'mobile' );
+			if ( is_wp_error( $result ) ) {
+				++$failed;
+				$this->logger->error(
+					sprintf( 'CWV fetch failed for post %d: %s', (int) $post->ID, $result->get_error_message() )
+				);
+			} else {
+				++$fetched;
+			}
+			// Brief pause to stay within the 25k/day unauthenticated quota.
+			usleep( 200000 ); // 0.2 seconds.
+		}
+
+		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_CWV, current_time( 'mysql' ), false );
+		$this->logger->info(
+			sprintf( 'CWV data fetch complete. Fetched: %d, Failed: %d.', $fetched, $failed )
+		);
 	}
 
 	public function run_generate_report() {
@@ -1266,14 +1323,17 @@ class SEO_Agent_AI_Plugin {
 	 */
 	/**
 	 * Types the plugin can actually execute automatically.
-	 * Content-generation types (content_expansion, content_refresh_plan, …)
-	 * need human review and must never be included here.
+	 * Content-generation types are included but subject to a tighter daily
+	 * budget check inside apply_auto_decision() — they save a pending draft
+	 * for human review rather than publishing anything directly.
 	 */
 	private static $autopilot_executable_types = array(
 		'meta_update',
 		'monitor_decline',
 		'schema_update',
 		'internal_link_needed',
+		'content_expansion',
+		'content_refresh_plan',
 	);
 
 	private function route_recommendations( $post_id, array $recommendations, array $gsc_metrics, array $analysis, $autopilot ) {
@@ -1337,6 +1397,15 @@ class SEO_Agent_AI_Plugin {
 		} elseif ( 'schema_update' === $type ) {
 			update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
 			$result = true;
+		} elseif ( 'content_expansion' === $type ) {
+			$focus   = isset( $rec['proposed']['focus_topic'] ) ? (string) $rec['proposed']['focus_topic'] : '';
+			$queries = isset( $rec['proposed']['gsc_queries'] ) && is_array( $rec['proposed']['gsc_queries'] ) ? $rec['proposed']['gsc_queries'] : array();
+			$intent  = isset( $rec['proposed']['search_intent'] ) ? (string) $rec['proposed']['search_intent'] : '';
+			$result  = $this->content_expander->expand( $post_id, $focus, $queries, $intent );
+		} elseif ( 'content_refresh_plan' === $type ) {
+			$queries = isset( $rec['proposed']['gsc_queries'] ) && is_array( $rec['proposed']['gsc_queries'] ) ? $rec['proposed']['gsc_queries'] : array();
+			$intent  = isset( $rec['proposed']['search_intent'] ) ? (string) $rec['proposed']['search_intent'] : '';
+			$result  = $this->content_expander->refresh( $post_id, $queries, $intent );
 		} else {
 			$result = $this->fix_executor->apply(
 				$post_id,

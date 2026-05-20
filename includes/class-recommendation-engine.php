@@ -16,9 +16,9 @@ class SEO_Agent_AI_Recommendation_Engine {
 	private $decision_engine;
 
 	public function __construct(
-		SEO_Agent_AI_Gemini_Client $gemini = null,
-		SEO_Agent_AI_OpenAI_Client $openai = null,
-		SEO_Agent_AI_Decision_Engine $decision_engine = null
+		?SEO_Agent_AI_Gemini_Client $gemini = null,
+		?SEO_Agent_AI_OpenAI_Client $openai = null,
+		?SEO_Agent_AI_Decision_Engine $decision_engine = null
 	) {
 		$this->gemini          = $gemini;
 		$this->openai          = $openai;
@@ -51,6 +51,26 @@ class SEO_Agent_AI_Recommendation_Engine {
 		$content     = isset( $analysis['content_data'] ) ? $analysis['content_data'] : array();
 		$top_query   = $this->extract_top_query( $gsc );
 		$impressions = isset( $gsc['impressions_total'] ) ? (int) $gsc['impressions_total'] : 0;
+
+		// --- Search intent classification ---
+		// Pull all GSC query strings and classify the dominant intent for this post.
+		$gsc_query_strings = array();
+		if ( ! empty( $gsc['queries'] ) && is_array( $gsc['queries'] ) ) {
+			foreach ( $gsc['queries'] as $q_row ) {
+				if ( ! empty( $q_row['query'] ) ) {
+					$gsc_query_strings[] = (string) $q_row['query'];
+				}
+			}
+		}
+		if ( ! empty( $top_query ) ) {
+			array_unshift( $gsc_query_strings, $top_query );
+		}
+		$search_intent = class_exists( 'SEO_Agent_AI_Search_Intent' )
+			? SEO_Agent_AI_Search_Intent::classify_bulk( $gsc_query_strings )
+			: 'unknown';
+		$intent_label  = class_exists( 'SEO_Agent_AI_Search_Intent' )
+			? SEO_Agent_AI_Search_Intent::label( $search_intent )
+			: __( 'Unknown', 'seo-agent-ai' );
 
 		$recommendations = array();
 
@@ -144,6 +164,22 @@ class SEO_Agent_AI_Recommendation_Engine {
 
 		if ( ! empty( $signals['thin_content'] ) ) {
 			$word_count = isset( $seo_audit['word_count'] ) ? (int) $seo_audit['word_count'] : ( $content['word_count'] ?? 0 );
+
+			// Tailor the expansion advice based on detected search intent.
+			if ( 'informational' === $search_intent ) {
+				$expansion_hint = __( 'Informational intent detected — expand with step-by-step explanations, definitions, and a FAQ block.', 'seo-agent-ai' );
+			} elseif ( 'commercial' === $search_intent ) {
+				$expansion_hint = __( 'Commercial intent detected — add a comparison table, pros/cons section, and expert verdict to satisfy research-phase users.', 'seo-agent-ai' );
+			} elseif ( 'transactional' === $search_intent ) {
+				$expansion_hint = __( 'Transactional intent detected — add clear calls-to-action, pricing details, and trust signals (reviews, guarantees).', 'seo-agent-ai' );
+			} else {
+				$expansion_hint = sprintf(
+					/* translators: %s: target search query or post title. */
+					__( 'Expand content to at least 600 words. Add an FAQ block for "%s", real examples, and a clear summary.', 'seo-agent-ai' ),
+					$top_query !== '' ? $top_query : $post->post_title
+				);
+			}
+
 			$recommendations[] = array(
 				'type'            => 'content_expansion',
 				'risk'            => 'risky',
@@ -155,12 +191,12 @@ class SEO_Agent_AI_Recommendation_Engine {
 					__( 'This post has only %d words. Google consistently favours comprehensive content (600+ words).', 'seo-agent-ai' ),
 					$word_count
 				),
+				'meta'            => array(
+					'search_intent'       => $search_intent,
+					'search_intent_label' => $intent_label,
+				),
 				'proposed'        => array(
-					'summary' => sprintf(
-						/* translators: %s: target search query or post title. */
-						__( 'Expand content to at least 600 words. Add an FAQ block for "%s", real examples, and a clear summary.', 'seo-agent-ai' ),
-						$top_query !== '' ? $top_query : $post->post_title
-					),
+					'summary' => $expansion_hint,
 				),
 			);
 		}
@@ -203,6 +239,33 @@ class SEO_Agent_AI_Recommendation_Engine {
 			$position = isset( $gsc['position_avg'] ) ? round( (float) $gsc['position_avg'], 1 ) : 0;
 			$time_sec = isset( $ga4['avg_time_on_page_sec'] ) ? (int) $ga4['avg_time_on_page_sec'] : 0;
 
+			// Intent-aware alignment hint.
+			if ( 'informational' === $search_intent ) {
+				$alignment_hint = sprintf(
+					/* translators: %s: target search query or post title. */
+					__( 'Informational intent detected — revise H1 and introduction to directly answer "%s" within the first 100 words, using clear definitions or step-by-step instructions.', 'seo-agent-ai' ),
+					$top_query !== '' ? $top_query : $post->post_title
+				);
+			} elseif ( 'transactional' === $search_intent ) {
+				$alignment_hint = sprintf(
+					/* translators: %s: target search query or post title. */
+					__( 'Transactional intent detected — lead with a clear CTA and pricing/availability for "%s" so users can act immediately rather than bouncing.', 'seo-agent-ai' ),
+					$top_query !== '' ? $top_query : $post->post_title
+				);
+			} elseif ( 'commercial' === $search_intent ) {
+				$alignment_hint = sprintf(
+					/* translators: %s: target search query or post title. */
+					__( 'Commercial intent detected — restructure around comparison and evaluation for "%s": add a verdict section and a clear winner recommendation early in the post.', 'seo-agent-ai' ),
+					$top_query !== '' ? $top_query : $post->post_title
+				);
+			} else {
+				$alignment_hint = sprintf(
+					/* translators: %s: target search query or post title. */
+					__( 'Revise H1, introduction, and meta snippet to directly answer "%s" within first visible paragraph.', 'seo-agent-ai' ),
+					$top_query !== '' ? $top_query : $post->post_title
+				);
+			}
+
 			$recommendations[] = array(
 				'type'            => 'intent_alignment',
 				'risk'            => 'risky',
@@ -210,17 +273,18 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'confidence'      => $confidence,
 				'expected_impact' => 'High — fixing intent mismatch reduces pogo-sticking and improves rankings.',
 				'reason'          => sprintf(
-					/* translators: 1: average search position, 2: average time on page in seconds. */
-					__( 'Strong ranking at position %1$.1f, but users spend only %2$ds — clear intent mismatch. Rewrite introduction to answer primary search intent within first 100 words.', 'seo-agent-ai' ),
+					/* translators: 1: average search position, 2: average time on page in seconds, 3: intent label. */
+					__( 'Strong ranking at position %1$.1f, but users spend only %2$ds — %3$s intent mismatch detected. Rewrite introduction to answer primary search intent within first 100 words.', 'seo-agent-ai' ),
 					$position,
-					$time_sec
+					$time_sec,
+					$intent_label
+				),
+				'meta'            => array(
+					'search_intent'       => $search_intent,
+					'search_intent_label' => $intent_label,
 				),
 				'proposed'        => array(
-					'summary' => sprintf(
-						/* translators: %s: target search query or post title. */
-						__( 'Revise H1, introduction, and meta snippet to directly answer "%s" within first visible paragraph.', 'seo-agent-ai' ),
-						$top_query !== '' ? $top_query : $post->post_title
-					),
+					'summary' => $alignment_hint,
 				),
 			);
 		}
@@ -487,7 +551,74 @@ class SEO_Agent_AI_Recommendation_Engine {
 		}
 
 		// ------------------------------------------------------------------
-		// 16. Index anomaly (new)
+		// 16. Core Web Vitals performance fix (new)
+		// ------------------------------------------------------------------
+
+		$psi_cache_key = 'sai_psi_' . md5( get_permalink( $post->ID ) . 'mobile' );
+		$psi_metrics   = get_transient( $psi_cache_key );
+		if ( is_array( $psi_metrics ) ) {
+			$cwv_lcp  = (int) ( $psi_metrics['lcp_ms'] ?? 0 );
+			$cwv_cls  = (float) ( $psi_metrics['cls'] ?? 0 );
+			$cwv_perf = (int) ( $psi_metrics['performance'] ?? 0 );
+
+			if ( $cwv_lcp >= 2500 || $cwv_cls >= 0.1 || $cwv_perf < 50 ) {
+				$cwv_reasons = array();
+
+				if ( $cwv_lcp >= 4000 ) {
+					$cwv_reasons[] = sprintf(
+						/* translators: %d: LCP time in milliseconds. */
+						__( 'LCP is poor (%dms — threshold 4,000ms)', 'seo-agent-ai' ),
+						$cwv_lcp
+					);
+				} elseif ( $cwv_lcp >= 2500 ) {
+					$cwv_reasons[] = sprintf(
+						/* translators: %d: LCP time in milliseconds. */
+						__( 'LCP needs improvement (%dms — threshold 2,500ms)', 'seo-agent-ai' ),
+						$cwv_lcp
+					);
+				}
+
+				if ( $cwv_cls >= 0.25 ) {
+					$cwv_reasons[] = sprintf(
+						/* translators: %.2f: CLS score. */
+						__( 'CLS is poor (%.2f — threshold 0.25)', 'seo-agent-ai' ),
+						$cwv_cls
+					);
+				} elseif ( $cwv_cls >= 0.1 ) {
+					$cwv_reasons[] = sprintf(
+						/* translators: %.2f: CLS score. */
+						__( 'CLS needs improvement (%.2f — threshold 0.1)', 'seo-agent-ai' ),
+						$cwv_cls
+					);
+				}
+
+				if ( $cwv_perf < 50 ) {
+					$cwv_reasons[] = sprintf(
+						/* translators: %d: Lighthouse performance score. */
+						__( 'Lighthouse performance score is low (%d/100)', 'seo-agent-ai' ),
+						$cwv_perf
+					);
+				}
+
+				$recommendations[] = array(
+					'type'            => 'needs_performance_fix',
+					'risk'            => 'safe',  // No content change — informational flag only.
+					'priority'        => 'high',
+					'confidence'      => 0.95,
+					'expected_impact' => __( 'High — Core Web Vitals are a confirmed Google ranking signal. Fixing poor scores can lift rankings and reduce bounce rate.', 'seo-agent-ai' ),
+					'reason'          => implode( '; ', $cwv_reasons ),
+					'proposed'        => array(
+						'lcp_ms'      => $cwv_lcp,
+						'cls'         => $cwv_cls,
+						'performance' => $cwv_perf,
+						'action'      => __( 'Review PageSpeed Insights for this URL and address the flagged issues.', 'seo-agent-ai' ),
+					),
+				);
+			}
+		}
+
+		// ------------------------------------------------------------------
+		// 17. Index anomaly (new)
 		// ------------------------------------------------------------------
 
 		if ( ! empty( $signals['index_anomaly'] ) ) {
@@ -515,6 +646,19 @@ class SEO_Agent_AI_Recommendation_Engine {
 		}
 
 		$recommendations = $this->dedupe_recommendations( $recommendations );
+
+		// ------------------------------------------------------------------
+		// Stamp search intent onto every recommendation that does not already
+		// carry a meta.search_intent value (set inline above for the ones that
+		// use it to customise reasoning text).
+		// ------------------------------------------------------------------
+		foreach ( $recommendations as &$rec ) {
+			if ( ! isset( $rec['meta']['search_intent'] ) ) {
+				$rec['meta']['search_intent']       = $search_intent;
+				$rec['meta']['search_intent_label'] = $intent_label;
+			}
+		}
+		unset( $rec );
 
 		// ------------------------------------------------------------------
 		// Route through decision engine (if available)

@@ -58,9 +58,72 @@ class SEO_Agent_AI_Fix_Executor {
 			return new WP_Error( 'seo_agent_ai_risky_recommendation', __( 'Only safe recommendations can be auto-applied.', 'seo-agent-ai' ) );
 		}
 
-		if ( ! in_array( $type, array( 'meta_update', 'monitor_decline', 'schema_update' ), true ) ) {
+		$allowed_types = array( 'meta_update', 'monitor_decline', 'schema_update', 'internal_link_needed', 'content_expansion', 'content_refresh_plan', 'alt_text', 'heading_update' );
+		if ( ! in_array( $type, $allowed_types, true ) ) {
 			return new WP_Error( 'seo_agent_ai_unsupported_recommendation', __( 'Recommendation type is not supported for auto-apply.', 'seo-agent-ai' ) );
 		}
+
+		// Types handled externally — just acknowledge and return.
+		if ( 'internal_link_needed' === $type || 'content_expansion' === $type || 'content_refresh_plan' === $type ) {
+			return true;
+		}
+
+		// Alt text update.
+		if ( 'alt_text' === $type ) {
+			$attachment_id = (int) ( $proposed['attachment_id'] ?? 0 );
+			$new_alt       = sanitize_text_field( $proposed['alt_text'] ?? '' );
+			if ( $attachment_id <= 0 || '' === $new_alt ) {
+				return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No alt text payload found.', 'seo-agent-ai' ) );
+			}
+			if ( $dry_run ) {
+				return true;
+			}
+			$this->backup_meta( $post_id );
+			$prev_alt = (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+			update_post_meta( $attachment_id, '_wp_attachment_image_alt', $new_alt );
+			$this->activity_log->log( $post_id, $type, 'alt_text', $prev_alt, $new_alt, $reason, $signal_data, $confidence, $triggered_by );
+			return true;
+		}
+
+		// Heading update: replace first <h1> in post_content, or update post_title.
+		if ( 'heading_update' === $type ) {
+			$new_heading = sanitize_text_field( $proposed['heading'] ?? '' );
+			if ( '' === $new_heading ) {
+				return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No heading payload found.', 'seo-agent-ai' ) );
+			}
+			if ( $dry_run ) {
+				return true;
+			}
+			$this->backup_meta( $post_id );
+			$content = $post->post_content;
+			if ( preg_match( '/<h1[^>]*>.*?<\/h1>/is', $content ) ) {
+				$prev_heading = '';
+				if ( preg_match( '/<h1[^>]*>(.*?)<\/h1>/is', $content, $hm ) ) {
+					$prev_heading = wp_strip_all_tags( $hm[1] );
+				}
+				$new_content = preg_replace( '/<h1[^>]*>.*?<\/h1>/is', '<h1>' . esc_html( $new_heading ) . '</h1>', $content, 1 );
+				wp_update_post(
+					array(
+						'ID'           => $post_id,
+						'post_content' => $new_content,
+					)
+				);
+				$this->activity_log->log( $post_id, $type, 'h1_heading', $prev_heading, $new_heading, $reason, $signal_data, $confidence, $triggered_by );
+			} else {
+				$prev_title = $post->post_title;
+				wp_update_post(
+					array(
+						'ID'         => $post_id,
+						'post_title' => $new_heading,
+					)
+				);
+				$this->activity_log->log( $post_id, $type, 'post_title', $prev_title, $new_heading, $reason, $signal_data, $confidence, $triggered_by );
+			}
+			update_post_meta( $post_id, '_seo_agent_ai_last_applied_at', current_time( 'mysql' ) );
+			return true;
+		}
+
+		// --- meta_update / monitor_decline ---
 
 		$new_title       = isset( $proposed['meta_title'] ) ? sanitize_text_field( $proposed['meta_title'] ) : '';
 		$new_description = isset( $proposed['meta_description'] ) ? sanitize_textarea_field( $proposed['meta_description'] ) : '';

@@ -389,32 +389,112 @@ class SEO_Agent_AI_Internal_Link_Engine {
 	/**
 	 * Wrap the first natural occurrence of $anchor in $content with an <a> tag.
 	 *
-	 * Returns null if anchor not found after stripping tags.
+	 * Uses DOMDocument for safe HTML-aware injection. Returns null if anchor is
+	 * not found in a text node outside of existing <a> elements.
+	 *
+	 * @param string $content    Post content HTML.
+	 * @param string $anchor     Anchor text to link.
+	 * @param string $target_url Destination URL.
+	 * @return string|null  Modified content, or null if anchor was not injected.
 	 */
 	private function inject_link( $content, $anchor, $target_url ) {
-		// Use a case-insensitive regex to match only text nodes (not inside tags).
-		$pattern = '/(?<![\'"])(' . preg_quote( $anchor, '/' ) . ')(?![^<]*>)/iu';
-		$link    = '<a href="' . esc_url( $target_url ) . '">' . esc_html( $anchor ) . '</a>';
-
-		$count   = 0;
-		$result  = preg_replace( $pattern, $link, $content, 1, $count );
-
-		if ( $count === 0 || $result === null ) {
+		if ( ! class_exists( 'DOMDocument' ) ) {
+			// Fallback for environments without DOM extension.
 			return null;
 		}
 
-		return $result;
+		$doc     = new DOMDocument( '1.0', 'UTF-8' );
+		$wrapped = '<div id="sai-il-root">' . $content . '</div>';
+		libxml_use_internal_errors( true );
+		$doc->loadHTML(
+			'<?xml encoding="UTF-8">' . $wrapped,
+			LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+		);
+		libxml_clear_errors();
+
+		$xpath    = new DOMXPath( $doc );
+		$injected = false;
+
+		// Walk all text nodes NOT inside <a> tags.
+		$text_nodes = $xpath->query( '//text()[not(ancestor::a)]' );
+		foreach ( $text_nodes as $text_node ) {
+			$node_text = $text_node->nodeValue;
+			$pos       = mb_stripos( $node_text, $anchor );
+			if ( false === $pos ) {
+				continue;
+			}
+
+			// Split the text node into three parts: before, anchor, after.
+			$before = mb_substr( $node_text, 0, $pos );
+			$match  = mb_substr( $node_text, $pos, mb_strlen( $anchor ) );
+			$after  = mb_substr( $node_text, $pos + mb_strlen( $anchor ) );
+
+			$parent = $text_node->parentNode;
+			$frag   = $doc->createDocumentFragment();
+
+			if ( '' !== $before ) {
+				$frag->appendChild( $doc->createTextNode( $before ) );
+			}
+
+			$link = $doc->createElement( 'a' );
+			$link->setAttribute( 'href', esc_url( $target_url ) );
+			$link->appendChild( $doc->createTextNode( $match ) );
+			$frag->appendChild( $link );
+
+			if ( '' !== $after ) {
+				$frag->appendChild( $doc->createTextNode( $after ) );
+			}
+
+			$parent->replaceChild( $frag, $text_node );
+			$injected = true;
+			break; // Only inject once.
+		}
+
+		if ( ! $injected ) {
+			return null;
+		}
+
+		// Extract only the inner content of our root div.
+		$root = $doc->getElementById( 'sai-il-root' );
+		if ( ! $root ) {
+			return null;
+		}
+
+		$result = '';
+		foreach ( $root->childNodes as $child ) {
+			$result .= $doc->saveHTML( $child );
+		}
+
+		// Remove any XML declaration DOMDocument may have prepended.
+		$result = preg_replace( '/^<\?xml[^?]*\?>\s*/i', '', $result );
+
+		return ( '' !== $result ) ? $result : null;
 	}
 
 	/**
 	 * Check if the anchor text already appears inside an <a> tag in the content.
+	 *
+	 * Uses DOMDocument for accurate HTML parsing.
+	 *
+	 * @param string $content
+	 * @param string $anchor
+	 * @return bool
 	 */
 	private function is_already_linked( $content, $anchor ) {
-		if ( ! preg_match_all( '/<a[^>]*>.*?<\/a>/is', $content, $matches ) ) {
+		if ( ! class_exists( 'DOMDocument' ) ) {
 			return false;
 		}
-		foreach ( $matches[0] as $link_html ) {
-			if ( mb_stripos( $link_html, $anchor ) !== false ) {
+		$doc = new DOMDocument( '1.0', 'UTF-8' );
+		libxml_use_internal_errors( true );
+		$doc->loadHTML(
+			'<?xml encoding="UTF-8"><div>' . $content . '</div>',
+			LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+		);
+		libxml_clear_errors();
+		$xpath = new DOMXPath( $doc );
+		$links = $xpath->query( '//a' );
+		foreach ( $links as $link ) {
+			if ( mb_stripos( $link->textContent, $anchor ) !== false ) {
 				return true;
 			}
 		}
