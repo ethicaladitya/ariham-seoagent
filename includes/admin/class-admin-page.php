@@ -90,6 +90,8 @@ class SEO_Agent_AI_Admin_Page {
 		$this->image_seo_page         = $image_seo_page;
 		$this->redirects_page         = $redirects_page;
 		$this->activity_log_page      = $activity_log_page;
+
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
 	// -------------------------------------------------------------------
@@ -217,7 +219,6 @@ class SEO_Agent_AI_Admin_Page {
 			array( $this, 'render_settings_page' )
 		);
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
 	public function enqueue_assets( $hook ) {
