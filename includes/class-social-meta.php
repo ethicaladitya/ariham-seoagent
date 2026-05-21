@@ -29,6 +29,11 @@ class SEO_Agent_AI_Social_Meta {
 			return;
 		}
 
+		// Defer to the active SEO plugin if one is handling OG/social tags.
+		if ( $this->has_competing_seo_plugin() ) {
+			return;
+		}
+
 		if ( is_singular() ) {
 			$this->output_singular_tags();
 		} elseif ( is_front_page() || is_home() ) {
@@ -36,6 +41,53 @@ class SEO_Agent_AI_Social_Meta {
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$this->output_term_tags();
 		}
+	}
+
+	// -------------------------------------------------------------------
+	// Competing SEO plugin detection
+	// -------------------------------------------------------------------
+
+	/**
+	 * Return true when another SEO plugin (Yoast, RankMath, SmartCrawl, etc.)
+	 * is active and will output its own Open Graph / social meta tags.
+	 * In that case we suppress our own output to avoid duplicates.
+	 *
+	 * @return bool
+	 */
+	private function has_competing_seo_plugin() {
+		// Yoast SEO.
+		if ( defined( 'WPSEO_VERSION' ) || class_exists( 'WPSEO_Frontend', false ) ) {
+			return true;
+		}
+		// RankMath.
+		if ( defined( 'RANK_MATH_VERSION' ) || class_exists( 'RankMath', false ) ) {
+			return true;
+		}
+		// SmartCrawl (WPMU DEV SEO).
+		if (
+			defined( 'SMARTCRAWL_VERSION' )
+			|| class_exists( 'SmartCrawl_Settings', false )
+			|| class_exists( 'Smartcrawl\\Smartcrawl', false )
+		) {
+			return true;
+		}
+		// The SEO Framework.
+		if ( function_exists( 'the_seo_framework' ) || class_exists( 'The_SEO_Framework\\Load', false ) ) {
+			return true;
+		}
+		// All in One SEO.
+		if (
+			defined( 'AIOSEO_VERSION' )
+			|| class_exists( 'AIOSEO\\Plugin\\AIOSEO', false )
+			|| function_exists( 'aioseo' )
+		) {
+			return true;
+		}
+		// SEOPress.
+		if ( defined( 'SEOPRESS_VERSION' ) || class_exists( 'SeoPress_Admin_Pages', false ) ) {
+			return true;
+		}
+		return false;
 	}
 
 	// -------------------------------------------------------------------
