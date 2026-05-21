@@ -130,6 +130,9 @@ class SEO_Agent_AI_Plugin {
 	/** @var SEO_Agent_AI_Content_Expander */
 	private $content_expander;
 
+	/** @var SEO_Agent_AI_IndexNow */
+	private $indexnow;
+
 	// -------------------------------------------------------------------
 	// Singleton
 	// -------------------------------------------------------------------
@@ -178,6 +181,11 @@ class SEO_Agent_AI_Plugin {
 
 		// Content generation.
 		$this->content_expander = new SEO_Agent_AI_Content_Expander( $this->openai, $this->gemini );
+
+		// IndexNow — instant URL submission after fixes.
+		$this->indexnow = new SEO_Agent_AI_IndexNow( $this->logger );
+		$this->indexnow->write_key_file();
+		add_action( 'seo_agent_ai_fix_applied', array( $this, 'on_fix_applied_indexnow' ), 10, 1 );
 
 		// Feature modules.
 		$this->image_seo        = new SEO_Agent_AI_Image_SEO( $this->gemini, $this->openai, $this->logger );
@@ -249,6 +257,12 @@ class SEO_Agent_AI_Plugin {
 		add_action( self::CRON_HOOK_GSC, array( $this, 'run_fetch_gsc' ) );
 		add_action( self::CRON_HOOK_GA4, array( $this, 'run_fetch_ga4' ) );
 		add_action( self::CRON_HOOK_REPORT, array( $this, 'run_generate_report' ) );
+
+		// Thin-content auto-expansion: runs as part of the daily analysis pass.
+		add_action( self::CRON_HOOK_DAILY, array( $this, 'queue_thin_content_for_expansion' ) );
+
+		// Async single-post expansion worker (scheduled by queue_thin_content_for_expansion).
+		add_action( 'seo_agent_ai_expand_single_post', array( $this, 'run_expand_single_post' ), 10, 3 );
 
 		// Cron hooks — weekly.
 		add_action( self::CRON_HOOK_SCORE, array( $this, 'run_score_pages' ) );
@@ -999,6 +1013,157 @@ class SEO_Agent_AI_Plugin {
 				++$applied_today;
 				set_transient( $date_key, $applied_today, DAY_IN_SECONDS );
 			}
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Single-post expansion worker
+	// -------------------------------------------------------------------
+
+	/**
+	 * Execute the AI content expansion for a single post.
+	 * Called by the async WP-Cron event scheduled by queue_thin_content_for_expansion().
+	 * The result is stored as a pending draft — nothing is auto-published.
+	 *
+	 * @param int    $post_id         Post to expand.
+	 * @param string $expansion_focus Optional keyword/topic focus.
+	 * @param array  $gsc_queries     GSC query data for context.
+	 */
+	public function run_expand_single_post( $post_id, $expansion_focus = '', array $gsc_queries = array() ) {
+		$post = get_post( (int) $post_id );
+		if ( ! $post instanceof WP_Post || $post->post_status !== 'publish' ) {
+			return;
+		}
+
+		$result = $this->content_expander->expand( (int) $post_id, (string) $expansion_focus, $gsc_queries );
+
+		if ( is_wp_error( $result ) ) {
+			$this->logger->warning(
+				sprintf( 'Content expansion failed for post %d: %s', $post_id, $result->get_error_message() )
+			);
+		} else {
+			$this->logger->info( sprintf( 'Content expansion draft created for post %d.', $post_id ) );
+			// After draft is ready, ping IndexNow so Google comes back to crawl
+			// once the admin reviews and publishes the draft.
+			$url = get_permalink( $post_id );
+			if ( $url ) {
+				$this->indexnow->ping( (string) $url );
+			}
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// IndexNow integration
+	// -------------------------------------------------------------------
+
+	/**
+	 * Submit a post URL to IndexNow after a fix has been applied.
+	 *
+	 * @param int $post_id
+	 */
+	public function on_fix_applied_indexnow( $post_id ) {
+		$url = get_permalink( (int) $post_id );
+		if ( $url ) {
+			$this->indexnow->ping( (string) $url );
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Thin-content auto-queuer (runs inside daily analysis cron)
+	// -------------------------------------------------------------------
+
+	/**
+	 * Find published posts with fewer than 300 words that haven't had an AI
+	 * expansion queued in the last 30 days, and queue them for content expansion
+	 * via the Decision Engine. Capped at 5 posts per daily run to stay within
+	 * API rate limits and avoid overwhelming the approval queue.
+	 */
+	public function queue_thin_content_for_expansion() {
+		if ( ! (bool) get_option( 'seo_agent_ai_auto_expand_thin', true ) ) {
+			return;
+		}
+
+		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+		$cap        = (int) apply_filters( 'seo_agent_ai_thin_content_daily_cap', 5 );
+		$min_words  = (int) apply_filters( 'seo_agent_ai_thin_content_word_threshold', 300 );
+
+		$posts = get_posts(
+			array(
+				'post_type'      => $post_types,
+				'post_status'    => 'publish',
+				'posts_per_page' => 30, // scan pool; we'll filter by word count below.
+				'orderby'        => 'rand',
+				'fields'         => 'all',
+				// Exclude posts we've already queued recently (within 30 days).
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					'relation' => 'OR',
+					array(
+						'key'     => '_seo_agent_ai_expand_queued_at',
+						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'     => '_seo_agent_ai_expand_queued_at',
+						'value'   => gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ),
+						'compare' => '<',
+						'type'    => 'DATETIME',
+					),
+				),
+			)
+		);
+
+		if ( empty( $posts ) ) {
+			return;
+		}
+
+		$queued = 0;
+		foreach ( $posts as $post ) {
+			if ( $queued >= $cap ) {
+				break;
+			}
+
+			$word_count = str_word_count( wp_strip_all_tags( $post->post_content ) );
+			if ( $word_count >= $min_words ) {
+				continue; // Post is not thin.
+			}
+
+			// Fetch GSC signals for context.
+			$url         = (string) get_permalink( $post );
+			$gsc_metrics = $url ? $this->gsc_client->get_page_metrics( $url ) : array();
+			$gsc_safe    = is_wp_error( $gsc_metrics ) ? array() : (array) $gsc_metrics;
+
+			// Build a simple recommendation for the decision engine.
+			$recommendation = array(
+				'type'        => 'content_expansion',
+				'reason'      => sprintf(
+					/* translators: 1: word count, 2: threshold */
+					__( 'Post has only %1$d words (threshold: %2$d). AI expansion draft queued for review.', 'seo-agent-ai' ),
+					$word_count,
+					$min_words
+				),
+				'confidence'  => 0.85,
+				'risk'        => 'safe',
+				'impact'      => 'medium',
+				'source'      => 'thin_content_detector',
+				'word_count'  => $word_count,
+				'gsc_metrics' => $gsc_safe,
+			);
+
+			// Route through the decision engine (creates a pending approval record).
+			$this->decision_engine->process( $post->ID, $recommendation, 0.95 ); // High threshold — always pending.
+
+			// Kick off the AI expansion draft asynchronously via a scheduled action.
+			wp_schedule_single_event(
+				time() + ( $queued * 30 ), // Stagger by 30 s each to avoid rate limits.
+				'seo_agent_ai_expand_single_post',
+				array( $post->ID, '', $gsc_safe )
+			);
+
+			update_post_meta( $post->ID, '_seo_agent_ai_expand_queued_at', current_time( 'mysql' ) );
+			++$queued;
+
+			$this->logger->info(
+				sprintf( 'Thin content queued for expansion: post %d (%d words).', $post->ID, $word_count )
+			);
 		}
 	}
 
