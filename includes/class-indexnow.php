@@ -91,7 +91,9 @@ class SEO_Agent_AI_IndexNow {
 	public function get_key() {
 		$key = (string) get_option( self::OPTION_KEY, '' );
 		if ( $key === '' ) {
-			$key = wp_generate_password( 32, false );
+			// Use PHP-native randomness — wp_generate_password() is not
+			// available this early in the load order (before pluggable.php).
+			$key = bin2hex( random_bytes( 16 ) );
 			update_option( self::OPTION_KEY, $key, false );
 		}
 		return $key;

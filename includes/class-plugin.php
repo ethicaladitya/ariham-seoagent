@@ -184,7 +184,8 @@ class SEO_Agent_AI_Plugin {
 
 		// IndexNow — instant URL submission after fixes.
 		$this->indexnow = new SEO_Agent_AI_IndexNow( $this->logger );
-		$this->indexnow->write_key_file();
+		// write_key_file() deferred to init so WordPress filesystem helpers are ready.
+		add_action( 'init', array( $this->indexnow, 'write_key_file' ), 20 );
 		add_action( 'seo_agent_ai_fix_applied', array( $this, 'on_fix_applied_indexnow' ), 10, 1 );
 
 		// Feature modules.
