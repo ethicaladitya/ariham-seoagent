@@ -22,7 +22,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SEO_Agent_AI_IndexNow {
 
-	const OPTION_KEY      = 'seo_agent_ai_indexnow_key';
 	const OPTION_ENABLED  = 'seo_agent_ai_indexnow_enabled';
 	const TRANSIENT_BATCH = 'seo_agent_ai_indexnow_batch';
 	const BATCH_LIMIT     = 100; // Max URLs per IndexNow batch request.
@@ -84,19 +83,18 @@ class SEO_Agent_AI_IndexNow {
 	}
 
 	/**
-	 * Get (or generate) the IndexNow API key.
+	 * Derive the IndexNow API key from wp-config.php constants.
 	 *
-	 * @return string
+	 * The key must be stable across requests (IndexNow verifies it via a
+	 * file at the web root) and unique per site. Deriving it from AUTH_KEY
+	 * + the site URL satisfies both requirements without storing anything
+	 * or generating random values.
+	 *
+	 * @return string 32-character hex key.
 	 */
 	public function get_key() {
-		$key = (string) get_option( self::OPTION_KEY, '' );
-		if ( $key === '' ) {
-			// Use PHP-native randomness — wp_generate_password() is not
-			// available this early in the load order (before pluggable.php).
-			$key = bin2hex( random_bytes( 16 ) );
-			update_option( self::OPTION_KEY, $key, false );
-		}
-		return $key;
+		$salt = defined( 'AUTH_KEY' ) ? AUTH_KEY : __FILE__;
+		return substr( md5( $salt . home_url() ), 0, 32 );
 	}
 
 	/**
