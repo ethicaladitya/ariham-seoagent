@@ -11,60 +11,99 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SEO_Agent_AI_Redirect_Manager {
 
-	const TABLE_REDIRECTS  = 'seo_agent_redirects';
-	const TABLE_404_LOG    = 'seo_agent_404_log';
-	const TABLE_SMARTCRAWL = 'smartcrawl_redirects';
+	const TABLE_REDIRECTS   = 'seo_agent_redirects';
+	const TABLE_404_LOG     = 'seo_agent_404_log';
+	const TABLE_SMARTCRAWL  = 'smartcrawl_redirects';
+	const TABLE_RANKMATH    = 'rank_math_redirections';
+	const TABLE_REDIRECTION = 'redirection_items';
+
+	const BACKEND_SMARTCRAWL  = 'smartcrawl';
+	const BACKEND_RANKMATH    = 'rankmath';
+	const BACKEND_REDIRECTION = 'redirection';
+	const BACKEND_OWN         = 'own';
 
 	const REDIRECT_CACHE_KEY = 'seo_agent_ai_redirect_list';
 	const REDIRECT_CACHE_TTL = 5 * MINUTE_IN_SECONDS;
 
-	/** @var bool|null  Cached SmartCrawl availability. */
-	private $sc_active = null;
+	/** @var string|null  Detected redirect backend. */
+	private $backend = null;
 
 	// -------------------------------------------------------------------
 	// Hooks
 	// -------------------------------------------------------------------
 
 	public function init_hooks() {
-		// Only run our own redirect engine when SmartCrawl isn't handling it.
-		if ( ! $this->smartcrawl_active() ) {
+		// Only run our own redirect engine when no SEO plugin handles it.
+		if ( self::BACKEND_OWN === $this->get_backend() ) {
 			add_action( 'template_redirect', array( $this, 'process_redirects' ), 1 );
 		}
 		add_action( 'wp', array( $this, 'init_404_logging' ) );
 	}
 
 	// -------------------------------------------------------------------
-	// SmartCrawl adapter
+	// Backend detection
 	// -------------------------------------------------------------------
 
 	/**
-	 * Returns true when SmartCrawl's redirect table exists.
+	 * Detect which redirect backend to use and cache the result.
+	 * Priority: SmartCrawl → Rank Math → Redirection plugin → own table.
 	 *
-	 * @return bool
+	 * @return string One of the BACKEND_* constants.
 	 */
-	private function smartcrawl_active() {
-		if ( $this->sc_active !== null ) {
-			return $this->sc_active;
+	private function get_backend() {
+		if ( $this->backend !== null ) {
+			return $this->backend;
 		}
+
 		global $wpdb;
-		$table           = $wpdb->prefix . self::TABLE_SMARTCRAWL;
-		$this->sc_active = (bool) $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $this->sc_active;
+
+		$checks = array(
+			self::BACKEND_SMARTCRAWL  => $wpdb->prefix . self::TABLE_SMARTCRAWL,
+			self::BACKEND_RANKMATH    => $wpdb->prefix . self::TABLE_RANKMATH,
+			self::BACKEND_REDIRECTION => $wpdb->prefix . self::TABLE_REDIRECTION,
+		);
+
+		foreach ( $checks as $backend => $table ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+				$this->backend = $backend;
+				return $backend;
+			}
+		}
+
+		$this->backend = self::BACKEND_OWN;
+		return self::BACKEND_OWN;
 	}
 
 	/**
-	 * Insert a redirect into SmartCrawl's table.
+	 * Human-readable label for the active backend.
 	 *
-	 * @param string $source Full URL of the source.
-	 * @param string $target Target URL.
-	 * @param int    $type   HTTP code (301|302).
-	 * @return int|false Inserted row ID or false.
+	 * @return string
+	 */
+	public function get_backend_label() {
+		$labels = array(
+			self::BACKEND_SMARTCRAWL  => 'SmartCrawl',
+			self::BACKEND_RANKMATH    => 'Rank Math',
+			self::BACKEND_REDIRECTION => 'Redirection',
+			self::BACKEND_OWN         => 'Built-in',
+		);
+		return $labels[ $this->get_backend() ] ?? 'Built-in';
+	}
+
+	// -------------------------------------------------------------------
+	// SmartCrawl adapter (wp_smartcrawl_redirects)
+	// -------------------------------------------------------------------
+
+	/**
+	 * @param string $source
+	 * @param string $target
+	 * @param int    $type
+	 * @return int|false
 	 */
 	private function sc_add_redirect( $source, $target, $type ) {
 		global $wpdb;
 		$table = $wpdb->prefix . self::TABLE_SMARTCRAWL;
 
-		// Avoid duplicates.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$existing_id = $wpdb->get_var(
 			$wpdb->prepare(
@@ -76,10 +115,8 @@ class SEO_Agent_AI_Redirect_Manager {
 			return (int) $existing_id;
 		}
 
-		// Derive path: relative URL portion with no leading slash.
 		$path = ltrim( (string) wp_parse_url( $source, PHP_URL_PATH ), '/' );
 
-		// SmartCrawl json_decode-fallbacks a plain URL correctly.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$result = $wpdb->insert(
 			$table,
@@ -99,10 +136,8 @@ class SEO_Agent_AI_Redirect_Manager {
 	}
 
 	/**
-	 * Read redirects from SmartCrawl's table, normalised to our display format.
-	 *
-	 * @param int $limit  Rows to return.
-	 * @param int $offset Offset.
+	 * @param int $limit
+	 * @param int $offset
 	 * @return array[]
 	 */
 	private function sc_get_redirects( $limit, $offset ) {
@@ -113,47 +148,36 @@ class SEO_Agent_AI_Redirect_Manager {
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT id, source, destination, type FROM `{$table}` ORDER BY id DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				(int) $limit,
-				(int) $offset
+				$limit,
+				$offset
 			),
 			ARRAY_A
 		);
 
-		if ( empty( $rows ) ) {
-			return array();
-		}
-
 		$out = array();
-		foreach ( $rows as $row ) {
-			// SmartCrawl stores destination as JSON-encoded string or plain URL.
-			$target = json_decode( $row['destination'], true );
-			if ( ! is_string( $target ) ) {
-				// Array means post-ID reference; resolve it.
-				if ( is_array( $target ) && ! empty( $target['id'] ) ) {
-					$permalink = get_permalink( (int) $target['id'] );
-					$target    = $permalink ? $permalink : '';
+		foreach ( (array) $rows as $row ) {
+			$dest = json_decode( $row['destination'], true );
+			if ( ! is_string( $dest ) ) {
+				if ( is_array( $dest ) && ! empty( $dest['id'] ) ) {
+					$permalink = get_permalink( (int) $dest['id'] );
+					$dest      = $permalink ?: '';
 				} else {
-					$target = (string) $row['destination'];
+					$dest = (string) $row['destination'];
 				}
 			}
 			$out[] = array(
 				'id'            => $row['id'],
 				'source_url'    => $row['source'],
-				'target_url'    => $target,
+				'target_url'    => $dest,
 				'redirect_type' => $row['type'],
 				'hit_count'     => null,
-				'last_hit'      => null,
-				'via'           => 'smartcrawl',
+				'via'           => self::BACKEND_SMARTCRAWL,
 			);
 		}
 		return $out;
 	}
 
-	/**
-	 * Count all redirects in SmartCrawl's table.
-	 *
-	 * @return int
-	 */
+	/** @return int */
 	private function sc_count_redirects() {
 		global $wpdb;
 		$table = $wpdb->prefix . self::TABLE_SMARTCRAWL;
@@ -161,17 +185,228 @@ class SEO_Agent_AI_Redirect_Manager {
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
-	/**
-	 * Delete a redirect from SmartCrawl's table.
-	 *
-	 * @param int $id Row ID.
-	 * @return bool
-	 */
+	/** @return bool */
 	private function sc_delete_redirect( $id ) {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		return (bool) $wpdb->delete(
 			$wpdb->prefix . self::TABLE_SMARTCRAWL,
+			array( 'id' => (int) $id ),
+			array( '%d' )
+		);
+	}
+
+	// -------------------------------------------------------------------
+	// Rank Math adapter (wp_rank_math_redirections)
+	// sources column: JSON [{"pattern":"old-slug/","comparison":"exact"}]
+	// -------------------------------------------------------------------
+
+	/**
+	 * @param string $source
+	 * @param string $target
+	 * @param int    $type
+	 * @return int|false
+	 */
+	private function rm_add_redirect( $source, $target, $type ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::TABLE_RANKMATH;
+		$path  = ltrim( (string) wp_parse_url( $source, PHP_URL_PATH ), '/' );
+
+		// Avoid duplicates by checking if any row already has this pattern.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$existing_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM `{$table}` WHERE sources LIKE %s AND status = 'active' LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'%' . $wpdb->esc_like( $path ) . '%'
+			)
+		);
+		if ( $existing_id ) {
+			return (int) $existing_id;
+		}
+
+		$sources = wp_json_encode( array( array( 'pattern' => $path, 'comparison' => 'exact' ) ) );
+		$now     = current_time( 'mysql' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$result = $wpdb->insert(
+			$table,
+			array(
+				'sources'       => $sources,
+				'url_to'        => substr( $target, 0, 2048 ),
+				'header_code'   => $type,
+				'hits'          => 0,
+				'last_accessed' => $now,
+				'status'        => 'active',
+				'created'       => $now,
+				'updated'       => $now,
+			),
+			array( '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s' )
+		);
+
+		return $result ? (int) $wpdb->insert_id : false;
+	}
+
+	/**
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array[]
+	 */
+	private function rm_get_redirects( $limit, $offset ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::TABLE_RANKMATH;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, sources, url_to, header_code, hits FROM `{$table}` WHERE status = 'active' ORDER BY id DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$limit,
+				$offset
+			),
+			ARRAY_A
+		);
+
+		$out = array();
+		foreach ( (array) $rows as $row ) {
+			$sources    = json_decode( $row['sources'], true );
+			$source_url = is_array( $sources ) && ! empty( $sources[0]['pattern'] )
+				? '/' . ltrim( $sources[0]['pattern'], '/' )
+				: $row['sources'];
+
+			$out[] = array(
+				'id'            => $row['id'],
+				'source_url'    => $source_url,
+				'target_url'    => $row['url_to'],
+				'redirect_type' => $row['header_code'],
+				'hit_count'     => (int) $row['hits'],
+				'via'           => self::BACKEND_RANKMATH,
+			);
+		}
+		return $out;
+	}
+
+	/** @return int */
+	private function rm_count_redirects() {
+		global $wpdb;
+		$table = $wpdb->prefix . self::TABLE_RANKMATH;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}` WHERE status = 'active'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/** @return bool */
+	private function rm_delete_redirect( $id ) {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (bool) $wpdb->delete(
+			$wpdb->prefix . self::TABLE_RANKMATH,
+			array( 'id' => (int) $id ),
+			array( '%d' )
+		);
+	}
+
+	// -------------------------------------------------------------------
+	// Redirection plugin adapter (wp_redirection_items)
+	// url = source path, action_data = target, action_code = HTTP code
+	// -------------------------------------------------------------------
+
+	/**
+	 * @param string $source
+	 * @param string $target
+	 * @param int    $type
+	 * @return int|false
+	 */
+	private function redir_add_redirect( $source, $target, $type ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::TABLE_REDIRECTION;
+		$path  = (string) wp_parse_url( $source, PHP_URL_PATH );
+
+		// Avoid duplicates.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$existing_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM `{$table}` WHERE url = %s AND status = 'enabled' LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$path
+			)
+		);
+		if ( $existing_id ) {
+			return (int) $existing_id;
+		}
+
+		// Use the first available group or fall back to 1.
+		$groups_table = $wpdb->prefix . 'redirection_groups';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$group_id = (int) $wpdb->get_var( "SELECT id FROM `{$groups_table}` WHERE status = 'enabled' ORDER BY id ASC LIMIT 1" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+		if ( ! $group_id ) {
+			$group_id = 1;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$result = $wpdb->insert(
+			$table,
+			array(
+				'url'         => substr( $path, 0, 2000 ),
+				'action_data' => substr( $target, 0, 2000 ),
+				'action_code' => $type,
+				'match_type'  => 'url',
+				'action_type' => 'url',
+				'status'      => 'enabled',
+				'group_id'    => $group_id,
+				'regex'       => 0,
+				'last_count'  => 0,
+				'last_access' => current_time( 'mysql' ),
+			),
+			array( '%s', '%s', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s' )
+		);
+
+		return $result ? (int) $wpdb->insert_id : false;
+	}
+
+	/**
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array[]
+	 */
+	private function redir_get_redirects( $limit, $offset ) {
+		global $wpdb;
+		$table = $wpdb->prefix . self::TABLE_REDIRECTION;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, url, action_data, action_code, last_count, last_access FROM `{$table}` WHERE status = 'enabled' ORDER BY id DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$limit,
+				$offset
+			),
+			ARRAY_A
+		);
+
+		$out = array();
+		foreach ( (array) $rows as $row ) {
+			$out[] = array(
+				'id'            => $row['id'],
+				'source_url'    => $row['url'],
+				'target_url'    => $row['action_data'],
+				'redirect_type' => $row['action_code'],
+				'hit_count'     => (int) $row['last_count'],
+				'via'           => self::BACKEND_REDIRECTION,
+			);
+		}
+		return $out;
+	}
+
+	/** @return int */
+	private function redir_count_redirects() {
+		global $wpdb;
+		$table = $wpdb->prefix . self::TABLE_REDIRECTION;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}` WHERE status = 'enabled'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/** @return bool */
+	private function redir_delete_redirect( $id ) {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		return (bool) $wpdb->delete(
+			$wpdb->prefix . self::TABLE_REDIRECTION,
 			array( 'id' => (int) $id ),
 			array( '%d' )
 		);
@@ -299,23 +534,30 @@ class SEO_Agent_AI_Redirect_Manager {
 	// -------------------------------------------------------------------
 
 	/**
-	 * Add a redirect rule — writes to SmartCrawl when available, falls back to own table.
+	 * Add a redirect — routes to the active SEO plugin or built-in table.
 	 *
-	 * @param string $source Source URL path or full URL.
+	 * @param string $source Source URL or path.
 	 * @param string $target Target URL.
-	 * @param int    $type   HTTP status code (301 or 302).
-	 * @param string $notes  Optional notes (own table only).
-	 * @return int|false Inserted row ID or false on error.
+	 * @param int    $type   HTTP code (301|302).
+	 * @param string $notes  Notes (built-in table only).
+	 * @return int|false Row ID or false.
 	 */
 	public function add_redirect( $source, $target, $type = 301, $notes = '' ) {
-		$source = esc_url_raw( $source );
-		$target = esc_url_raw( $target );
-		$type   = in_array( (int) $type, array( 301, 302 ), true ) ? (int) $type : 301;
+		$source  = esc_url_raw( $source );
+		$target  = esc_url_raw( $target );
+		$type    = in_array( (int) $type, array( 301, 302 ), true ) ? (int) $type : 301;
+		$backend = $this->get_backend();
 
-		if ( $this->smartcrawl_active() ) {
-			return $this->sc_add_redirect( $source, $target, $type );
+		switch ( $backend ) {
+			case self::BACKEND_SMARTCRAWL:
+				return $this->sc_add_redirect( $source, $target, $type );
+			case self::BACKEND_RANKMATH:
+				return $this->rm_add_redirect( $source, $target, $type );
+			case self::BACKEND_REDIRECTION:
+				return $this->redir_add_redirect( $source, $target, $type );
 		}
 
+		// Built-in table fallback.
 		global $wpdb;
 		$notes = substr( sanitize_text_field( $notes ), 0, 500 );
 
@@ -342,42 +584,67 @@ class SEO_Agent_AI_Redirect_Manager {
 	}
 
 	/**
-	 * Get redirect rules — reads from SmartCrawl when available.
+	 * Get redirects from the active backend.
 	 *
 	 * @param int $limit  Number of rows.
 	 * @param int $offset Offset.
 	 * @return array[]
 	 */
 	public function get_redirects( $limit = 50, $offset = 0 ) {
-		if ( $this->smartcrawl_active() ) {
-			return $this->sc_get_redirects( (int) $limit, (int) $offset );
+		$limit   = (int) $limit;
+		$offset  = (int) $offset;
+		$backend = $this->get_backend();
+
+		switch ( $backend ) {
+			case self::BACKEND_SMARTCRAWL:
+				return $this->sc_get_redirects( $limit, $offset );
+			case self::BACKEND_RANKMATH:
+				return $this->rm_get_redirects( $limit, $offset );
+			case self::BACKEND_REDIRECTION:
+				return $this->redir_get_redirects( $limit, $offset );
 		}
 
+		// Built-in table fallback.
 		global $wpdb;
 		$table = $wpdb->prefix . self::TABLE_REDIRECTS;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return $wpdb->get_results(
+		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM `{$table}` ORDER BY created_at DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				(int) $limit,
-				(int) $offset
+				$limit,
+				$offset
 			),
 			ARRAY_A
 		);
+
+		foreach ( (array) $rows as &$row ) {
+			$row['via'] = self::BACKEND_OWN;
+		}
+		unset( $row );
+
+		return (array) $rows;
 	}
 
 	/**
-	 * Delete a redirect rule by ID — deletes from SmartCrawl when available.
+	 * Delete a redirect from the active backend.
 	 *
 	 * @param int $id Row ID.
-	 * @return bool True on success.
+	 * @return bool
 	 */
 	public function delete_redirect( $id ) {
-		if ( $this->smartcrawl_active() ) {
-			return $this->sc_delete_redirect( (int) $id );
+		$backend = $this->get_backend();
+
+		switch ( $backend ) {
+			case self::BACKEND_SMARTCRAWL:
+				return $this->sc_delete_redirect( (int) $id );
+			case self::BACKEND_RANKMATH:
+				return $this->rm_delete_redirect( (int) $id );
+			case self::BACKEND_REDIRECTION:
+				return $this->redir_delete_redirect( (int) $id );
 		}
 
+		// Built-in table fallback.
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -394,7 +661,6 @@ class SEO_Agent_AI_Redirect_Manager {
 		return (bool) $result;
 	}
 
-	// -------------------------------------------------------------------
 	// Runtime redirect processing
 	// -------------------------------------------------------------------
 
@@ -660,9 +926,20 @@ class SEO_Agent_AI_Redirect_Manager {
 
 		$l_table = $wpdb->prefix . self::TABLE_404_LOG;
 
-		$total_redirects = $this->smartcrawl_active()
-			? $this->sc_count_redirects()
-			: (int) $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $wpdb->prefix . self::TABLE_REDIRECTS . '`' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+		switch ( $this->get_backend() ) {
+			case self::BACKEND_SMARTCRAWL:
+				$total_redirects = $this->sc_count_redirects();
+				break;
+			case self::BACKEND_RANKMATH:
+				$total_redirects = $this->rm_count_redirects();
+				break;
+			case self::BACKEND_REDIRECTION:
+				$total_redirects = $this->redir_count_redirects();
+				break;
+			default:
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+				$total_redirects = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $wpdb->prefix . self::TABLE_REDIRECTS . '`' );
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$total_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
