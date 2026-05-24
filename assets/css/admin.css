@@ -950,17 +950,24 @@ body.wp-admin .sai-page {
 .sai-field-control textarea:focus,
 .sai-field-control select:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 2px var(--cl-accent-bg); }
 
-/* Radio and checkbox styling inside sai-field-control */
+/* Radio and checkbox: restore native rendering inside sai-field-control */
 .sai-field-control input[type="radio"],
 .sai-field-control input[type="checkbox"] {
-	width:    auto;
-	height:   auto;
-	margin:   0 6px 0 0;
-	padding:  0;
-	border:   none;
-	background: none;
-	vertical-align: middle;
-	flex-shrink: 0;
+	-webkit-appearance: auto;
+	-moz-appearance:    auto;
+	appearance:         auto;
+	width:              auto;
+	height:             auto;
+	min-width:          0;
+	min-height:         0;
+	padding:            0;
+	margin:             0 6px 0 0;
+	border:             revert;
+	background:         revert;
+	box-shadow:         none;
+	vertical-align:     middle;
+	flex-shrink:        0;
+	cursor:             pointer;
 }
 
 .sai-key-input-wrap { position: relative; }
