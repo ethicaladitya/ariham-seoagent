@@ -383,7 +383,7 @@ class SEO_Agent_AI_Redirect_Manager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$candidates = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, url FROM `{$log_table}` WHERE hit_count >= %d AND redirect_created = 0 ORDER BY hit_count DESC LIMIT 50", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT id, url FROM `{$log_table}` WHERE hit_count >= %d AND redirect_created = 0 ORDER BY hit_count DESC LIMIT 500", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				3
 			),
 			ARRAY_A
