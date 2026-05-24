@@ -55,6 +55,36 @@ class SEO_Agent_AI_Dashboard_Page {
 		$today_changes = $this->activity_log->get_count(
 			array( 'date_from' => gmdate( 'Y-m-d' ) . ' 00:00:00' )
 		);
+
+		$last_run_raw   = get_option( 'seo_agent_ai_last_run_seo_agent_ai_daily_analysis', '' );
+		$last_run_label = '';
+		$agent_overdue  = false;
+		if ( $last_run_raw !== '' ) {
+			$diff = time() - (int) strtotime( $last_run_raw );
+			if ( $diff < HOUR_IN_SECONDS ) {
+				$last_run_label = sprintf(
+					/* translators: %d: minutes ago. */
+					__( '%d min ago', 'seo-agent-ai' ),
+					(int) floor( $diff / 60 )
+				);
+			} elseif ( $diff < DAY_IN_SECONDS ) {
+				$last_run_label = sprintf(
+					/* translators: %d: hours ago. */
+					__( '%dh ago', 'seo-agent-ai' ),
+					(int) floor( $diff / HOUR_IN_SECONDS )
+				);
+			} else {
+				$last_run_label = sprintf(
+					/* translators: %d: days ago. */
+					__( '%dd ago', 'seo-agent-ai' ),
+					(int) floor( $diff / DAY_IN_SECONDS )
+				);
+				$agent_overdue = $diff > ( 26 * HOUR_IN_SECONDS );
+			}
+		} else {
+			$last_run_label = __( 'Never', 'seo-agent-ai' );
+			$agent_overdue  = true;
+		}
 		?>
 		<div class="wrap sai-page">
 
@@ -76,7 +106,28 @@ class SEO_Agent_AI_Dashboard_Page {
 
 			<div class="sai-body">
 
-				<?php if ( $autopilot ) : ?>
+				<?php if ( $agent_overdue ) : ?>
+				<div class="sai-autopilot-bar" style="background:#fef2f2;border-color:#fecaca">
+					<div class="sai-ap-indicator">
+						<div class="sai-ap-pulse" style="background:#dc2626"></div>
+						<div>
+							<div class="sai-ap-label" style="color:#991b1b">
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+								<?php esc_html_e( 'Agent Overdue', 'seo-agent-ai' ); ?>
+							</div>
+							<div class="sai-ap-sub" style="color:#991b1b">
+								<?php
+								printf(
+									/* translators: %s: time since last run. */
+									esc_html__( 'Last run: %s — daily analysis may be stuck. Check Cron Status.', 'seo-agent-ai' ),
+									esc_html( $last_run_label )
+								);
+								?>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php elseif ( $autopilot ) : ?>
 				<div class="sai-autopilot-bar ap-on">
 					<div class="sai-ap-indicator">
 						<div class="sai-ap-pulse"></div>
@@ -85,7 +136,15 @@ class SEO_Agent_AI_Dashboard_Page {
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
 								<?php esc_html_e( 'Autopilot ON', 'seo-agent-ai' ); ?>
 							</div>
-							<div class="sai-ap-sub"><?php esc_html_e( 'Auto-applying safe changes as they are generated.', 'seo-agent-ai' ); ?></div>
+							<div class="sai-ap-sub">
+								<?php
+								printf(
+									/* translators: %s: time of last run. */
+									esc_html__( 'Auto-applying safe changes. Last run: %s', 'seo-agent-ai' ),
+									esc_html( $last_run_label )
+								);
+								?>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -338,10 +397,10 @@ class SEO_Agent_AI_Dashboard_Page {
 			$confidence = round( (float) $entry['confidence'] * 100 );
 			$conf_level = $confidence >= 80 ? 'high' : ( $confidence >= 50 ? 'med' : 'low' );
 
-			$status        = (string) $entry['status'];
-			$triggered     = (string) $entry['triggered_by'];
-			$when_raw      = (string) $entry['created_at'];
-			$when          = $when_raw ? human_time_diff( strtotime( $when_raw ), current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'seo-agent-ai' ) : '—'; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
+			$status    = (string) $entry['status'];
+			$triggered = (string) $entry['triggered_by'];
+			$when_raw  = (string) $entry['created_at'];
+			$when      = $when_raw ? human_time_diff( strtotime( $when_raw ), current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'seo-agent-ai' ) : '—'; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 
 			$badge_class = 'b-neutral';
 			if ( 'applied' === $status ) {

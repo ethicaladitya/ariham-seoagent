@@ -302,6 +302,126 @@ class SEO_Agent_AI_Redirect_Manager {
 	}
 
 	// -------------------------------------------------------------------
+	// Auto-resolve 404s
+	// -------------------------------------------------------------------
+
+	/**
+	 * Automatically create redirects for 404 URLs that have been hit 3+ times
+	 * and can be matched to an existing published post via slug similarity.
+	 *
+	 * Safe to call from a cron — idempotent via redirect_created flag.
+	 *
+	 * @return int Number of redirects created.
+	 */
+	public function auto_resolve_404s() {
+		global $wpdb;
+
+		$log_table = $wpdb->prefix . self::TABLE_404_LOG;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$candidates = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, url FROM `{$log_table}` WHERE hit_count >= %d AND redirect_created = 0 ORDER BY hit_count DESC LIMIT 50", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				3
+			),
+			ARRAY_A
+		);
+
+		if ( empty( $candidates ) ) {
+			return 0;
+		}
+
+		$created = 0;
+
+		foreach ( $candidates as $row ) {
+			$source_url = (string) $row['url'];
+			$path       = wp_parse_url( $source_url, PHP_URL_PATH );
+			if ( ! is_string( $path ) || $path === '' ) {
+				continue;
+			}
+
+			// Derive a slug guess from the last path segment.
+			$slug = sanitize_title( basename( untrailingslashit( $path ) ) );
+			if ( $slug === '' ) {
+				continue;
+			}
+
+			// Search for a published post whose slug closely matches.
+			$post = $this->find_post_by_slug_similarity( $slug );
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+
+			$target = get_permalink( $post );
+			if ( ! $target ) {
+				continue;
+			}
+
+			$redirect_id = $this->add_redirect( $source_url, $target, 301, 'Auto-created from 404 log.' );
+			if ( $redirect_id ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->update(
+					$log_table,
+					array( 'redirect_created' => 1 ),
+					array( 'id' => (int) $row['id'] ),
+					array( '%d' ),
+					array( '%d' )
+				);
+				++$created;
+			}
+		}
+
+		return $created;
+	}
+
+	/**
+	 * Find a published post whose slug matches $slug or is the closest Levenshtein match.
+	 *
+	 * @param string $slug Candidate slug.
+	 * @return WP_Post|null
+	 */
+	private function find_post_by_slug_similarity( $slug ) {
+		// Exact match first.
+		$exact = get_posts(
+			array(
+				'name'           => $slug,
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+			)
+		);
+		if ( ! empty( $exact ) ) {
+			return $exact[0];
+		}
+
+		// Fuzzy match: find the post with the lowest Levenshtein distance.
+		$all_posts = get_posts(
+			array(
+				'post_status'    => 'publish',
+				'posts_per_page' => 500,
+				'fields'         => 'ids',
+			)
+		);
+
+		$best_post     = null;
+		$best_distance = PHP_INT_MAX;
+		$max_distance  = (int) max( 3, floor( strlen( $slug ) * 0.3 ) );
+
+		foreach ( $all_posts as $post_id ) {
+			$post = get_post( (int) $post_id );
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+			$distance = levenshtein( $slug, $post->post_name );
+			if ( $distance < $best_distance && $distance <= $max_distance ) {
+				$best_distance = $distance;
+				$best_post     = $post;
+			}
+		}
+
+		return $best_post;
+	}
+
+	// -------------------------------------------------------------------
 	// Stats
 	// -------------------------------------------------------------------
 

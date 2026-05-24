@@ -218,7 +218,6 @@ class SEO_Agent_AI_Admin_Page {
 			'seo-agent-ai-settings',
 			array( $this, 'render_settings_page' )
 		);
-
 	}
 
 	public function enqueue_assets( $hook ) {
@@ -238,21 +237,25 @@ class SEO_Agent_AI_Admin_Page {
 			SEO_AGENT_AI_VERSION,
 			true
 		);
-		wp_localize_script( 'seo-agent-ai-admin', 'seoAgentAI', array(
-			'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
-			'nonce'        => wp_create_nonce( 'seo_agent_ai_analyze_batch' ),
-			'nonceApprove' => wp_create_nonce( 'seo_agent_ai_bulk_apply_safe' ),
-			'i18n'         => array(
-				'loading'        => __( 'Working…', 'seo-agent-ai' ),
-				'scanning'       => __( 'Scanning', 'seo-agent-ai' ),
-				'scan_done'      => __( 'Scan complete!', 'seo-agent-ai' ),
-				'scan_error'     => __( 'Scan failed. Please try again.', 'seo-agent-ai' ),
-				'network_error'  => __( 'Network error. Please try again.', 'seo-agent-ai' ),
-				'recommendations' => __( 'recommendation(s) generated.', 'seo-agent-ai' ),
-				'saved'          => __( 'Settings saved!', 'seo-agent-ai' ),
-				'bulk_confirm'   => __( 'Apply all safe pending decisions now? This cannot be undone.', 'seo-agent-ai' ),
-			),
-		) );
+		wp_localize_script(
+			'seo-agent-ai-admin',
+			'seoAgentAI',
+			array(
+				'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+				'nonce'        => wp_create_nonce( 'seo_agent_ai_analyze_batch' ),
+				'nonceApprove' => wp_create_nonce( 'seo_agent_ai_bulk_apply_safe' ),
+				'i18n'         => array(
+					'loading'         => __( 'Working…', 'seo-agent-ai' ),
+					'scanning'        => __( 'Scanning', 'seo-agent-ai' ),
+					'scan_done'       => __( 'Scan complete!', 'seo-agent-ai' ),
+					'scan_error'      => __( 'Scan failed. Please try again.', 'seo-agent-ai' ),
+					'network_error'   => __( 'Network error. Please try again.', 'seo-agent-ai' ),
+					'recommendations' => __( 'recommendation(s) generated.', 'seo-agent-ai' ),
+					'saved'           => __( 'Settings saved!', 'seo-agent-ai' ),
+					'bulk_confirm'    => __( 'Apply all safe pending decisions now? This cannot be undone.', 'seo-agent-ai' ),
+				),
+			)
+		);
 	}
 
 	// -------------------------------------------------------------------
@@ -596,6 +599,7 @@ class SEO_Agent_AI_Admin_Page {
 		$score_target    = (int) get_option( 'seo_agent_ai_score_target', 70 );
 		$ai_provider     = (string) get_option( 'seo_agent_ai_ai_provider', 'gemini' );
 		$email_reports   = (bool) get_option( 'seo_agent_ai_email_reports', false );
+		$email_address   = (string) get_option( 'seo_agent_ai_email_address', '' );
 		$conn_result     = get_transient( SEO_Agent_AI_Plugin::CONNECTION_TEST_TRANSIENT );
 		$is_connected    = $this->oauth->is_connected();
 		$sitekit_active  = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
@@ -900,6 +904,13 @@ class SEO_Agent_AI_Admin_Page {
 										<p class="description"><?php esc_html_e( 'Log entries older than this many days are deleted automatically.', 'seo-agent-ai' ); ?></p>
 									</div>
 								</div>
+								<div class="sai-field" style="margin-top:16px">
+									<label class="sai-field-label" for="email_address"><?php esc_html_e( 'Report Email Address', 'seo-agent-ai' ); ?></label>
+									<div class="sai-field-control">
+										<input type="email" id="email_address" name="email_address" value="<?php echo esc_attr( $email_address ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_option( 'admin_email', '' ) ); ?>">
+										<p class="description"><?php esc_html_e( 'Destination for daily and weekly reports. Defaults to the WordPress admin email when left blank.', 'seo-agent-ai' ); ?></p>
+									</div>
+								</div>
 								<div class="sai-toggle-wrap" style="margin-top:12px">
 									<label class="sai-toggle">
 										<input type="checkbox" name="email_reports" value="1" <?php checked( $email_reports ); ?>>
@@ -907,7 +918,7 @@ class SEO_Agent_AI_Admin_Page {
 									</label>
 									<div class="sai-toggle-info">
 										<strong><?php esc_html_e( 'Email Daily Reports', 'seo-agent-ai' ); ?></strong>
-										<span><?php esc_html_e( 'Send the daily SEO summary report to the admin email address.', 'seo-agent-ai' ); ?></span>
+										<span><?php esc_html_e( 'Send a rich HTML daily SEO report and a weekly rankings summary to the address above.', 'seo-agent-ai' ); ?></span>
 									</div>
 								</div>
 							</div>

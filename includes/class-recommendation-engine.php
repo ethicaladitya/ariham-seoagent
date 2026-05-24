@@ -46,7 +46,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 		$autopilot_threshold = 0.70,
 		$dry_run = false
 	) {
-		$signals    = isset( $analysis['signals'] ) ? $analysis['signals'] : array();
+		$signals     = isset( $analysis['signals'] ) ? $analysis['signals'] : array();
 		$confidence  = isset( $analysis['confidence'] ) ? (float) $analysis['confidence'] : 0.5;
 		$content     = isset( $analysis['content_data'] ) ? $analysis['content_data'] : array();
 		$top_query   = $this->extract_top_query( $gsc );
@@ -461,7 +461,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 		if ( ! empty( $signals['orphan_page'] ) ) {
 			$recommendations[] = array(
 				'type'            => 'internal_link_needed',
-				'risk'            => 'risky',
+				'risk'            => 'safe',
 				'priority'        => 'medium',
 				'confidence'      => max( $confidence, 0.75 ),
 				'expected_impact' => 'Medium — internal links pass authority and help Google discover the page.',
@@ -666,14 +666,14 @@ class SEO_Agent_AI_Recommendation_Engine {
 
 		if ( $this->decision_engine instanceof SEO_Agent_AI_Decision_Engine ) {
 			foreach ( $recommendations as &$rec ) {
-				$decision = $this->decision_engine->process(
+				$decision             = $this->decision_engine->process(
 					$post->ID,
 					$rec,
 					$autopilot_threshold,
 					$dry_run
 				);
-				$rec['decision_tier']    = $decision['tier'];
-				$rec['decision_id']      = $decision['decision_id'];
+				$rec['decision_tier'] = $decision['tier'];
+				$rec['decision_id']   = $decision['decision_id'];
 			}
 			unset( $rec );
 		}
@@ -780,7 +780,9 @@ class SEO_Agent_AI_Recommendation_Engine {
 			return '';
 		}
 
-		usort( $gsc['queries'], fn( $a, $b ) =>
+		usort(
+			$gsc['queries'],
+			fn( $a, $b ) =>
 			( (int) ( $b['impressions'] ?? 0 ) ) - ( (int) ( $a['impressions'] ?? 0 ) )
 		);
 

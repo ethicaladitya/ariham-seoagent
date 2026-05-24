@@ -37,6 +37,9 @@ class SEO_Agent_AI_Plugin {
 	const CRON_HOOK_IMAGE_ALTS      = 'seo_agent_generate_image_alts';
 	const CRON_HOOK_OBSERVE         = 'seo_agent_observe_results';
 	const CRON_HOOK_CWV             = 'seo_agent_fetch_cwv_data';
+	const CRON_HOOK_HEALTH          = 'seo_agent_health_check';
+	const CRON_HOOK_AUTO_REDIRECT   = 'seo_agent_auto_redirect_404s';
+	const CRON_HOOK_WEEKLY_EMAIL    = 'seo_agent_weekly_ranking_email';
 
 	private static $instance = null;
 
@@ -267,6 +270,15 @@ class SEO_Agent_AI_Plugin {
 		// Cron hook — weekly Core Web Vitals data prefetch via PageSpeed Insights API.
 		add_action( self::CRON_HOOK_CWV, array( $this, 'run_fetch_cwv_data' ) );
 
+		// Cron hook — 6-hourly health check: alert if daily analysis is overdue.
+		add_action( self::CRON_HOOK_HEALTH, array( $this, 'run_health_check' ) );
+
+		// Cron hook — weekly: auto-resolve high-traffic 404s with redirects.
+		add_action( self::CRON_HOOK_AUTO_REDIRECT, array( $this, 'run_auto_redirect_404s' ) );
+
+		// Cron hook — weekly: send ranking summary email.
+		add_action( self::CRON_HOOK_WEEKLY_EMAIL, array( $this, 'run_weekly_ranking_email' ) );
+
 		$this->image_seo->init_hooks();
 		$this->social_meta->init_hooks();
 		$this->meta_box->init_hooks();
@@ -303,6 +315,10 @@ class SEO_Agent_AI_Plugin {
 			++$offset;
 		}
 
+		if ( ! wp_next_scheduled( self::CRON_HOOK_HEALTH ) ) {
+			wp_schedule_event( time() + 6 * HOUR_IN_SECONDS, 'twicedaily', self::CRON_HOOK_HEALTH );
+		}
+
 		$weekly_hooks = array(
 			self::CRON_HOOK_SCORE,
 			self::CRON_HOOK_DECAY,
@@ -313,6 +329,8 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_ORPHAN,
 			self::CRON_HOOK_OBSERVE,
 			self::CRON_HOOK_CWV,
+			self::CRON_HOOK_AUTO_REDIRECT,
+			self::CRON_HOOK_WEEKLY_EMAIL,
 		);
 		foreach ( $weekly_hooks as $hook ) {
 			if ( ! wp_next_scheduled( $hook ) ) {
@@ -340,6 +358,9 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_IMAGE_ALTS,
 			self::CRON_HOOK_OBSERVE,
 			self::CRON_HOOK_CWV,
+			self::CRON_HOOK_HEALTH,
+			self::CRON_HOOK_AUTO_REDIRECT,
+			self::CRON_HOOK_WEEKLY_EMAIL,
 		);
 		foreach ( $all_hooks as $hook ) {
 			wp_clear_scheduled_hook( $hook );
@@ -405,6 +426,15 @@ class SEO_Agent_AI_Plugin {
 		if ( ! wp_next_scheduled( self::CRON_HOOK_CWV ) ) {
 			wp_schedule_event( time() + DAY_IN_SECONDS + 6 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_CWV );
 		}
+		if ( ! wp_next_scheduled( self::CRON_HOOK_HEALTH ) ) {
+			wp_schedule_event( time() + 6 * HOUR_IN_SECONDS, 'twicedaily', self::CRON_HOOK_HEALTH );
+		}
+		if ( ! wp_next_scheduled( self::CRON_HOOK_AUTO_REDIRECT ) ) {
+			wp_schedule_event( time() + DAY_IN_SECONDS + 7 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_AUTO_REDIRECT );
+		}
+		if ( ! wp_next_scheduled( self::CRON_HOOK_WEEKLY_EMAIL ) ) {
+			wp_schedule_event( time() + DAY_IN_SECONDS + 8 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_WEEKLY_EMAIL );
+		}
 
 		set_transient( 'seo_agent_ai_cron_checked', 1, HOUR_IN_SECONDS );
 	}
@@ -441,6 +471,61 @@ class SEO_Agent_AI_Plugin {
 		}
 
 		$this->logger->info( 'GSC keyword history fetch complete. Posts: ' . count( $posts ) );
+
+		// Detect low-CTR opportunities: pages with impressions > 0 but CTR < 2%.
+		// These are queued as gsc_ctr_gap decisions for the recommendation engine.
+		$this->detect_ctr_gap_opportunities( $posts );
+	}
+
+	/**
+	 * Identify posts with GSC impressions but very low click-through rates,
+	 * and insert them as pending gsc_ctr_gap decisions so they surface in reports.
+	 *
+	 * insert_decision() is idempotent — it skips duplicates by (post_id, decision_type, field, status).
+	 *
+	 * @param WP_Post[] $posts
+	 */
+	private function detect_ctr_gap_opportunities( array $posts ) {
+		foreach ( $posts as $post ) {
+			$url     = get_permalink( $post );
+			$metrics = $this->gsc_client->get_page_metrics( $url );
+			if ( is_wp_error( $metrics ) || ! is_array( $metrics ) ) {
+				continue;
+			}
+
+			$impressions = (float) ( $metrics['impressions_total'] ?? 0 );
+			$ctr         = (float) ( $metrics['ctr_avg'] ?? 0 );
+			$position    = (float) ( $metrics['position_avg'] ?? 99 );
+
+			// Only flag pages with real impressions but critically low CTR on page 1.
+			if ( $impressions < 50 || $ctr >= 0.02 || $position > 20 ) {
+				continue;
+			}
+
+			SEO_Agent_AI_DB_Manager::insert_decision(
+				array(
+					'post_id'         => (int) $post->ID,
+					'decision_type'   => 'gsc_ctr_gap',
+					'field'           => 'meta_title',
+					'proposed_value'  => '',
+					'current_value'   => '',
+					'confidence'      => 0.85,
+					'reasoning'       => sprintf(
+						/* translators: 1: impressions count, 2: CTR %, 3: avg position. */
+						__(
+							'%1$d impressions but only %2$s%% CTR at position %3$s. Optimising the title tag and meta description to better match search intent could significantly increase clicks.',
+							'seo-agent-ai'
+						),
+						(int) $impressions,
+						number_format( $ctr * 100, 1 ),
+						number_format( $position, 1 )
+					),
+					'expected_impact' => __( 'High — even a 1% CTR improvement on 50+ impressions yields meaningful traffic gains.', 'seo-agent-ai' ),
+					'risk_level'      => 'safe',
+					'status'          => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+				)
+			);
+		}
 	}
 
 	public function run_fetch_ga4() {
@@ -986,6 +1071,13 @@ class SEO_Agent_AI_Plugin {
 			// Heal any decisions stuck at STATUS_APPROVED.
 			$this->drain_approved_decisions();
 
+			// When autopilot is enabled, also drain old pending decisions — this applies
+			// content_expansion drafts and internal-link suggestions that were queued but
+			// not yet actioned (e.g. from before autopilot was turned on).
+			if ( $autopilot ) {
+				$this->drain_pending_decisions();
+			}
+
 			update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_DAILY, current_time( 'mysql' ), false );
 
 		} finally {
@@ -1095,7 +1187,7 @@ class SEO_Agent_AI_Plugin {
 		// Priority posts from GSC site-level opportunity data (no API call —
 		// reads from the 6-hour transient populated by run_fetch_gsc).
 		// ------------------------------------------------------------------
-		$priority_ids = array();
+		$priority_ids  = array();
 		$opportunities = $this->gsc_opportunity_analyzer->get_opportunities();
 
 		if ( is_array( $opportunities ) ) {
@@ -1120,14 +1212,14 @@ class SEO_Agent_AI_Plugin {
 		// Also prioritise posts flagged by the observation pass as needing re-analysis.
 		$reanalysis_posts = get_posts(
 			array(
-				'post_type'      => 'any',
-				'post_status'    => 'publish',
-				'numberposts'    => 20,
-				'no_found_rows'  => true,
+				'post_type'     => 'any',
+				'post_status'   => 'publish',
+				'numberposts'   => 20,
+				'no_found_rows' => true,
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_key'       => '_seo_agent_ai_needs_reanalysis',
+				'meta_key'      => '_seo_agent_ai_needs_reanalysis',
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-				'meta_value'     => '1',
+				'meta_value'    => '1',
 			)
 		);
 		foreach ( $reanalysis_posts as $rp ) {
@@ -1497,7 +1589,6 @@ class SEO_Agent_AI_Plugin {
 						$this->decision_engine->mark_applied( $dec_id );
 					}
 				}
-
 			} else {
 				// Unknown/unexecutable type — mark applied so it doesn't block the queue.
 				$this->decision_engine->mark_applied( $dec_id );
@@ -1521,6 +1612,8 @@ class SEO_Agent_AI_Plugin {
 			)
 		);
 
+		$processed = 0;
+
 		foreach ( $pending as $dec ) {
 			$dec_id  = (int) $dec['id'];
 			$post_id = (int) $dec['post_id'];
@@ -1528,10 +1621,41 @@ class SEO_Agent_AI_Plugin {
 			$field   = $dec['field'] ?? '';
 			$value   = $dec['proposed_value'] ?? '';
 
+			if ( 'content_expansion' === $type || 'content_refresh_plan' === $type ) {
+				// Skip if a draft already exists for this post.
+				if ( get_post_meta( $post_id, '_seo_agent_ai_pending_draft_id', true ) ) {
+					continue;
+				}
+				if ( 'content_expansion' === $type ) {
+					$result = $this->content_expander->expand( $post_id );
+				} else {
+					$result = $this->content_expander->refresh( $post_id );
+				}
+				if ( ! is_wp_error( $result ) ) {
+					$this->decision_engine->mark_applied( $dec_id );
+					++$processed;
+				}
+				continue;
+			}
+
+			if ( 'internal_link_needed' === $type ) {
+				$this->internal_link_engine->run_for_post( $post_id );
+				$this->decision_engine->mark_applied( $dec_id );
+				++$processed;
+				continue;
+			}
+
+			if ( 'schema_update' === $type ) {
+				update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+				$this->decision_engine->mark_applied( $dec_id );
+				++$processed;
+				continue;
+			}
+
 			$proposed = array();
-			if ( $field === 'meta_title' ) {
+			if ( 'meta_title' === $field ) {
 				$proposed['meta_title'] = $value;
-			} elseif ( $field === 'meta_description' ) {
+			} elseif ( 'meta_description' === $field ) {
 				$proposed['meta_description'] = $value;
 			} else {
 				$decoded = json_decode( $value, true );
@@ -1550,21 +1674,16 @@ class SEO_Agent_AI_Plugin {
 						'reason'     => $dec['reasoning'] ?? '',
 						'confidence' => (float) ( $dec['confidence'] ?? 0.7 ),
 					),
-					'autopilot'
+					SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT
 				);
 				if ( ! is_wp_error( $result ) ) {
 					$this->decision_engine->mark_applied( $dec_id );
+					++$processed;
 				}
-			} elseif ( $type === 'internal_link_needed' ) {
-				$this->internal_link_engine->run_for_post( $post_id );
-				$this->decision_engine->mark_applied( $dec_id );
-			} elseif ( $type === 'schema_update' ) {
-				update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
-				$this->decision_engine->mark_applied( $dec_id );
 			}
 		}
 
-		$this->logger->info( sprintf( 'Autopilot drain: processed %d pending decisions.', count( $pending ) ) );
+		$this->logger->info( sprintf( 'Autopilot drain: processed %d of %d pending decisions.', $processed, count( $pending ) ) );
 	}
 
 	// -------------------------------------------------------------------
@@ -1722,9 +1841,10 @@ class SEO_Agent_AI_Plugin {
 		// OpenAI / AI provider settings.
 		$ai_provider   = isset( $_POST['ai_provider'] ) ? sanitize_key( $_POST['ai_provider'] ) : 'gemini';
 		$openai_key    = isset( $_POST['openai_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['openai_api_key'] ) ) : '';
-		$openai_url        = isset( $_POST['openai_base_url'] ) ? esc_url_raw( wp_unslash( $_POST['openai_base_url'] ) ) : '';
-		$openai_model      = isset( $_POST['openai_model'] ) ? sanitize_text_field( wp_unslash( $_POST['openai_model'] ) ) : '';
+		$openai_url    = isset( $_POST['openai_base_url'] ) ? esc_url_raw( wp_unslash( $_POST['openai_base_url'] ) ) : '';
+		$openai_model  = isset( $_POST['openai_model'] ) ? sanitize_text_field( wp_unslash( $_POST['openai_model'] ) ) : '';
 		$email_reports = ! empty( $_POST['email_reports'] );
+		$email_address = isset( $_POST['email_address'] ) ? sanitize_email( wp_unslash( $_POST['email_address'] ) ) : '';
 
 		if ( ! in_array( $ai_provider, array( 'gemini', 'openai', 'auto' ), true ) ) {
 			$ai_provider = 'gemini';
@@ -1762,6 +1882,7 @@ class SEO_Agent_AI_Plugin {
 		update_option( SEO_Agent_AI_OpenAI_Client::OPTION_BASE_URL, $openai_url, false );
 		update_option( SEO_Agent_AI_OpenAI_Client::OPTION_MODEL, $openai_model, false );
 		update_option( 'seo_agent_ai_email_reports', $email_reports, false );
+		update_option( 'seo_agent_ai_email_address', $email_address, false );
 
 		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'settings_saved', admin_url( 'admin.php?page=seo-agent-ai-settings' ) ) );
 		exit;
@@ -2138,6 +2259,83 @@ class SEO_Agent_AI_Plugin {
 				(int) $result['failed']
 			)
 		);
+	}
+
+	// -------------------------------------------------------------------
+	// Cron: health check
+	// -------------------------------------------------------------------
+
+	/**
+	 * Fire every ~12 hours. Send an alert email if the daily analysis has not
+	 * run in the last 26 hours (i.e. a whole day has been missed).
+	 */
+	public function run_health_check() {
+		$last_raw = get_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_DAILY, '' );
+		if ( $last_raw === '' ) {
+			return;
+		}
+
+		$last_ts = strtotime( $last_raw );
+		$overdue = ( time() - $last_ts ) > ( 26 * HOUR_IN_SECONDS );
+		if ( ! $overdue ) {
+			return;
+		}
+
+		$to = (string) get_option( 'seo_agent_ai_email_address', '' );
+		if ( $to === '' ) {
+			$to = (string) get_option( 'admin_email', '' );
+		}
+		if ( $to === '' ) {
+			return;
+		}
+
+		$site_name = get_bloginfo( 'name' );
+		$subject   = sprintf(
+			/* translators: %s: site name. */
+			__( '[%s] SEO Agent AI — Daily Analysis Missed', 'seo-agent-ai' ),
+			$site_name
+		);
+		$message = sprintf(
+			/* translators: 1: site name, 2: last run time. */
+			__( "The daily SEO analysis on %1\$s has not run since %2\$s. This usually means WP-Cron is not firing.\n\nPlease check your hosting cron configuration or visit the Cron Status page in your WordPress admin.\n\n%3\$s", 'seo-agent-ai' ),
+			$site_name,
+			$last_raw,
+			admin_url( 'admin.php?page=seo-agent-cron-status' )
+		);
+
+		wp_mail( sanitize_email( $to ), $subject, $message );
+		$this->logger->warning( 'Health check: daily analysis overdue, alert email sent.' );
+	}
+
+	// -------------------------------------------------------------------
+	// Cron: auto-resolve 404s
+	// -------------------------------------------------------------------
+
+	/**
+	 * Weekly cron: automatically create 301 redirects for 404 URLs that have
+	 * been hit 3+ times and can be matched to a live post by slug similarity.
+	 */
+	public function run_auto_redirect_404s() {
+		$this->logger->info( 'Starting auto-redirect 404 resolution.' );
+		$created = $this->redirect_manager->auto_resolve_404s();
+		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_AUTO_REDIRECT, current_time( 'mysql' ), false );
+		$this->logger->info( sprintf( 'Auto-redirect 404 resolution complete. Redirects created: %d.', $created ) );
+	}
+
+	// -------------------------------------------------------------------
+	// Cron: weekly ranking email
+	// -------------------------------------------------------------------
+
+	/**
+	 * Weekly cron: send a rankings trend email digest when email reports are enabled.
+	 */
+	public function run_weekly_ranking_email() {
+		if ( ! (bool) get_option( 'seo_agent_ai_email_reports', false ) ) {
+			return;
+		}
+		$this->logger->info( 'Sending weekly ranking summary email.' );
+		$this->report_engine->send_weekly_ranking_email();
+		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_WEEKLY_EMAIL, current_time( 'mysql' ), false );
 	}
 
 	// -------------------------------------------------------------------
