@@ -930,7 +930,7 @@ body.wp-admin .sai-page {
 .sai-field-label { font-size: 13px; font-weight: 600; color: var(--cl-text); padding-top: 6px; }
 .sai-field-desc  { font-size: 12px; color: var(--cl-text-muted); margin-top: 3px; line-height: 1.4; }
 
-.sai-field-control input,
+.sai-field-control input:not([type="radio"]):not([type="checkbox"]),
 .sai-field-control textarea,
 .sai-field-control select {
 	font-family:   var(--cl-font);
@@ -946,9 +946,22 @@ body.wp-admin .sai-page {
 	transition:    border-color var(--cl-dur), box-shadow var(--cl-dur);
 }
 
-.sai-field-control input:focus,
+.sai-field-control input:not([type="radio"]):not([type="checkbox"]):focus,
 .sai-field-control textarea:focus,
 .sai-field-control select:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 2px var(--cl-accent-bg); }
+
+/* Radio and checkbox styling inside sai-field-control */
+.sai-field-control input[type="radio"],
+.sai-field-control input[type="checkbox"] {
+	width:    auto;
+	height:   auto;
+	margin:   0 6px 0 0;
+	padding:  0;
+	border:   none;
+	background: none;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
 
 .sai-key-input-wrap { position: relative; }
 .sai-key-input-wrap input { padding-right: 40px; font-family: var(--cl-mono); letter-spacing: .08em; }

@@ -288,7 +288,8 @@ class SEO_Agent_AI_Redirect_Manager {
 	// -------------------------------------------------------------------
 
 	/**
-	 * Log 404 requests. Hooked on `wp` action.
+	 * Log 404 requests and attempt an immediate redirect when the threshold is met.
+	 * Hooked on `wp` action — fires before `template_redirect`, so wp_safe_redirect() still works.
 	 */
 	public function init_404_logging() {
 		if ( ! is_404() ) {
@@ -299,6 +300,67 @@ class SEO_Agent_AI_Redirect_Manager {
 		$referrer = isset( $_SERVER['HTTP_REFERER'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 
 		$this->log_404( $url, $referrer );
+		$this->maybe_auto_redirect_now( $url );
+	}
+
+	/**
+	 * Immediately redirect a 404 URL if it has crossed the hit threshold and a
+	 * matching post can be found. Called inline on every 404 request so visitors
+	 * are redirected as soon as the threshold is met, without waiting for the cron.
+	 *
+	 * @param string $url Full URL of the 404 request.
+	 */
+	private function maybe_auto_redirect_now( string $url ): void {
+		global $wpdb;
+
+		$log_table = $wpdb->prefix . self::TABLE_404_LOG;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT id, hit_count, redirect_created FROM `{$log_table}` WHERE url = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$url
+			)
+		);
+
+		if ( ! $row || (int) $row->hit_count < 3 || (int) $row->redirect_created === 1 ) {
+			return;
+		}
+
+		$path = wp_parse_url( $url, PHP_URL_PATH );
+		if ( ! is_string( $path ) || $path === '' ) {
+			return;
+		}
+
+		$slug = sanitize_title( basename( untrailingslashit( $path ) ) );
+		if ( $slug === '' ) {
+			return;
+		}
+
+		$post = $this->find_post_by_slug_similarity( $slug );
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$target = get_permalink( $post );
+		if ( ! $target ) {
+			return;
+		}
+
+		$redirect_id = $this->add_redirect( $url, $target, 301, 'Auto-created (real-time) from 404.' );
+		if ( $redirect_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->update(
+				$log_table,
+				array( 'redirect_created' => 1 ),
+				array( 'id' => (int) $row->id ),
+				array( '%d' ),
+				array( '%d' )
+			);
+
+			wp_safe_redirect( esc_url_raw( $target ), 301 );
+			exit;
+		}
 	}
 
 	// -------------------------------------------------------------------
