@@ -167,7 +167,7 @@ class SEO_Agent_AI_Redirects_Page {
 										<td>
 										<code><?php echo esc_html( $r['source_url'] ); ?></code>
 										<?php if ( ! empty( $r['via'] ) && 'own' !== $r['via'] ) : ?>
-											<span class="sai-badge b-info" style="margin-left:6px;vertical-align:middle"><?php echo esc_html( SEO_Agent_AI_Redirect_Manager::instance()->get_backend_label() ); ?></span>
+											<span class="sai-badge b-info" style="margin-left:6px;vertical-align:middle"><?php echo esc_html( $this->redirect_manager->get_backend_label() ); ?></span>
 										<?php endif; ?>
 									</td>
 										<td class="col-trunc"><a href="<?php echo esc_url( $r['target_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $r['target_url'] ); ?></a></td>
