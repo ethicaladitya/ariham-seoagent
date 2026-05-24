@@ -146,7 +146,7 @@ class SEO_Agent_AI_Redirects_Page {
 				</div>
 
 				<!-- Redirects table -->
-				<?php if ( $redirects ) : ?>
+					<?php if ( $redirects ) : ?>
 				<div class="sai-card">
 					<div class="sai-card-header"><h2 class="sai-card-title"><?php esc_html_e( 'Active Redirects', 'seo-agent-ai' ); ?></h2></div>
 					<div class="sai-card-body" style="padding:0">
@@ -158,20 +158,25 @@ class SEO_Agent_AI_Redirects_Page {
 										<th><?php esc_html_e( 'Target', 'seo-agent-ai' ); ?></th>
 										<th class="col-center"><?php esc_html_e( 'Type', 'seo-agent-ai' ); ?></th>
 										<th class="col-center col-num"><?php esc_html_e( 'Hits', 'seo-agent-ai' ); ?></th>
-										<th><?php esc_html_e( 'Last Hit', 'seo-agent-ai' ); ?></th>
-										<th><?php esc_html_e( 'Action', 'seo-agent-ai' ); ?></th>
+												<th><?php esc_html_e( 'Action', 'seo-agent-ai' ); ?></th>
 									</tr>
 								</thead>
 								<tbody>
 								<?php foreach ( $redirects as $r ) : ?>
 									<tr>
-										<td><code><?php echo esc_html( $r['source_url'] ); ?></code></td>
+										<td>
+										<code><?php echo esc_html( $r['source_url'] ); ?></code>
+										<?php if ( ! empty( $r['via'] ) && 'smartcrawl' === $r['via'] ) : ?>
+											<span class="sai-badge b-info" style="margin-left:6px;vertical-align:middle">SmartCrawl</span>
+										<?php endif; ?>
+									</td>
 										<td class="col-trunc"><a href="<?php echo esc_url( $r['target_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $r['target_url'] ); ?></a></td>
 										<td class="col-center">
 											<span class="sai-redirect-type"><?php echo esc_html( $r['redirect_type'] ); ?></span>
 										</td>
-										<td class="col-center col-num"><?php echo esc_html( number_format_i18n( (int) $r['hit_count'] ) ); ?></td>
-										<td style="font-size:12px;color:#787c82"><?php echo esc_html( $r['last_hit'] ?? '—' ); ?></td>
+										<td class="col-center col-num">
+										<?php echo ( isset( $r['hit_count'] ) && null !== $r['hit_count'] ) ? esc_html( number_format_i18n( (int) $r['hit_count'] ) ) : '&mdash;'; ?>
+									</td>
 										<td>
 											<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
 												<?php wp_nonce_field( 'seo_agent_ai_delete_redirect' ); ?>
@@ -202,7 +207,7 @@ class SEO_Agent_AI_Redirects_Page {
 				<?php else : ?>
 
 				<!-- 404 Log -->
-				<?php if ( $log_404 ) : ?>
+					<?php if ( $log_404 ) : ?>
 				<div class="sai-card">
 					<div class="sai-card-header"><h2 class="sai-card-title"><?php esc_html_e( '404 Error Log', 'seo-agent-ai' ); ?></h2></div>
 					<div class="sai-card-body" style="padding:0">
@@ -227,8 +232,6 @@ class SEO_Agent_AI_Redirects_Page {
 											<?php endif; ?>
 										</td>
 										<td class="col-center col-num"><?php echo esc_html( number_format_i18n( (int) $e['hit_count'] ) ); ?></td>
-										<td style="font-size:12px;color:#787c82"><?php echo esc_html( $e['first_seen'] ); ?></td>
-										<td style="font-size:12px;color:#787c82"><?php echo esc_html( $e['last_seen'] ); ?></td>
 										<td>
 											<?php if ( ! $e['redirect_created'] ) : ?>
 											<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-redirects&tab=redirects&prefill=' . rawurlencode( $e['url'] ) ) ); ?>"
