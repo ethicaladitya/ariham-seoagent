@@ -1849,3 +1849,15 @@ body.wp-admin .sai-page::before {
 	/* Score ring: smaller on phone */
 	.sai-score-ring-num { font-size: 20px; }
 }
+
+/* ── Meta Box (post edit screen) ── */
+.sai-tabs { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid #ddd; padding-bottom: 0; }
+.sai-tab-btn { cursor: pointer; padding: 6px 14px; border: 1px solid #ddd; border-bottom: none; background: #f6f7f7; color: #23282d; border-radius: 3px 3px 0 0; }
+.sai-tab-btn.active { background: #fff; font-weight: 600; }
+.sai-tab-panel { display: none; }
+.sai-tab-panel.active { display: block; }
+.sai-score-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; color: #fff; font-weight: 700; font-size: 1.1em; background: #888; }
+.sai-row { margin-bottom: 10px; }
+.sai-row label { display: block; font-weight: 600; margin-bottom: 3px; }
+.sai-row input[type=text], .sai-row textarea { width: 100%; }
+.sai-char-count { font-size: 11px; color: #888; }

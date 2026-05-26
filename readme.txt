@@ -1,4 +1,4 @@
-=== SEO Agent AI ===
+=== SiteAgent SEO ===
 Contributors: ethicaladitya
 Tags: seo, google-search-console, analytics, ai, automation
 Requires at least: 6.4
@@ -8,20 +8,21 @@ Stable tag: 0.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-An autonomous SEO agent that connects Google Search Console, Google Analytics 4, and your existing SEO plugins to continuously analyse, score, and fix your content — so your site keeps improving on its own.
+Autonomous SEO agent: connects GSC, GA4, and your SEO plugins to continuously analyse, score, and fix your content on autopilot.
 
 == Description ==
 
-**SEO Agent AI is a hands-free SEO growth engine for WordPress.** It connects to Google Search Console and Google Analytics 4 to read real traffic and ranking data for every post on your site, then uses that data — optionally combined with Gemini or OpenAI — to detect problems, generate prioritised recommendations, and apply safe fixes automatically.
+**SiteAgent SEO is a hands-free SEO growth engine for WordPress.** It connects to Google Search Console and Google Analytics 4 to read real traffic and ranking data for every post on your site, then uses that data — optionally combined with Gemini or OpenAI — to detect problems, generate prioritised recommendations, and apply safe fixes automatically.
 
-Unlike traditional SEO plugins that show you a checklist to fill in, SEO Agent AI acts like a background analyst that never sleeps: it scores every page on a 0–100 SEO scale, surfaces the highest-impact opportunities first, and can apply safe metadata updates for you on a schedule — with full rollback if anything looks wrong.
+Unlike traditional SEO plugins that show you a checklist to fill in, SiteAgent SEO acts like a background analyst that never sleeps: it scores every page on a 0–100 SEO scale, surfaces the highest-impact opportunities first, and can apply safe metadata updates for you on a schedule — with full rollback if anything looks wrong.
 
-**Connect your existing tools — SEO Agent AI enhances what you already have:**
+**Connect your existing tools — SiteAgent SEO enhances what you already have:**
 
-SEO Agent AI reads and writes to the SEO plugins you already use. It does not replace them.
+SiteAgent SEO reads and writes to the SEO plugins you already use. It does not replace them.
 
 * **Google Search Console** — pulls real queries, impressions, clicks, average position, and CTR per post so recommendations are based on actual search performance, not guesses.
 * **Google Analytics 4** — pulls sessions, engagement rate, and average time-on-page to identify pages losing traffic or readers leaving quickly.
+* **Google Site Kit** — if Site Kit is already installed and authorised, SiteAgent SEO uses its connection bridge to access Search Console data without requiring a separate OAuth setup.
 * **Yoast SEO** — reads and writes meta titles, descriptions, and focus keywords to Yoast's fields.
 * **Rank Math** — reads and writes meta and focus keywords to Rank Math's meta keys.
 * **SmartCrawl** — integrates with SmartCrawl's redirect manager and meta fields.
@@ -59,9 +60,9 @@ No data leaves your server until you explicitly connect a Google account. No rem
 
 1. Upload the `seo-agent-ai` folder to `/wp-content/plugins/`, or install via the WordPress Plugins screen.
 2. Activate the plugin.
-3. Go to **SEO Agent AI → Settings** and enter your Google OAuth Client ID and Client Secret.
+3. Go to **SiteAgent SEO → Settings** and enter your Google OAuth Client ID and Client Secret.
    - Create a project at [Google Cloud Console](https://console.cloud.google.com/), enable the Search Console API and Google Analytics Data API, and add your wp-admin Connect Google page URL as an authorised redirect URI.
-4. Go to **SEO Agent AI → Connect Google** and complete the OAuth flow.
+4. Go to **SiteAgent SEO → Connect Google** and complete the OAuth flow.
 5. In Settings, select your verified Search Console property and your GA4 property.
 6. Optionally paste a Gemini or OpenAI API key to enable AI-powered meta generation.
 7. Click **Run Full Scan** once to seed data. Daily WP-Cron keeps everything fresh from then on.
@@ -74,7 +75,7 @@ No — not by default. In the default manual mode you must click "Apply" on each
 
 = Do I need to have a specific SEO plugin installed? =
 
-No. SEO Agent AI works standalone and writes meta to its own post-meta keys. If you have Yoast SEO, Rank Math, SmartCrawl, The SEO Framework, AIOSEO, or SEOPress installed and active, the plugin will also write to those plugins' meta fields automatically, so your existing SEO plugin always shows the correct values.
+No. SiteAgent SEO works standalone and writes meta to its own post-meta keys. If you have Yoast SEO, Rank Math, SmartCrawl, The SEO Framework, AIOSEO, or SEOPress installed and active, the plugin will also write to those plugins' meta fields automatically, so your existing SEO plugin always shows the correct values.
 
 = Does it send any data to external servers before I configure it? =
 
@@ -82,7 +83,7 @@ No. The plugin makes zero remote calls until you provide OAuth credentials and c
 
 = Where are my API keys and OAuth tokens stored? =
 
-In your WordPress options table, encrypted at rest with AES-256-CBC using a key derived from your site's `wp_salt('secure_auth')`. They never leave your server except when making authorised API requests.
+In your WordPress database, encrypted at rest with AES-256-CBC using a key derived from your site's `wp_salt('secure_auth')`. They never leave your server except when making authorised API requests.
 
 = Which SEO plugins does it read from and write to? =
 
@@ -90,7 +91,7 @@ Yoast SEO, Rank Math, SmartCrawl, The SEO Framework, AIOSEO, and SEOPress — wh
 
 = How do I undo a change? =
 
-Open **SEO Agent AI → Rollback Center**, find the entry, and click Rollback. The previous meta value is restored across every SEO plugin that was written to.
+Open **SiteAgent SEO → Rollback Center**, find the entry, and click Rollback. The previous meta value is restored across every SEO plugin that was written to.
 
 = Will it slow down my site? =
 
@@ -98,7 +99,7 @@ No. All analysis and API calls happen inside WP-Cron jobs that run in the backgr
 
 = Does it work with Google Site Kit? =
 
-Yes. If Google Site Kit is installed and authorised, SEO Agent AI can use the Site Kit bridge to access Search Console data without requiring a separate OAuth setup.
+Yes. If Google Site Kit is installed and already authorised with your Google account, SiteAgent SEO detects it automatically and uses its connection bridge to pull Search Console data — no separate OAuth credentials required. You can still set up the dedicated OAuth flow if you prefer, or if you need GA4 data that Site Kit does not expose.
 
 == External Services ==
 

@@ -358,7 +358,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 
 		// Toggle body on header click.
 		?>
-		<script>
+		<?php ob_start(); ?>
 		document.addEventListener('click', function (e) {
 			var header = e.target.closest('.sai-decision-header');
 			if (!header) return;
@@ -368,7 +368,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 				body.style.display = (body.style.display === 'none' || body.style.display === '') ? 'block' : 'none';
 			}
 		});
-		</script>
+		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 		<?php
 	}
 

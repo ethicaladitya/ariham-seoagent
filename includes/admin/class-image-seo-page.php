@@ -138,7 +138,7 @@ class SEO_Agent_AI_Image_SEO_Page {
 			</div>
 		</div>
 
-		<script>
+		<?php ob_start(); ?>
 		(function($){
 			var nonce = '<?php echo esc_js( wp_create_nonce( 'seo_agent_ai_image_seo' ) ); ?>';
 
@@ -208,7 +208,7 @@ class SEO_Agent_AI_Image_SEO_Page {
 				next();
 			});
 		}(jQuery));
-		</script>
+		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 		<?php
 	}
 }

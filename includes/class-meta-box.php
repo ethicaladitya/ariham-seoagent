@@ -16,6 +16,7 @@ class SEO_Agent_AI_Meta_Box {
 	// -------------------------------------------------------------------
 
 	public function init_hooks() {
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_meta_box_assets' ) );
 		add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
 		add_action( 'wp_ajax_seo_agent_ai_analyze_single_post', array( $this, 'ajax_analyze_single_post' ) );
@@ -24,6 +25,22 @@ class SEO_Agent_AI_Meta_Box {
 	// -------------------------------------------------------------------
 	// Registration
 	// -------------------------------------------------------------------
+
+	// -------------------------------------------------------------------
+	// Asset enqueue (post edit screens)
+	// -------------------------------------------------------------------
+
+	public function enqueue_meta_box_assets( $hook ) {
+		if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			return;
+		}
+		wp_enqueue_style(
+			'seo-agent-ai-admin',
+			SEO_AGENT_AI_PLUGIN_URL . 'assets/css/admin.css',
+			array(),
+			SEO_AGENT_AI_VERSION
+		);
+	}
 
 	public function register_meta_boxes() {
 		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post', 'page' ) );
@@ -75,18 +92,6 @@ class SEO_Agent_AI_Meta_Box {
 
 		$score_label = $score ? (string) $score : __( 'N/A', 'seo-agent-ai' );
 		?>
-		<style>
-			.sai-tabs { display:flex; gap:4px; margin-bottom:12px; border-bottom:1px solid #ddd; padding-bottom:0; }
-			.sai-tab-btn { cursor:pointer; padding:6px 14px; border:1px solid #ddd; border-bottom:none; background:#f6f7f7; color:#23282d; border-radius:3px 3px 0 0; }
-			.sai-tab-btn.active { background:#fff; font-weight:600; }
-			.sai-tab-panel { display:none; }
-			.sai-tab-panel.active { display:block; }
-			.sai-score-badge { display:inline-block; padding:2px 10px; border-radius:12px; color:#fff; font-weight:700; font-size:1.1em; background:<?php echo esc_attr( $badge_color ); ?>; }
-			.sai-row { margin-bottom:10px; }
-			.sai-row label { display:block; font-weight:600; margin-bottom:3px; }
-			.sai-row input[type=text], .sai-row textarea { width:100%; }
-			.sai-char-count { font-size:11px; color:#888; }
-		</style>
 		<div class="sai-tabs">
 			<button type="button" class="sai-tab-btn active" data-tab="sai-tab-score"><?php esc_html_e( 'Focus & Score', 'seo-agent-ai' ); ?></button>
 			<button type="button" class="sai-tab-btn" data-tab="sai-tab-meta"><?php esc_html_e( 'Meta', 'seo-agent-ai' ); ?></button>
@@ -96,7 +101,7 @@ class SEO_Agent_AI_Meta_Box {
 		<div id="sai-tab-score" class="sai-tab-panel active">
 			<div class="sai-row">
 				<label><?php esc_html_e( 'SEO Score', 'seo-agent-ai' ); ?></label>
-				<span class="sai-score-badge"><?php echo esc_html( $score_label ); ?></span>
+				<span class="sai-score-badge" style="background:<?php echo esc_attr( $badge_color ); ?>"><?php echo esc_html( $score_label ); ?></span>
 			</div>
 			<div class="sai-row">
 				<label for="seo_agent_ai_focus_keyword"><?php esc_html_e( 'Focus Keyword', 'seo-agent-ai' ); ?></label>
@@ -154,7 +159,7 @@ class SEO_Agent_AI_Meta_Box {
 			</div>
 		</div>
 
-		<script>
+		<?php ob_start(); ?>
 		(function(){
 			var tabs = document.querySelectorAll('.sai-tab-btn');
 			tabs.forEach(function(btn){
@@ -199,7 +204,7 @@ class SEO_Agent_AI_Meta_Box {
 				});
 			}
 		})();
-		</script>
+		<?php wp_add_inline_script( 'jquery', ob_get_clean() ); ?>
 		<?php
 	}
 

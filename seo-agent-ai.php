@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name:       SEO Agent AI
- * Plugin URI:        https://adityashah.blog/seo-agent-ai/
+ * Plugin Name:       SiteAgent SEO
+ * Plugin URI:        https://adityashah.blog/
  * Description:       Autonomous SEO growth engine — continuously analyzes Search Console and GA4 signals, then proposes prioritized SEO recommendations with full audit trail, optional autopilot, and AI-powered content intelligence.
  * Version:           0.0.1
  * Requires at least: 6.4
  * Requires PHP:      7.4
- * Author:            SEO Agent AI
+ * Author:            EthicalAditya
  * Author URI:        https://adityashah.blog/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html

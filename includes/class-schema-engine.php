@@ -104,6 +104,8 @@ class SEO_Agent_AI_Schema_Engine {
 
 		foreach ( $blocks as $block ) {
 			echo "\n<script type=\"application/ld+json\">\n";
+			// JSON_UNESCAPED_SLASHES and JSON_UNESCAPED_UNICODE are required for valid JSON-LD (URLs must not have escaped slashes).
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_json_encode output is safe; flags are standard for JSON-LD.
 			echo wp_json_encode( $block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
 			echo "\n</script>\n";
 		}

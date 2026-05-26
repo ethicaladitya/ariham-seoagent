@@ -357,7 +357,7 @@ class SEO_Agent_AI_Opportunities_Page {
 	private function render_scan_js() {
 		$nonce = wp_create_nonce( 'seo_agent_ai_analyze_batch' );
 		?>
-		<script>
+		<?php ob_start(); ?>
 		(function () {
 			var nonce      = <?php echo wp_json_encode( $nonce ); ?>;
 			var ajaxUrl    = <?php echo wp_json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
@@ -470,7 +470,7 @@ class SEO_Agent_AI_Opportunities_Page {
 				}
 			});
 		})();
-		</script>
+		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 		<?php
 	}
 }

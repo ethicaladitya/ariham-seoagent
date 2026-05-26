@@ -336,7 +336,7 @@ class SEO_Agent_AI_Admin_Page {
 				</div>
 			</div>
 
-			<script>
+			<?php ob_start(); ?>
 			(function($) {
 				'use strict';
 				var batchNonce = '<?php echo esc_js( wp_create_nonce( 'seo_agent_ai_analyze_batch' ) ); ?>';
@@ -413,7 +413,7 @@ class SEO_Agent_AI_Admin_Page {
 					$('#seo-run-analysis').prop('disabled', false).text(strings.retry);
 				}
 			})(jQuery);
-			</script>
+			<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 
 			<?php if ( empty( $post_ids ) ) : ?>
 				<p><em><?php esc_html_e( 'No recommendations yet. Run an analysis to populate insights.', 'seo-agent-ai' ); ?></em></p>
@@ -933,7 +933,7 @@ class SEO_Agent_AI_Admin_Page {
 		</div>
 
 		<?php if ( $is_connected && ! $sitekit_active ) : ?>
-		<script>
+		<?php ob_start(); ?>
 		(function($) {
 			'use strict';
 			$(function() {
@@ -1034,7 +1034,7 @@ class SEO_Agent_AI_Admin_Page {
 				loadGA4Properties();
 			});
 		})(jQuery);
-		</script>
+		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 		<?php endif; ?>
 		<?php
 	}

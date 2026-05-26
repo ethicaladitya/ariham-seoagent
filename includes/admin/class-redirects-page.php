@@ -261,7 +261,7 @@ class SEO_Agent_AI_Redirects_Page {
 			</div>
 		</div>
 
-		<script>
+		<?php ob_start(); ?>
 		(function($){
 			// Pre-fill source URL from 404 log link.
 			var params = new URLSearchParams(window.location.search);
@@ -270,7 +270,7 @@ class SEO_Agent_AI_Redirects_Page {
 				$('input[name="source_url"]').val(decodeURIComponent(prefill));
 			}
 		}(jQuery));
-		</script>
+		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 		<?php
 	}
 }
