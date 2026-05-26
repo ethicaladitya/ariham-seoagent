@@ -1,12 +1,11 @@
 <?php
 /**
  * Plugin Name:       SiteAgent SEO
- * Plugin URI:        https://github.com/ethicaladitya/WP-SEO-Agent
  * Description:       Autonomous SEO growth engine — continuously analyzes Search Console and GA4 signals, then proposes prioritized SEO recommendations with full audit trail, optional autopilot, and AI-powered content intelligence.
  * Version:           0.0.1
  * Requires at least: 6.4
  * Requires PHP:      7.4
- * Author:            EthicalAditya
+ * Author:            Aditya Shah
  * Author URI:        https://adityashah.blog/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,14 +14,14 @@
  * @package SEO_Agent_AI
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
-define( 'SEO_AGENT_AI_VERSION', '0.0.1' );
-define( 'SEO_AGENT_AI_PLUGIN_FILE', __FILE__ );
-define( 'SEO_AGENT_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'SEO_AGENT_AI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define('SEO_AGENT_AI_VERSION', '0.0.1');
+define('SEO_AGENT_AI_PLUGIN_FILE', __FILE__);
+define('SEO_AGENT_AI_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('SEO_AGENT_AI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Shared helpers.
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-crypto.php';
@@ -90,15 +89,15 @@ require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-redirect-manager.php';
 // Plugin orchestrator.
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-plugin.php';
 
-register_activation_hook( __FILE__, array( 'SEO_Agent_AI_Plugin', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'SEO_Agent_AI_Plugin', 'deactivate' ) );
+register_activation_hook(__FILE__, array('SEO_Agent_AI_Plugin', 'activate'));
+register_deactivation_hook(__FILE__, array('SEO_Agent_AI_Plugin', 'deactivate'));
 
-add_action( 'plugins_loaded', array( 'SEO_Agent_AI_Plugin', 'maybe_upgrade' ) );
+add_action('plugins_loaded', array('SEO_Agent_AI_Plugin', 'maybe_upgrade'));
 
 SEO_Agent_AI_Plugin::instance();
 
 // WP-CLI command registration.
-if ( defined( 'WP_CLI' ) && WP_CLI ) {
+if (defined('WP_CLI') && WP_CLI) {
 	require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-cli.php';
-	WP_CLI::add_command( 'seo-agent', 'SEO_Agent_AI_CLI' );
+	WP_CLI::add_command('seo-agent', 'SEO_Agent_AI_CLI');
 }
