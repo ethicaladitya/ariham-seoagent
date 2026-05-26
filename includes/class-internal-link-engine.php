@@ -86,12 +86,12 @@ class SEO_Agent_AI_Internal_Link_Engine {
 		}
 
 		// Get all published posts except the target itself.
-		$source_ids = get_posts( array( // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+		$source_ids = get_posts( array(
 			'post_type'      => 'post',
 			'post_status'    => 'publish',
 			'posts_per_page' => 200,
 			'fields'         => 'ids',
-			'exclude'        => array( $target_post->ID ),
+			'exclude'        => array( $target_post->ID ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 		) );
 
 		$candidates = array();
