@@ -77,7 +77,7 @@ class SEO_Agent_AI_Queue_Manager {
 	public function enqueue_all_stale( $stale_days = 7 ) {
 		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( '-' . (int) $stale_days . ' days' ) );
 
-		$post_ids = get_posts( array(
+		$post_ids = get_posts( array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			'post_type'      => 'post',
 			'post_status'    => 'publish',
 			'posts_per_page' => 2000,
