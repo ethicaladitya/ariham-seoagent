@@ -73,7 +73,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 	// -------------------------------------------------------------------
 
 	private function render_activity_tab() {
-		$paged    = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$paged    = max( 1, absint( wp_unslash( $_GET['paged'] ?? 1 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$per_page = 30;
 		$status   = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$trigger  = isset( $_GET['trigger'] ) ? sanitize_key( $_GET['trigger'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
@@ -208,7 +208,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 	// -------------------------------------------------------------------
 
 	private function render_debug_tab() {
-		$lines       = max( 50, min( 500, (int) ( $_GET['lines'] ?? 100 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$lines       = max( 50, min( 500, absint( wp_unslash( $_GET['lines'] ?? 100 ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$level       = isset( $_GET['level'] ) ? sanitize_key( $_GET['level'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$log_path    = $this->logger->get_log_path();
 		$log_entries = $this->logger->tail( $lines, $level );

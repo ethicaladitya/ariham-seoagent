@@ -180,9 +180,8 @@ class SEO_Agent_AI_Redirect_Manager {
 	/** @return int */
 	private function sc_count_redirects() {
 		global $wpdb;
-		$table = $wpdb->prefix . self::TABLE_SMARTCRAWL;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$table = esc_sql( $wpdb->prefix . self::TABLE_SMARTCRAWL );
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 
 	/** @return bool */
@@ -287,9 +286,8 @@ class SEO_Agent_AI_Redirect_Manager {
 	/** @return int */
 	private function rm_count_redirects() {
 		global $wpdb;
-		$table = $wpdb->prefix . self::TABLE_RANKMATH;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}` WHERE status = 'active'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$table = esc_sql( $wpdb->prefix . self::TABLE_RANKMATH );
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}` WHERE status = 'active'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 
 	/** @return bool */
@@ -332,8 +330,8 @@ class SEO_Agent_AI_Redirect_Manager {
 		}
 
 		// Use the first available group or fall back to 1.
-		$groups_table = $wpdb->prefix . 'redirection_groups';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$groups_table = esc_sql( $wpdb->prefix . 'redirection_groups' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$group_id = (int) $wpdb->get_var( "SELECT id FROM `{$groups_table}` WHERE status = 'enabled' ORDER BY id ASC LIMIT 1" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 		if ( ! $group_id ) {
 			$group_id = 1;
@@ -396,9 +394,8 @@ class SEO_Agent_AI_Redirect_Manager {
 	/** @return int */
 	private function redir_count_redirects() {
 		global $wpdb;
-		$table = $wpdb->prefix . self::TABLE_REDIRECTION;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}` WHERE status = 'enabled'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$table = esc_sql( $wpdb->prefix . self::TABLE_REDIRECTION );
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}` WHERE status = 'enabled'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 
 	/** @return bool */
@@ -674,9 +671,8 @@ class SEO_Agent_AI_Redirect_Manager {
 		$redirects = get_transient( self::REDIRECT_CACHE_KEY );
 
 		if ( false === $redirects ) {
-			$table = $wpdb->prefix . self::TABLE_REDIRECTS;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$redirects = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$table = esc_sql( $wpdb->prefix . self::TABLE_REDIRECTS );
+			$redirects = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id, source_url, target_url, redirect_type FROM `{$table}` ORDER BY id ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				ARRAY_A
 			);
@@ -924,7 +920,7 @@ class SEO_Agent_AI_Redirect_Manager {
 	public function get_stats() {
 		global $wpdb;
 
-		$l_table = $wpdb->prefix . self::TABLE_404_LOG;
+		$l_table = esc_sql( $wpdb->prefix . self::TABLE_404_LOG );
 
 		switch ( $this->get_backend() ) {
 			case self::BACKEND_SMARTCRAWL:
@@ -941,10 +937,8 @@ class SEO_Agent_AI_Redirect_Manager {
 				$total_redirects = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $wpdb->prefix . self::TABLE_REDIRECTS . '`' );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$total_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$unresolved_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}` WHERE redirect_created = 0" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$total_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$unresolved_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}` WHERE redirect_created = 0" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		return compact( 'total_redirects', 'total_404s', 'unresolved_404s' );
 	}

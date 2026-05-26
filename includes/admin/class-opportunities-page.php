@@ -24,9 +24,9 @@ class SEO_Agent_AI_Opportunities_Page {
 		}
 
 		$autopilot   = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
-		$filter_type = isset( $_GET['type'] ) ? sanitize_text_field( $_GET['type'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		$filter_risk = isset( $_GET['risk'] ) ? sanitize_text_field( $_GET['risk'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		$paged       = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$filter_type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$filter_risk = isset( $_GET['risk'] ) ? sanitize_text_field( wp_unslash( $_GET['risk'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$paged       = max( 1, absint( wp_unslash( $_GET['paged'] ?? 1 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$per_page    = 20;
 
 		$args = array(

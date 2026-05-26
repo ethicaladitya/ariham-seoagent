@@ -201,7 +201,7 @@ class SEO_Agent_AI_Report_Engine {
 	private function compute_trends() {
 		// Get top 10 rising and declining pages based on keyword_history position changes.
 		global $wpdb;
-		$table = $wpdb->prefix . 'seo_agent_keyword_history';
+		$table = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 
 		$seven_days_ago    = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
 		$fourteen_days_ago = gmdate( 'Y-m-d', strtotime( '-14 days' ) );
@@ -219,7 +219,7 @@ class SEO_Agent_AI_Report_Engine {
 		 ORDER BY (pos_prior - pos_recent) DESC
 		 LIMIT 10"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$rising = $wpdb->get_results( $wpdb->prepare( $rising_sql, $seven_days_ago, $seven_days_ago, $fourteen_days_ago ), ARRAY_A );
 
 		$declining_sql = "SELECT * FROM (
@@ -234,7 +234,7 @@ class SEO_Agent_AI_Report_Engine {
 		 ORDER BY (pos_recent - pos_prior) DESC
 		 LIMIT 10"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$declining = $wpdb->get_results( $wpdb->prepare( $declining_sql, $seven_days_ago, $seven_days_ago, $fourteen_days_ago ), ARRAY_A );
 
 		$format_trend = function ( $rows ) {
@@ -523,7 +523,7 @@ class SEO_Agent_AI_Report_Engine {
 	private function build_weekly_email_html() {
 		global $wpdb;
 
-		$table         = $wpdb->prefix . 'seo_agent_keyword_history';
+		$table         = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 		$site_name     = esc_html( get_bloginfo( 'name' ) );
 		$period_from   = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
 		$period_to     = gmdate( 'Y-m-d' );
@@ -534,7 +534,7 @@ class SEO_Agent_AI_Report_Engine {
 				    AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,
 				    AVG(CASE WHEN recorded_at < %s AND recorded_at >= %s THEN position END) AS pos_prior
 				FROM `' . $table . '` GROUP BY post_id, keyword HAVING pos_recent IS NOT NULL AND pos_prior IS NOT NULL AND ABS(pos_prior - pos_recent) >= 1 ORDER BY (pos_prior - pos_recent) DESC LIMIT 20'; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$top_movers = $wpdb->get_results( $wpdb->prepare( $top_movers_sql, $period_from, $period_from, gmdate( 'Y-m-d', strtotime( '-14 days' ) ) ), ARRAY_A );
 
 		// Score distribution snapshot.

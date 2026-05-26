@@ -553,7 +553,7 @@ class SEO_Agent_AI_CLI {
 		$tables   = array( 'seo_agent_keyword_history', 'seo_agent_page_insights', 'seo_agent_ai_decisions', 'seo_agent_daily_reports', 'seo_agent_internal_links', 'seo_agent_ai_activity' );
 		$all_ok   = true;
 		foreach ( $tables as $tbl ) {
-			$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->prefix . $tbl ) );
+			$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->prefix . $tbl ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! $exists ) {
 				$all_ok = false;
 			}

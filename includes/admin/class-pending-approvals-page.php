@@ -68,7 +68,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		}
 
 		$action      = sanitize_key( $_POST['seo_action'] ?? '' );
-		$decision_id = (int) ( $_POST['decision_id'] ?? 0 );
+		$decision_id = absint( wp_unslash( $_POST['decision_id'] ?? 0 ) );
 
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'seo_agent_ai_decision_' . $decision_id ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'seo-agent-ai' ) );
@@ -93,8 +93,8 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 	 */
 	private function execute_decision( $decision_id ) {
 		global $wpdb;
-		$table = $wpdb->prefix . 'seo_agent_ai_decisions';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$table = esc_sql( $wpdb->prefix . 'seo_agent_ai_decisions' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$dec = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $decision_id ), ARRAY_A );
 
 		if ( ! $dec ) {
@@ -158,7 +158,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		}
 
 		$single_id = isset( $_GET['decision_id'] ) ? (int) $_GET['decision_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
-		$paged     = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$paged     = max( 1, absint( wp_unslash( $_GET['paged'] ?? 1 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$per_page  = 15;
 
 		$total = SEO_Agent_AI_DB_Manager::count_decisions( SEO_Agent_AI_DB_Manager::STATUS_PENDING );
@@ -378,8 +378,8 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 
 	private function render_single_decision( $decision_id ) {
 		global $wpdb;
-		$table = $wpdb->prefix . 'seo_agent_ai_decisions';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$table = esc_sql( $wpdb->prefix . 'seo_agent_ai_decisions' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$dec = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $decision_id ), ARRAY_A );
 
 		if ( ! $dec ) {

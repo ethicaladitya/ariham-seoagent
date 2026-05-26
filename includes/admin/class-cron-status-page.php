@@ -71,7 +71,7 @@ class SEO_Agent_AI_Cron_Status_Page {
 		}
 
 		// Fire the event now.
-		do_action( $hook );
+		do_action( $hook ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 
 		$redirect_page = sanitize_key( $_POST['redirect_page'] ?? 'seo-agent-cron' );
 		$allowed_pages = array( 'seo-agent-cron', 'seo-agent-rankings' );
@@ -91,7 +91,8 @@ class SEO_Agent_AI_Cron_Status_Page {
 		if ( ! empty( $_GET['triggered'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			$hook = sanitize_key( $_GET['triggered'] ); // phpcs:ignore WordPress.Security.NonceVerification
 			echo '<div class="sai-notice n-success" style="margin-bottom:16px"><p>';
-			echo esc_html( sprintf( __( 'Hook "%s" triggered manually.', 'seo-agent-ai' ), $hook ) );
+			// translators: %s is the cron hook name that was triggered.
+		echo esc_html( sprintf( __( 'Hook "%s" triggered manually.', 'seo-agent-ai' ), $hook ) );
 			echo '</p></div>';
 		}
 

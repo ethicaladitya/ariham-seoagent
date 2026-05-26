@@ -271,7 +271,7 @@ class SEO_Agent_AI_Meta_Box {
 	public function ajax_analyze_single_post() {
 		check_ajax_referer( 'seo_agent_ai_analyze_post', 'nonce' );
 
-		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		$post_id = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
 			wp_send_json_error( __( 'Unauthorized or invalid post.', 'seo-agent-ai' ), 403 );
 		}

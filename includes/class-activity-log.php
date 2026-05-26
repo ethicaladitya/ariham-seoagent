@@ -171,7 +171,7 @@ class SEO_Agent_AI_Activity_Log {
 			$offset
 		);
 
-		$rows = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		$rows = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if ( ! is_array( $rows ) ) {
 			return array();
@@ -200,7 +200,7 @@ class SEO_Agent_AI_Activity_Log {
 		$table = self::get_table_name();
 		$where = $this->build_where( $filters );
 
-		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT COUNT(*) FROM {$table} {$where}"
 		);
 
@@ -229,7 +229,7 @@ class SEO_Agent_AI_Activity_Log {
 		$table = self::get_table_name();
 		$sql   = $wpdb->prepare( "SELECT * FROM `{$table}` WHERE id = %d", (int) $id ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		$row = $wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		$row = $wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if ( ! is_array( $row ) ) {
 			return null;
@@ -255,7 +255,7 @@ class SEO_Agent_AI_Activity_Log {
 		$table  = self::get_table_name();
 		$sql    = $wpdb->prepare( "DELETE FROM `{$table}` WHERE created_at < %s", $cutoff ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 
 	// -----------------------------------------------------------------------
@@ -267,7 +267,7 @@ class SEO_Agent_AI_Activity_Log {
 	 */
 	public static function get_table_name() {
 		global $wpdb;
-		return $wpdb->prefix . 'seo_agent_ai_activity';
+		return esc_sql( $wpdb->prefix . 'seo_agent_ai_activity' );
 	}
 
 	/**

@@ -108,6 +108,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	}
 
 	// 3b. Sweep date-suffixed transients and last-run options + feature flags + API page caches.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$wpdb->query(
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s",

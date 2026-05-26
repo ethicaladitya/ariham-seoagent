@@ -663,7 +663,7 @@ class SEO_Agent_AI_Plugin {
 
 		$this->logger->info( 'Running cannibalization detection from keyword history.' );
 
-		$table = SEO_Agent_AI_DB_Manager::keyword_history_table();
+		$table = esc_sql( SEO_Agent_AI_DB_Manager::keyword_history_table() );
 		$since = gmdate( 'Y-m-d', strtotime( '-28 days' ) );
 
 		// Aggregate impressions per (post_id, keyword) over the last 28 days.
@@ -675,8 +675,8 @@ class SEO_Agent_AI_Plugin {
 		 GROUP BY post_id, keyword
 		 HAVING total_impressions >= 20
 		 ORDER BY keyword, total_impressions DESC';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $since ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $since ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if ( empty( $rows ) ) {
 			$this->logger->info( 'No keyword history data for cannibalization check.' );

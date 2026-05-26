@@ -396,8 +396,8 @@ class SEO_Agent_AI_Image_SEO {
 			wp_send_json_error( __( 'Unauthorized.', 'seo-agent-ai' ), 403 );
 		}
 
-		$attachment_id = (int) ( $_POST['attachment_id'] ?? 0 );
-		$post_id       = (int) ( $_POST['post_id'] ?? 0 );
+		$attachment_id = absint( wp_unslash( $_POST['attachment_id'] ?? 0 ) );
+		$post_id       = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 
 		if ( ! $attachment_id ) {
 			wp_send_json_error( __( 'Invalid attachment ID.', 'seo-agent-ai' ) );
@@ -419,7 +419,7 @@ class SEO_Agent_AI_Image_SEO {
 			wp_send_json_error( __( 'Unauthorized.', 'seo-agent-ai' ), 403 );
 		}
 
-		$limit  = (int) ( $_POST['limit'] ?? 20 );
+		$limit  = absint( wp_unslash( $_POST['limit'] ?? 20 ) );
 		$limit  = max( 1, min( 100, $limit ) );
 		$result = $this->bulk_generate_alt_text( $limit );
 

@@ -30,7 +30,7 @@ class SEO_Agent_AI_Rollback_Center_Page {
 			wp_die( esc_html__( 'Not allowed.', 'seo-agent-ai' ) );
 		}
 
-		$post_id = (int) ( $_POST['post_id'] ?? 0 );
+		$post_id = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'seo_agent_ai_rollback_' . $post_id ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'seo-agent-ai' ) );
@@ -53,8 +53,8 @@ class SEO_Agent_AI_Rollback_Center_Page {
 			wp_die( esc_html__( 'You do not have sufficient permissions.', 'seo-agent-ai' ) );
 		}
 
-		$search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		$paged  = max( 1, (int) ( $_GET['paged'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$paged  = max( 1, absint( wp_unslash( $_GET['paged'] ?? 1 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		?>
 		<div class="wrap sai-page">
 			<div class="sai-header">
@@ -67,10 +67,12 @@ class SEO_Agent_AI_Rollback_Center_Page {
 			<div class="sai-body">
 				<?php if ( ! empty( $_GET['rolled_back'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
 					<?php $pid = (int) $_GET['rolled_back']; // phpcs:ignore WordPress.Security.NonceVerification ?>
-					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'seo-agent-ai' ), $pid ) ); ?></p></div>
+					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php
+					// translators: %d is the post ID.
+					echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'seo-agent-ai' ), $pid ) ); ?></p></div>
 				<?php endif; ?>
 				<?php if ( ! empty( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
-					<div class="sai-notice n-error" style="margin-bottom:16px"><p><?php echo esc_html( sanitize_text_field( urldecode( $_GET['error'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?></p></div>
+					<div class="sai-notice n-error" style="margin-bottom:16px"><p><?php echo esc_html( sanitize_text_field( urldecode( wp_unslash( $_GET['error'] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?></p></div>
 				<?php endif; ?>
 
 				<div class="sai-notice n-warning" style="margin-bottom:20px">

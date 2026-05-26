@@ -16,7 +16,7 @@ class SEO_Agent_AI_Rankings_Page {
 			wp_die( esc_html__( 'You do not have sufficient permissions.', 'seo-agent-ai' ) );
 		}
 
-		$search_query = isset( $_GET['keyword'] ) ? sanitize_text_field( $_GET['keyword'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$search_query = isset( $_GET['keyword'] ) ? sanitize_text_field( wp_unslash( $_GET['keyword'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$post_id      = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification
 		$days         = isset( $_GET['days'] ) ? (int) $_GET['days'] : 30; // phpcs:ignore WordPress.Security.NonceVerification
 		$days         = in_array( $days, array( 7, 14, 30, 60, 90 ), true ) ? $days : 30;
@@ -174,10 +174,10 @@ class SEO_Agent_AI_Rankings_Page {
 
 	private function render_post_rankings( $post_id, $days ) {
 		global $wpdb;
-		$table  = $wpdb->prefix . 'seo_agent_keyword_history';
+		$table  = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
-		$rows = $wpdb->get_results( $wpdb->prepare(
+		$rows = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT keyword, position, impressions, clicks, recorded_at
 			 FROM {$table}
 			 WHERE post_id = %d AND recorded_at >= %s
@@ -190,6 +190,7 @@ class SEO_Agent_AI_Rankings_Page {
 		$title = $post instanceof WP_Post ? $post->post_title : "(#{$post_id})";
 
 		echo '<div class="sai-card">';
+		// translators: %s is the post title.
 		echo '<div class="sai-card-header"><h2 class="sai-card-title">' . esc_html( sprintf( __( 'Rankings for: %s', 'seo-agent-ai' ), $title ) ) . '</h2></div>';
 		echo '<div class="sai-card-body">';
 
@@ -219,10 +220,10 @@ class SEO_Agent_AI_Rankings_Page {
 
 	private function render_keyword_rankings( $keyword, $days ) {
 		global $wpdb;
-		$table  = $wpdb->prefix . 'seo_agent_keyword_history';
+		$table  = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
-		$rows = $wpdb->get_results( $wpdb->prepare(
+		$rows = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT post_id, keyword, position, impressions, clicks, recorded_at
 			 FROM {$table}
 			 WHERE keyword LIKE %s AND recorded_at >= %s
@@ -233,6 +234,7 @@ class SEO_Agent_AI_Rankings_Page {
 		), ARRAY_A );
 
 		echo '<div class="sai-card">';
+		// translators: %s is the search keyword.
 		echo '<div class="sai-card-header"><h2 class="sai-card-title">' . esc_html( sprintf( __( 'Rankings for keyword: "%s"', 'seo-agent-ai' ), $keyword ) ) . '</h2></div>';
 		echo '<div class="sai-card-body">';
 
@@ -299,7 +301,7 @@ class SEO_Agent_AI_Rankings_Page {
 		$prior_cut  = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
 		// Rising — wrap in subquery to avoid HAVING-alias restriction in strict MySQL.
-		$rising = $wpdb->get_results( $wpdb->prepare(
+		$rising = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT * FROM (
 			     SELECT post_id, keyword,
 			         AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,
@@ -317,7 +319,7 @@ class SEO_Agent_AI_Rankings_Page {
 		), ARRAY_A );
 
 		// Declining.
-		$declining = $wpdb->get_results( $wpdb->prepare(
+		$declining = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT * FROM (
 			     SELECT post_id, keyword,
 			         AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,

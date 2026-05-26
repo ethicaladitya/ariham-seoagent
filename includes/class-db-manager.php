@@ -170,7 +170,7 @@ class SEO_Agent_AI_DB_Manager {
 		);
 
 		foreach ( $tables as $t ) {
-			$wpdb->query( "DROP TABLE IF EXISTS `{$wpdb->prefix}{$t}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->query( "DROP TABLE IF EXISTS `{$wpdb->prefix}{$t}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		delete_option( self::DB_VERSION_OPTION );
@@ -182,27 +182,27 @@ class SEO_Agent_AI_DB_Manager {
 
 	public static function keyword_history_table() {
 		global $wpdb;
-		return $wpdb->prefix . self::TABLE_KEYWORD_HISTORY;
+		return esc_sql( $wpdb->prefix . self::TABLE_KEYWORD_HISTORY );
 	}
 
 	public static function page_insights_table() {
 		global $wpdb;
-		return $wpdb->prefix . self::TABLE_PAGE_INSIGHTS;
+		return esc_sql( $wpdb->prefix . self::TABLE_PAGE_INSIGHTS );
 	}
 
 	public static function ai_decisions_table() {
 		global $wpdb;
-		return $wpdb->prefix . self::TABLE_AI_DECISIONS;
+		return esc_sql( $wpdb->prefix . self::TABLE_AI_DECISIONS );
 	}
 
 	public static function daily_reports_table() {
 		global $wpdb;
-		return $wpdb->prefix . self::TABLE_DAILY_REPORTS;
+		return esc_sql( $wpdb->prefix . self::TABLE_DAILY_REPORTS );
 	}
 
 	public static function internal_links_table() {
 		global $wpdb;
-		return $wpdb->prefix . self::TABLE_INTERNAL_LINKS;
+		return esc_sql( $wpdb->prefix . self::TABLE_INTERNAL_LINKS );
 	}
 
 	// -------------------------------------------------------------------
@@ -227,7 +227,7 @@ class SEO_Agent_AI_DB_Manager {
 
 		// Deduplicate: if a pending decision for this post+type+field already exists, return that ID.
 		$existing_id = $wpdb->get_var(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id FROM {$table} WHERE post_id = %d AND decision_type = %s AND field = %s AND status = %s LIMIT 1",
 				$post_id,
 				$type,
@@ -317,7 +317,7 @@ class SEO_Agent_AI_DB_Manager {
 		}
 
 		$table = self::ai_decisions_table();
-		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT * FROM {$table} WHERE {$where} ORDER BY created_at DESC LIMIT {$offset}, {$limit}",
 			ARRAY_A
 		) ?: array();
@@ -330,9 +330,9 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = self::ai_decisions_table();
 		if ( $status ) {
-			return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", $status ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", $status ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 
 	/**
@@ -378,7 +378,7 @@ class SEO_Agent_AI_DB_Manager {
 
 		$table = self::ai_decisions_table();
 
-		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			$wpdb->prepare(
 				"SELECT * FROM {$table}
 				 WHERE status = %s
@@ -413,7 +413,7 @@ class SEO_Agent_AI_DB_Manager {
 		$table = self::keyword_history_table();
 
 		$existing = $wpdb->get_var(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id FROM {$table} WHERE post_id = %d AND keyword = %s AND recorded_at = %s LIMIT 1",
 				$post_id,
 				$keyword,
@@ -451,7 +451,7 @@ class SEO_Agent_AI_DB_Manager {
 		$since = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
 
 		return $wpdb->get_results(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT keyword, position, impressions, clicks, ctr, recorded_at
 			 FROM {$table}
 			 WHERE post_id = %d AND recorded_at >= %s
@@ -516,7 +516,7 @@ class SEO_Agent_AI_DB_Manager {
 		$table = self::page_insights_table();
 
 		$existing = $wpdb->get_var(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id FROM {$table} WHERE post_id = %d AND DATE(recorded_at) = %s LIMIT 1",
 				(int) $post_id,
 				$today
@@ -559,7 +559,7 @@ class SEO_Agent_AI_DB_Manager {
 		$table = self::page_insights_table();
 
 		$existing_id = $wpdb->get_var(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id FROM {$table} WHERE post_id = %d ORDER BY recorded_at DESC LIMIT 1",
 				(int) $post_id
 			)
@@ -608,15 +608,15 @@ class SEO_Agent_AI_DB_Manager {
 		$cutoff_dt   = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 		$cutoff_date = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
 
-		$kh = self::keyword_history_table();
-		$pi = self::page_insights_table();
-		$ad = self::ai_decisions_table();
-		$dr = self::daily_reports_table();
+		$kh = esc_sql( self::keyword_history_table() );
+		$pi = esc_sql( self::page_insights_table() );
+		$ad = esc_sql( self::ai_decisions_table() );
+		$dr = esc_sql( self::daily_reports_table() );
 
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$kh} WHERE recorded_at < %s", $cutoff_date ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$pi} WHERE recorded_at < %s", $cutoff_dt ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$ad} WHERE status IN ('applied','rejected','discarded') AND created_at < %s", $cutoff_dt ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$dr} WHERE report_date < %s", $cutoff_date ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$kh} WHERE recorded_at < %s", $cutoff_date ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$pi} WHERE recorded_at < %s", $cutoff_dt ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$ad} WHERE status IN ('applied','rejected','discarded') AND created_at < %s", $cutoff_dt ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$dr} WHERE report_date < %s", $cutoff_date ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 
 	/**
@@ -629,7 +629,7 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = self::page_insights_table();
 		$row   = $wpdb->get_row(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT * FROM {$table} WHERE post_id = %d ORDER BY recorded_at DESC LIMIT 1",
 				$post_id
 			),
@@ -653,7 +653,7 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = self::page_insights_table();
 		return $wpdb->get_results(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT * FROM {$table} WHERE post_id = %d ORDER BY recorded_at DESC LIMIT %d",
 				$post_id,
 				$limit
@@ -688,7 +688,7 @@ class SEO_Agent_AI_DB_Manager {
 		);
 
 		$existing = $wpdb->get_var(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id FROM {$table} WHERE report_date = %s LIMIT 1",
 				$date
 			)
@@ -713,7 +713,7 @@ class SEO_Agent_AI_DB_Manager {
 		$date  = $date ?: gmdate( 'Y-m-d' );
 		$table = self::daily_reports_table();
 		$row   = $wpdb->get_row(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT * FROM {$table} WHERE report_date = %s LIMIT 1",
 				$date
 			),
@@ -736,7 +736,7 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = self::daily_reports_table();
 		return $wpdb->get_col(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT report_date FROM {$table} ORDER BY report_date DESC LIMIT %d",
 				$limit
 			)
@@ -795,7 +795,7 @@ class SEO_Agent_AI_DB_Manager {
 			$where = $wpdb->prepare( 'source_post_id = %d', $post_id );
 		}
 
-		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+		return $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT * FROM {$table} WHERE {$where} AND status = 'active' ORDER BY added_at DESC",
 			ARRAY_A
 		) ?: array();
@@ -825,7 +825,7 @@ class SEO_Agent_AI_DB_Manager {
 		$cutoff = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
 		$table  = self::keyword_history_table();
 		$wpdb->query(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"DELETE FROM {$table} WHERE recorded_at < %s",
 				$cutoff
 			)
@@ -842,7 +842,7 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = self::page_insights_table();
 		$rows  = $wpdb->get_results(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT pi.* FROM {$table} pi
 			 INNER JOIN (
 			     SELECT post_id, MAX(recorded_at) AS max_at
@@ -870,7 +870,7 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = self::page_insights_table();
 		$rows  = $wpdb->get_col(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT pi.post_id
 			 FROM {$table} pi
 			 INNER JOIN (
@@ -899,7 +899,7 @@ class SEO_Agent_AI_DB_Manager {
 		global $wpdb;
 		$table = SEO_Agent_AI_Activity_Log::get_table_name();
 		$rows  = $wpdb->get_results(
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT * FROM {$table} WHERE created_at >= %s AND created_at <= %s ORDER BY created_at DESC LIMIT 500",
 				$date_from,
 				$date_to
