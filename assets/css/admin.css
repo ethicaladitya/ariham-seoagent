@@ -242,10 +242,6 @@ body.wp-admin .sai-page::before {
 .sai-two-col-wide { display: grid; grid-template-columns: 2fr 1fr;     gap: 20px; }
 .sai-three-col    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 
-@media (max-width: 1100px) {
-	.sai-two-col, .sai-two-col-wide, .sai-three-col { grid-template-columns: 1fr; }
-}
-
 .sai-page-desc {
 	font-size:    13px;
 	color:        var(--cl-text-muted);
@@ -1657,3 +1653,199 @@ body.wp-admin .sai-page::before {
 .trend-change.positive  { background: var(--cl-success-bg); color: #065f46; border-radius: var(--cl-radius-sm); padding: 1px 6px; font-size: 11px; font-weight: 700; }
 .trend-change.negative  { background: var(--cl-danger-bg); color: #991b1b; border-radius: var(--cl-radius-sm); padding: 1px 6px; font-size: 11px; font-weight: 700; }
 .seo-agent-table th     { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; background: var(--cl-bg); color: var(--cl-text-muted); padding: 9px 14px; border-bottom: 1px solid var(--cl-border); }
+
+/* ==========================================================================
+   32. Mobile & responsive
+   WordPress admin breakpoints:
+     782px — sidebar collapses to icon rail
+     600px — admin bar goes full mobile
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------
+   Tablet — 782–1100px (also catches wp-admin collapsed sidebar)
+   ----------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+	.sai-two-col,
+	.sai-two-col-wide,
+	.sai-three-col { grid-template-columns: 1fr; }
+}
+
+/* -----------------------------------------------------------------------
+   Narrow tablet / large phone — ≤ 782px
+   ----------------------------------------------------------------------- */
+@media (max-width: 782px) {
+
+	/* Dot-grid texture: hide on small screens (performance) */
+	body.wp-admin .sai-page::before { display: none; }
+
+	/* Header: tighter padding, allow wrapping, un-sticky so it doesn't
+	   fight with the WP mobile admin bar */
+	.sai-header {
+		position:    relative;
+		top:         auto;
+		padding:     16px 20px 0;
+		flex-wrap:   wrap;
+		gap:         12px;
+	}
+
+	.sai-header-title {
+		font-size:      20px;
+		margin-bottom:  12px;
+		letter-spacing: -.02em;
+	}
+
+	.sai-header-actions {
+		width:          100%;
+		padding-bottom: 12px;
+		flex-wrap:      wrap;
+	}
+
+	/* Body: tighter horizontal padding */
+	.sai-body { padding: 20px 16px; }
+
+	/* Metrics: 2-column on tablet */
+	.sai-metrics {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 10px;
+	}
+
+	.sai-metric-value { font-size: 26px; }
+
+	/* Navigation tabs: scrollable row */
+	.sai-nav {
+		overflow-x:   auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		padding-bottom: 1px;
+	}
+
+	.sai-nav::-webkit-scrollbar { display: none; }
+
+	/* Filter bar: wrap to column */
+	.sai-filters {
+		flex-direction: column;
+		align-items:    stretch;
+		gap:            8px;
+		padding:        12px;
+	}
+
+	.sai-filters label {
+		flex-direction: row;
+		align-items:    center;
+		gap:            8px;
+	}
+
+	.sai-filters select,
+	.sai-filters input[type="search"],
+	.sai-filters input[type="text"],
+	.sai-filters input[type="date"] {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.sai-search-wrap { min-width: 0; }
+
+	/* Timeline diff: stack to single column */
+	.sai-timeline-diff { grid-template-columns: 1fr; gap: 4px; }
+
+	/* Decision cards: stack actions below info */
+	.sai-decision-header {
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.sai-decision-actions {
+		width:       100%;
+		padding-top: 0;
+		padding-bottom: 2px;
+		gap: 6px;
+	}
+
+	.sai-decision-actions .sai-btn { flex: 1; justify-content: center; }
+
+	/* Settings field: single column */
+	.sai-field {
+		grid-template-columns: 1fr;
+		gap: 6px;
+	}
+
+	.sai-field-label { padding-top: 0; }
+
+	/* Card body: tighter padding */
+	.sai-card-body   { padding: 14px 16px 18px; }
+	.sai-card-header { padding: 14px 16px 0; }
+	.sai-card-footer { padding: 12px 16px; }
+
+	/* Cron grid: single column */
+	.sai-cron-grid { grid-template-columns: 1fr; }
+
+	/* Rollback item: stack */
+	.sai-rollback-item { flex-wrap: wrap; }
+
+	/* Table: allow horizontal scroll */
+	.sai-table-wrap { border-radius: var(--cl-radius-sm); }
+
+	/* Pagination: tighter */
+	.sai-pagination { gap: 3px; flex-wrap: wrap; }
+
+	/* Connect hero: less padding */
+	.sai-connect-hero { padding: 32px 12px 24px; }
+}
+
+/* -----------------------------------------------------------------------
+   Mobile phone — ≤ 600px
+   ----------------------------------------------------------------------- */
+@media (max-width: 600px) {
+
+	/* Pull flush to screen edges */
+	#wpbody-content > .sai-page {
+		margin-left:  -10px;
+		margin-right: -10px;
+	}
+
+	.sai-body { padding: 16px 12px; }
+
+	.sai-header { padding: 14px 14px 0; }
+
+	.sai-header-title { font-size: 18px; }
+
+	/* Metrics: single column on phones */
+	.sai-metrics { grid-template-columns: 1fr; gap: 8px; }
+
+	.sai-metric { padding: 16px 16px 14px; }
+	.sai-metric-value { font-size: 28px; }
+
+	/* Full-width primary action buttons */
+	.sai-header-actions .sai-btn { width: 100%; justify-content: center; }
+
+	/* Decision cards: full-width diff */
+	.sai-timeline-diff { grid-template-columns: 1fr; }
+
+	/* Empty state: less padding */
+	.sai-empty { padding: 36px 16px; }
+
+	/* Toast: full width near bottom */
+	#sai-toasts {
+		left:   10px;
+		right:  10px;
+		bottom: 10px;
+	}
+
+	.sai-toast { min-width: 0; max-width: 100%; }
+
+	/* Nav tabs: compact */
+	.sai-nav-tab { padding: 8px 10px; font-size: 12px; }
+
+	/* Buttons: ensure minimum tap target (44px height) */
+	.sai-btn     { min-height: 38px; }
+	.sai-btn-sm  { min-height: 32px; }
+
+	/* Settings: tighter */
+	.sai-settings-section { margin-bottom: 24px; }
+
+	/* Autopilot bar: tighter */
+	.sai-autopilot-bar { padding: 10px 14px; }
+
+	/* Score ring: smaller on phone */
+	.sai-score-ring-num { font-size: 20px; }
+}
