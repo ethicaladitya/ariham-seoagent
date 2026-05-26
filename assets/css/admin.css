@@ -1,115 +1,164 @@
 /* ==========================================================================
-   SEO Agent AI — Claude Design System
-   Inspired by claude.ai: warm off-white, clean type, amber accent, dark rail.
+   SEO Agent AI — Premium Design System v5.0
+   Warm off-white palette, amber accent, system-UI typography.
+   Stripe/Linear-level polish adapted for wp-admin context.
    ========================================================================== */
 
 /* -----------------------------------------------------------------------
-   1. Design tokens — Claude palette
+   1. Design tokens
    ----------------------------------------------------------------------- */
 :root {
 	/* Core surfaces */
-	--cl-bg:         #f9f8f6;     /* warm off-white page background */
-	--cl-bg-2:       #f2f1ee;     /* slightly darker warm, for zebra rows */
-	--cl-surface:    #ffffff;     /* card / input surfaces */
-	--cl-rail:       #1a1918;     /* dark left-rail nav background */
+	--cl-bg:         #f8f7f5;
+	--cl-bg-2:       #f0efe9;
+	--cl-surface:    #ffffff;
+	--cl-rail:       #1a1918;
 	--cl-rail-hover: #2d2c2a;
 	--cl-rail-active:#3d3c3a;
 
 	/* Borders */
-	--cl-border:     #e5e3df;     /* warm neutral border */
-	--cl-border-2:   #d4d2ce;     /* slightly stronger */
+	--cl-border:   #e8e6e1;
+	--cl-border-2: #d5d3cd;
 
 	/* Typography */
-	--cl-text:       #1a1918;     /* near-black, warm */
-	--cl-text-soft:  #3d3c3a;
-	--cl-text-muted: #6b6967;     /* warm mid-gray */
-	--cl-text-faint: #9b9895;     /* light warm gray */
+	--cl-text:       #18171a;
+	--cl-text-soft:  #3a3840;
+	--cl-text-muted: #6b6875;
+	--cl-text-faint: #9e9aa8;
 
-	/* Accent — Claude orange/amber */
-	--cl-accent:     #d97706;     /* amber-600 */
-	--cl-accent-dark:#b45309;
-	--cl-accent-bg:  #fffbeb;     /* amber-50 */
-	--cl-accent-border: #fde68a; /* amber-200 */
+	/* Accent — amber */
+	--cl-accent:        #d97706;
+	--cl-accent-dark:   #b45309;
+	--cl-accent-light:  #f59e0b;
+	--cl-accent-bg:     #fffbeb;
+	--cl-accent-border: #fde68a;
 
-	/* Semantic colours */
-	--cl-success:       #059669;  /* emerald-600 */
-	--cl-success-bg:    #ecfdf5;
-	--cl-success-border:#a7f3d0;
-	--cl-warning:       #d97706;  /* same as accent */
-	--cl-warning-bg:    #fffbeb;
-	--cl-warning-border:#fde68a;
-	--cl-danger:        #dc2626;  /* red-600 */
-	--cl-danger-bg:     #fef2f2;
-	--cl-danger-border: #fecaca;
-	--cl-info:          #2563eb;  /* blue-600 */
-	--cl-info-bg:       #eff6ff;
-	--cl-info-border:   #bfdbfe;
+	/* Semantic */
+	--cl-success:        #059669;
+	--cl-success-bg:     #ecfdf5;
+	--cl-success-border: #6ee7b7;
+	--cl-warning:        #d97706;
+	--cl-warning-bg:     #fffbeb;
+	--cl-warning-border: #fde68a;
+	--cl-danger:         #dc2626;
+	--cl-danger-bg:      #fef2f2;
+	--cl-danger-border:  #fca5a5;
+	--cl-info:           #2563eb;
+	--cl-info-bg:        #eff6ff;
+	--cl-info-border:    #93c5fd;
 
-	/* Radius / shadow / motion */
+	/* Primary — indigo/blue used for b-primary badge */
+	--cl-primary:        #4f46e5;
+	--cl-primary-bg:     #eef2ff;
+	--cl-primary-border: #c7d2fe;
+
+	/* Radius */
+	--cl-radius-xs: 4px;
 	--cl-radius-sm: 6px;
 	--cl-radius:    10px;
-	--cl-radius-lg: 16px;
-	--cl-shadow-xs: 0 1px 2px rgba(26,25,24,.05);
-	--cl-shadow:    0 1px 4px rgba(26,25,24,.07), 0 1px 2px rgba(26,25,24,.04);
-	--cl-shadow-md: 0 4px 16px rgba(26,25,24,.08), 0 2px 4px rgba(26,25,24,.04);
-	--cl-shadow-lg: 0 12px 40px rgba(26,25,24,.12), 0 4px 8px rgba(26,25,24,.05);
-	--cl-ease:      cubic-bezier(.4,0,.2,1);
-	--cl-dur:       150ms;
+	--cl-radius-lg: 14px;
+	--cl-radius-xl: 20px;
 
-	/* Font stacks */
-	--cl-font:      'Söhne', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-	--cl-mono:      'Söhne Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+	/* Shadows — ambient + directional */
+	--cl-shadow-xs: 0 1px 2px rgba(24,23,26,.04);
+	--cl-shadow-sm: 0 1px 3px rgba(24,23,26,.07), 0 1px 2px rgba(24,23,26,.04);
+	--cl-shadow:    0 2px 8px rgba(24,23,26,.07), 0 1px 3px rgba(24,23,26,.04);
+	--cl-shadow-md: 0 4px 16px rgba(24,23,26,.09), 0 2px 4px rgba(24,23,26,.05);
+	--cl-shadow-lg: 0 12px 40px rgba(24,23,26,.11), 0 4px 8px rgba(24,23,26,.05);
+	--cl-shadow-xl: 0 24px 60px rgba(24,23,26,.14), 0 8px 16px rgba(24,23,26,.06);
+
+	/* Motion */
+	--cl-ease:     cubic-bezier(.4,0,.2,1);
+	--cl-ease-out: cubic-bezier(0,0,.2,1);
+	--cl-dur:      150ms;
+	--cl-dur-md:   200ms;
+	--cl-dur-lg:   300ms;
+
+	/* Font */
+	--cl-font: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', system-ui, ui-sans-serif, sans-serif;
+	--cl-mono: 'Cascadia Code', 'Fira Code', 'Consolas', ui-monospace, monospace;
+
+	/* --sai-* aliases: PHP renders inline styles using these names */
+	--sai-border:     var(--cl-border);
+	--sai-text-muted: var(--cl-text-muted);
+	--sai-text-soft:  var(--cl-text-soft);
+	--sai-text:       var(--cl-text);
+	--sai-surface:    var(--cl-surface);
+	--sai-bg:         var(--cl-bg);
+	--sai-accent:     var(--cl-accent);
+	--sai-success:    var(--cl-success);
+	--sai-danger:     var(--cl-danger);
 }
 
 /* -----------------------------------------------------------------------
-   2. Page scaffold — warm background, pull flush against WP chrome
+   2. Page scaffold
    ----------------------------------------------------------------------- */
 body.wp-admin .sai-page {
-	font-family:            var(--cl-font);
-	background:             var(--cl-bg);
-	color:                  var(--cl-text);
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing:grayscale;
+	font-family:             var(--cl-font);
+	background:              var(--cl-bg);
+	color:                   var(--cl-text);
+	-webkit-font-smoothing:  antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle dot-grid texture — premium visual detail */
+body.wp-admin .sai-page::before {
+	content:         '';
+	position:        fixed;
+	inset:           0;
+	background-image: radial-gradient(circle, var(--cl-border) 1px, transparent 1px);
+	background-size: 28px 28px;
+	opacity:         .5;
+	pointer-events:  none;
+	z-index:         0;
 }
 
 #wpbody-content > .sai-page {
 	margin-left:  -20px;
 	margin-right: -20px;
 	margin-top:   -8px;
+	position:     relative;
 }
 
+.sai-body,
+.sai-header { position: relative; z-index: 1; }
+
 /* -----------------------------------------------------------------------
-   3. Page header — clean white bar with warm underline
+   3. Page header
    ----------------------------------------------------------------------- */
 .sai-header {
 	background:    var(--cl-surface);
 	border-bottom: 1px solid var(--cl-border);
-	padding:       24px 32px 0;
+	padding:       22px 32px 0;
 	display:       flex;
 	align-items:   flex-end;
 	gap:           24px;
 	position:      sticky;
 	top:           32px;
 	z-index:       200;
+	box-shadow:    var(--cl-shadow-xs);
+	transition:    box-shadow var(--cl-dur-md) var(--cl-ease);
 }
+
+.sai-header.scrolled { box-shadow: var(--cl-shadow); }
 
 .sai-header-left { flex: 1; min-width: 0; }
 
 .sai-header-eyebrow {
-	font-size:      11px;
-	font-weight:    600;
-	letter-spacing: .07em;
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .09em;
 	text-transform: uppercase;
 	color:          var(--cl-accent);
-	margin:         0 0 5px;
+	margin:         0 0 4px;
 	display:        flex;
 	align-items:    center;
-	gap:            7px;
+	gap:            6px;
 }
 
 .sai-dot {
-	width:         7px;
-	height:        7px;
+	width:         6px;
+	height:        6px;
 	border-radius: 50%;
 	background:    var(--cl-accent);
 	display:       inline-block;
@@ -122,32 +171,35 @@ body.wp-admin .sai-page {
 }
 
 .sai-header-title {
-	font-size:   22px;
-	font-weight: 700;
-	color:       var(--cl-text);
-	margin:      0 0 18px;
-	line-height: 1.2;
-	letter-spacing: -.01em;
+	font-size:       24px;
+	font-weight:     700;
+	color:           var(--cl-text);
+	margin:          0 0 18px;
+	line-height:     1.15;
+	letter-spacing:  -.03em;
+	display:         flex;
+	align-items:     center;
+	gap:             10px;
 }
 
 .sai-header-actions {
-	display:     flex;
-	align-items: center;
-	gap:         8px;
-	padding-bottom: 18px;
-	flex-shrink: 0;
+	display:        flex;
+	align-items:    center;
+	gap:            8px;
+	padding-bottom: 16px;
+	flex-shrink:    0;
 }
 
 /* -----------------------------------------------------------------------
-   4. Navigation tabs inside header
+   4. Navigation tabs
    ----------------------------------------------------------------------- */
-.sai-nav { display: flex; margin-top: auto; }
+.sai-nav { display: flex; margin-top: auto; gap: 2px; }
 
 .sai-nav-tab {
 	display:         inline-flex;
 	align-items:     center;
-	gap:             6px;
-	padding:         10px 16px;
+	gap:             5px;
+	padding:         9px 14px;
 	font-size:       13px;
 	font-weight:     500;
 	color:           var(--cl-text-muted);
@@ -182,16 +234,23 @@ body.wp-admin .sai-page {
 }
 
 /* -----------------------------------------------------------------------
-   5. Body
+   5. Body & layout
    ----------------------------------------------------------------------- */
 .sai-body { padding: 28px 32px; }
 
-.sai-two-col      { display: grid; grid-template-columns: 1fr 1fr;   gap: 20px; }
-.sai-two-col-wide { display: grid; grid-template-columns: 2fr 1fr;   gap: 20px; }
+.sai-two-col      { display: grid; grid-template-columns: 1fr 1fr;     gap: 20px; }
+.sai-two-col-wide { display: grid; grid-template-columns: 2fr 1fr;     gap: 20px; }
 .sai-three-col    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 
 @media (max-width: 1100px) {
 	.sai-two-col, .sai-two-col-wide, .sai-three-col { grid-template-columns: 1fr; }
+}
+
+.sai-page-desc {
+	font-size:    13px;
+	color:        var(--cl-text-muted);
+	margin:       0 0 16px;
+	line-height:  1.5;
 }
 
 /* -----------------------------------------------------------------------
@@ -201,10 +260,12 @@ body.wp-admin .sai-page {
 	background:    var(--cl-surface);
 	border:        1px solid var(--cl-border);
 	border-radius: var(--cl-radius);
-	box-shadow:    var(--cl-shadow);
+	box-shadow:    var(--cl-shadow-sm);
 	overflow:      hidden;
+	transition:    box-shadow var(--cl-dur-md) var(--cl-ease);
 }
 
+.sai-card:hover { box-shadow: var(--cl-shadow); }
 .sai-card + .sai-card { margin-top: 20px; }
 
 .sai-card-header {
@@ -222,22 +283,32 @@ body.wp-admin .sai-page {
 	margin:      0;
 	display:     flex;
 	align-items: center;
-	gap:         8px;
+	gap:         7px;
 	letter-spacing: -.01em;
 }
+
+.sai-card-title svg { color: var(--cl-text-muted); flex-shrink: 0; }
 
 .sai-card-body   { padding: 18px 22px 22px; }
 
 .sai-card-footer {
-	padding:    14px 22px;
-	background: var(--cl-bg);
-	border-top: 1px solid var(--cl-border);
-	display:    flex;
+	padding:     14px 22px;
+	background:  var(--cl-bg);
+	border-top:  1px solid var(--cl-border);
+	display:     flex;
 	align-items: center;
-	gap:        12px;
+	gap:         12px;
+}
+
+.sai-card-desc {
+	font-size:   13px;
+	color:       var(--cl-text-muted);
+	margin:      0 0 18px;
+	line-height: 1.6;
 }
 
 /* Accent top-border variants */
+.sai-card.accent-primary { border-top: 3px solid var(--cl-primary); }
 .sai-card.accent-accent  { border-top: 3px solid var(--cl-accent); }
 .sai-card.accent-success { border-top: 3px solid var(--cl-success); }
 .sai-card.accent-danger  { border-top: 3px solid var(--cl-danger); }
@@ -247,9 +318,9 @@ body.wp-admin .sai-page {
    7. Metric cards
    ----------------------------------------------------------------------- */
 .sai-metrics {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-	gap:     14px;
+	display:       grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap:           12px;
 	margin-bottom: 24px;
 }
 
@@ -258,16 +329,21 @@ body.wp-admin .sai-page {
 	border:        1px solid var(--cl-border);
 	border-radius: var(--cl-radius);
 	box-shadow:    var(--cl-shadow-xs);
-	padding:       18px 20px;
+	padding:       20px 20px 18px;
 	position:      relative;
 	overflow:      hidden;
-	transition:    box-shadow var(--cl-dur) var(--cl-ease), transform var(--cl-dur) var(--cl-ease);
+	transition:    box-shadow var(--cl-dur-md) var(--cl-ease), transform var(--cl-dur-md) var(--cl-ease), border-color var(--cl-dur) var(--cl-ease);
 }
 
-.sai-metric:hover { box-shadow: var(--cl-shadow-md); transform: translateY(-1px); }
+.sai-metric:hover {
+	box-shadow:   var(--cl-shadow-md);
+	transform:    translateY(-2px);
+	border-color: var(--cl-border-2);
+}
 
 .sai-metric a { text-decoration: none; color: inherit; display: block; }
 
+/* Left colored stripe */
 .sai-metric-stripe {
 	position:      absolute;
 	left: 0; top: 0; bottom: 0;
@@ -275,37 +351,56 @@ body.wp-admin .sai-page {
 	border-radius: 0 2px 2px 0;
 }
 
+/* Decorative circle in top-right */
+.sai-metric::after {
+	content:       '';
+	position:      absolute;
+	right:         -14px;
+	top:           -14px;
+	width:         70px;
+	height:        70px;
+	border-radius: 50%;
+	opacity:       .06;
+	transition:    opacity var(--cl-dur-lg) var(--cl-ease);
+}
+
+.sai-metric:hover::after { opacity: .10; }
+
+.sai-metric.m-primary::after  { background: var(--cl-accent); }
+.sai-metric.m-success::after  { background: var(--cl-success); }
+.sai-metric.m-warning::after  { background: var(--cl-warning); }
+.sai-metric.m-danger::after   { background: var(--cl-danger); }
+.sai-metric.m-info::after     { background: var(--cl-info); }
+.sai-metric.m-neutral::after  { background: var(--cl-text-muted); }
+
+.sai-metric.m-primary .sai-metric-stripe { background: var(--cl-accent); }
 .sai-metric.m-accent  .sai-metric-stripe { background: var(--cl-accent); }
 .sai-metric.m-success .sai-metric-stripe { background: var(--cl-success); }
 .sai-metric.m-danger  .sai-metric-stripe { background: var(--cl-danger); }
 .sai-metric.m-info    .sai-metric-stripe { background: var(--cl-info); }
+.sai-metric.m-warning .sai-metric-stripe { background: var(--cl-accent); }
 .sai-metric.m-neutral .sai-metric-stripe { background: var(--cl-border-2); }
 
 .sai-metric-label {
-	font-size:      11px;
-	font-weight:    600;
-	letter-spacing: .05em;
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .06em;
 	text-transform: uppercase;
 	color:          var(--cl-text-muted);
-	margin-bottom:  8px;
+	margin-bottom:  10px;
 }
 
 .sai-metric-value {
-	font-size:     30px;
-	font-weight:   700;
+	font-size:     32px;
+	font-weight:   800;
 	line-height:   1;
 	color:         var(--cl-text);
-	margin-bottom: 5px;
-	letter-spacing: -.03em;
+	margin-bottom: 4px;
+	letter-spacing: -.04em;
 	font-feature-settings: 'tnum';
 }
 
-.sai-metric-delta {
-	font-size:   12px;
-	font-weight: 500;
-	color:       var(--cl-text-muted);
-}
-
+.sai-metric-delta { font-size: 12px; font-weight: 500; color: var(--cl-text-muted); }
 .sai-metric-delta.up   { color: var(--cl-success); }
 .sai-metric-delta.down { color: var(--cl-danger); }
 
@@ -316,17 +411,18 @@ body.wp-admin .sai-page {
 	display:       flex;
 	align-items:   center;
 	gap:           14px;
-	padding:       12px 18px;
+	padding:       13px 18px;
 	border-radius: var(--cl-radius);
 	margin-bottom: 20px;
 	border:        1px solid;
 	flex-wrap:     wrap;
+	transition:    background var(--cl-dur-md), border-color var(--cl-dur-md);
 }
 
 .sai-autopilot-bar.ap-on  { background: var(--cl-success-bg); border-color: var(--cl-success-border); }
 .sai-autopilot-bar.ap-off { background: var(--cl-bg-2);       border-color: var(--cl-border); }
 
-.sai-ap-indicator { display: flex; align-items: center; gap: 10px; flex: 1; }
+.sai-ap-indicator { display: flex; align-items: center; gap: 12px; flex: 1; }
 
 .sai-ap-pulse {
 	width:         10px;
@@ -345,12 +441,22 @@ body.wp-admin .sai-page {
 	inset:         -4px;
 	border-radius: 50%;
 	background:    var(--cl-success);
-	opacity:       .22;
+	opacity:       .2;
 	animation:     cl-pulse-ring 2s infinite;
 }
 
-.sai-ap-label { font-size: 13px; font-weight: 600; color: var(--cl-text); }
-.sai-ap-sub   { font-size: 12px; color: var(--cl-text-muted); }
+.sai-ap-label {
+	font-size:   13px;
+	font-weight: 600;
+	color:       var(--cl-text);
+	display:     flex;
+	align-items: center;
+	gap:         5px;
+}
+
+.sai-ap-label svg { width: 14px; height: 14px; }
+
+.sai-ap-sub { font-size: 12px; color: var(--cl-text-muted); margin-top: 1px; }
 
 /* -----------------------------------------------------------------------
    9. Activity timeline
@@ -362,7 +468,7 @@ body.wp-admin .sai-page {
 	gap:           12px;
 	padding:       14px 0;
 	border-bottom: 1px solid var(--cl-border);
-	animation:     cl-fade-in .25s ease forwards;
+	animation:     cl-slide-up .22s var(--cl-ease-out) both;
 }
 
 .sai-timeline-item:last-child { border-bottom: none; }
@@ -380,11 +486,14 @@ body.wp-admin .sai-page {
 
 .sai-timeline-icon svg { width: 14px; height: 14px; }
 
-.sai-timeline-icon.t-meta    { background: var(--cl-accent-bg);  color: var(--cl-accent); border: 1px solid var(--cl-accent-border); }
-.sai-timeline-icon.t-link    { background: var(--cl-success-bg); color: var(--cl-success); border: 1px solid var(--cl-success-border); }
-.sai-timeline-icon.t-schema  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
-.sai-timeline-icon.t-image   { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
-.sai-timeline-icon.t-default { background: var(--cl-bg-2); color: var(--cl-text-muted); border: 1px solid var(--cl-border); }
+/* Icon type styles — used for both .sai-timeline-icon and .sai-decision-type-icon */
+.dt-meta,    .t-meta    { background: var(--cl-accent-bg);   color: var(--cl-accent);   border: 1px solid var(--cl-accent-border); }
+.dt-link,    .t-link    { background: var(--cl-success-bg);  color: var(--cl-success);  border: 1px solid var(--cl-success-border); }
+.dt-schema,  .t-schema  { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+.dt-content, .t-content { background: var(--cl-info-bg);     color: var(--cl-info);     border: 1px solid var(--cl-info-border); }
+.dt-image,   .t-image   { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+.dt-redirect            { background: var(--cl-danger-bg);   color: var(--cl-danger);   border: 1px solid var(--cl-danger-border); }
+.dt-default, .t-default { background: var(--cl-bg-2); color: var(--cl-text-muted); border: 1px solid var(--cl-border); }
 
 .sai-timeline-body { flex: 1; min-width: 0; }
 
@@ -395,30 +504,29 @@ body.wp-admin .sai-page {
 	margin:      0 0 3px;
 	display:     flex;
 	align-items: center;
-	gap:         7px;
+	gap:         6px;
 	flex-wrap:   wrap;
 }
 
-.sai-timeline-sub {
-	font-size:   12px;
-	color:       var(--cl-text-muted);
-	margin:      0;
-}
+.sai-timeline-title a { color: inherit; text-decoration: none; }
+.sai-timeline-title a:hover { color: var(--cl-accent); }
+
+.sai-timeline-sub { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
 
 .sai-timeline-diff {
-	margin-top:    10px;
-	display:       grid;
+	margin-top: 10px;
+	display:    grid;
 	grid-template-columns: 1fr 1fr;
-	gap:           6px;
-	font-size:     12px;
+	gap:        6px;
+	font-size:  12px;
 }
 
 .sai-diff-before,
 .sai-diff-after {
-	padding:       7px 10px;
+	padding:       8px 11px;
 	border-radius: var(--cl-radius-sm);
 	word-break:    break-word;
-	line-height:   1.5;
+	line-height:   1.55;
 }
 
 .sai-diff-before { background: var(--cl-danger-bg);  border: 1px solid var(--cl-danger-border);  color: #991b1b; }
@@ -427,14 +535,51 @@ body.wp-admin .sai-page {
 .sai-diff-label {
 	font-size:      9px;
 	font-weight:    700;
-	letter-spacing: .08em;
+	letter-spacing: .09em;
 	text-transform: uppercase;
 	display:        block;
 	margin-bottom:  4px;
-	opacity:        .6;
+	opacity:        .65;
 }
 
 .sai-timeline-meta { font-size: 11px; color: var(--cl-text-faint); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+/* Trend list (dashboard — was entirely missing) */
+.sai-trend-label {
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .07em;
+	text-transform: uppercase;
+	margin:         0 0 8px;
+}
+
+.sai-trend-label.sai-trend-up   { color: var(--cl-success); }
+.sai-trend-label.sai-trend-down { color: var(--cl-danger); }
+
+.sai-trend-list { list-style: none; margin: 0; padding: 0; }
+
+.sai-trend-item {
+	display:       flex;
+	align-items:   center;
+	gap:           8px;
+	padding:       7px 0;
+	border-bottom: 1px solid var(--cl-border);
+	font-size:     12px;
+}
+
+.sai-trend-item:last-child { border-bottom: none; }
+
+.sai-trend-keyword {
+	font-weight: 600;
+	color:       var(--cl-text);
+	flex-shrink: 0;
+	max-width:   120px;
+	overflow:    hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.sai-trend-page { flex: 1; color: var(--cl-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* -----------------------------------------------------------------------
    10. Decision / recommendation cards
@@ -447,10 +592,17 @@ body.wp-admin .sai-page {
 	border-radius: var(--cl-radius);
 	box-shadow:    var(--cl-shadow-xs);
 	overflow:      hidden;
-	transition:    box-shadow var(--cl-dur) var(--cl-ease), border-color var(--cl-dur) var(--cl-ease);
+	transition:    box-shadow var(--cl-dur-md) var(--cl-ease), border-color var(--cl-dur) var(--cl-ease), transform var(--cl-dur-md) var(--cl-ease);
+	animation:     cl-slide-up .24s var(--cl-ease-out) both;
 }
 
-.sai-decision:hover { box-shadow: var(--cl-shadow); border-color: var(--cl-border-2); }
+.sai-decision:hover {
+	box-shadow:   var(--cl-shadow);
+	border-color: var(--cl-border-2);
+}
+
+/* Type-colored left border accent on expand */
+.sai-decision.expanded       { box-shadow: var(--cl-shadow-md); }
 
 .sai-decision-header {
 	display:     flex;
@@ -458,6 +610,25 @@ body.wp-admin .sai-page {
 	gap:         12px;
 	padding:     14px 16px;
 	cursor:      pointer;
+	user-select: none;
+}
+
+.sai-decision-header:hover { background: var(--cl-bg); }
+
+/* Expand indicator */
+.sai-decision-header::after {
+	content:    '›';
+	font-size:  16px;
+	color:      var(--cl-text-faint);
+	flex-shrink: 0;
+	margin-top:  6px;
+	line-height: 1;
+	transition:  transform var(--cl-dur) var(--cl-ease), color var(--cl-dur);
+}
+
+.sai-decision.expanded .sai-decision-header::after {
+	transform: rotate(90deg);
+	color:     var(--cl-text-muted);
 }
 
 .sai-decision-type-icon {
@@ -472,14 +643,6 @@ body.wp-admin .sai-page {
 }
 
 .sai-decision-type-icon svg { width: 15px; height: 15px; }
-
-.dt-meta    { background: var(--cl-accent-bg);  color: var(--cl-accent);  border-color: var(--cl-accent-border); }
-.dt-link    { background: var(--cl-success-bg); color: var(--cl-success); border-color: var(--cl-success-border); }
-.dt-schema  { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
-.dt-content { background: var(--cl-info-bg);    color: var(--cl-info);    border-color: var(--cl-info-border); }
-.dt-image   { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
-.dt-redirect { background: var(--cl-danger-bg); color: var(--cl-danger);  border-color: var(--cl-danger-border); }
-.dt-default { background: var(--cl-bg-2); color: var(--cl-text-muted); border-color: var(--cl-border); }
 
 .sai-decision-info { flex: 1; min-width: 0; }
 
@@ -496,46 +659,47 @@ body.wp-admin .sai-page {
 .sai-decision-post a { color: inherit; text-decoration: none; }
 .sai-decision-post a:hover { color: var(--cl-accent); }
 
-.sai-decision-reason { font-size: 12px; color: var(--cl-text-muted); margin: 0 0 7px; line-height: 1.5; }
+.sai-decision-reason { font-size: 12px; color: var(--cl-text-muted); margin: 0 0 8px; line-height: 1.5; }
 
-.sai-decision-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.sai-decision-tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
 
 .sai-decision-actions { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; padding-top: 1px; }
 
 .sai-decision-body {
-	padding:    0 16px 14px;
+	padding:    14px 16px;
 	border-top: 1px solid var(--cl-border);
 	background: var(--cl-bg);
 }
 
 .sai-decision-proposed {
 	margin-top:    12px;
-	padding:       10px 13px;
+	padding:       11px 14px;
 	background:    var(--cl-accent-bg);
 	border:        1px solid var(--cl-accent-border);
 	border-radius: var(--cl-radius-sm);
 	font-size:     12px;
 	color:         var(--cl-text-soft);
-	line-height:   1.5;
+	line-height:   1.6;
 }
 
 .sai-decision-proposed strong {
 	display:        block;
-	font-size:      10px;
+	font-size:      9px;
 	font-weight:    700;
-	letter-spacing: .06em;
+	letter-spacing: .07em;
 	text-transform: uppercase;
 	color:          var(--cl-accent);
-	margin-bottom:  3px;
+	margin-bottom:  4px;
 }
 
 /* Confidence meter */
-.sai-conf { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--cl-text-muted); }
+.sai-conf { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--cl-text-muted); }
 
-.sai-conf-bar { width: 48px; height: 3px; background: var(--cl-border-2); border-radius: 2px; overflow: hidden; }
+.sai-conf-bar { width: 52px; height: 3px; background: var(--cl-border-2); border-radius: 2px; overflow: hidden; }
 
-.sai-conf-fill { height: 100%; border-radius: 2px; }
+.sai-conf-fill        { height: 100%; border-radius: 2px; transition: width .7s var(--cl-ease-out); }
 .sai-conf-fill.high   { background: var(--cl-success); }
+.sai-conf-fill.med,
 .sai-conf-fill.medium { background: var(--cl-accent); }
 .sai-conf-fill.low    { background: var(--cl-danger); }
 
@@ -547,14 +711,16 @@ body.wp-admin .sai-page {
 	align-items:    center;
 	font-size:      10px;
 	font-weight:    600;
-	letter-spacing: .04em;
+	letter-spacing: .05em;
 	text-transform: uppercase;
 	padding:        2px 7px;
-	border-radius:  20px;
+	border-radius:  var(--cl-radius-xl);
 	border:         1px solid transparent;
 	white-space:    nowrap;
+	line-height:    1.6;
 }
 
+.sai-badge.b-primary { background: var(--cl-primary-bg); color: var(--cl-primary); border-color: var(--cl-primary-border); }
 .sai-badge.b-accent  { background: var(--cl-accent-bg);  color: var(--cl-accent-dark); border-color: var(--cl-accent-border); }
 .sai-badge.b-success { background: var(--cl-success-bg); color: #065f46; border-color: var(--cl-success-border); }
 .sai-badge.b-warning { background: var(--cl-warning-bg); color: #92400e; border-color: var(--cl-warning-border); }
@@ -583,22 +749,22 @@ body.wp-admin .sai-page {
 	gap:            5px;
 	font-size:      11px;
 	font-weight:    600;
-	letter-spacing: .03em;
+	letter-spacing: .04em;
 	text-transform: uppercase;
 }
 
 .sai-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 .sai-status.s-applied    { color: var(--cl-success); }
-.sai-status.s-applied::before    { background: var(--cl-success); }
+.sai-status.s-applied::before { background: var(--cl-success); }
 .sai-status.s-pending    { color: var(--cl-accent); }
-.sai-status.s-pending::before    { background: var(--cl-accent); }
+.sai-status.s-pending::before { background: var(--cl-accent); }
 .sai-status.s-discarded  { color: var(--cl-text-faint); }
-.sai-status.s-discarded::before  { background: var(--cl-text-faint); }
+.sai-status.s-discarded::before { background: var(--cl-text-faint); }
 .sai-status.s-rolled_back { color: var(--cl-danger); }
 .sai-status.s-rolled_back::before { background: var(--cl-danger); }
 .sai-status.s-approved   { color: var(--cl-info); }
-.sai-status.s-approved::before   { background: var(--cl-info); }
+.sai-status.s-approved::before { background: var(--cl-info); }
 
 /* -----------------------------------------------------------------------
    12. Buttons
@@ -611,76 +777,109 @@ body.wp-admin .sai-page {
 	font-family:     var(--cl-font);
 	font-size:       13px;
 	font-weight:     500;
-	padding:         7px 14px;
+	padding:         7px 15px;
 	border-radius:   var(--cl-radius-sm);
 	border:          1px solid transparent;
 	cursor:          pointer;
 	text-decoration: none;
-	transition:      background var(--cl-dur) var(--cl-ease), box-shadow var(--cl-dur) var(--cl-ease), transform var(--cl-dur) var(--cl-ease);
+	transition:      background var(--cl-dur) var(--cl-ease), box-shadow var(--cl-dur) var(--cl-ease), transform var(--cl-dur) var(--cl-ease), color var(--cl-dur);
 	line-height:     1;
 	white-space:     nowrap;
 }
 
-.sai-btn:hover  { transform: translateY(-1px); }
+.sai-btn:hover  { transform: translateY(-1px); text-decoration: none; }
 .sai-btn:active { transform: translateY(0); }
 .sai-btn:focus-visible { outline: 2px solid var(--cl-accent); outline-offset: 2px; }
 .sai-btn svg    { width: 14px; height: 14px; flex-shrink: 0; }
 
-/* Primary — dark, Claude style */
+/* Primary — rich dark button */
 .sai-btn-primary {
-	background: var(--cl-text);
-	color:      #fff;
-	border-color: var(--cl-text);
-	box-shadow: 0 1px 2px rgba(26,25,24,.25);
+	background:   linear-gradient(160deg, #2d2c2a 0%, #1a1918 100%);
+	color:        #fff;
+	border-color: #0f0e0d;
+	box-shadow:   0 1px 0 rgba(255,255,255,.1) inset, 0 2px 4px rgba(26,25,24,.35);
 }
-.sai-btn-primary:hover { background: var(--cl-text-soft); color: #fff; box-shadow: 0 3px 10px rgba(26,25,24,.25); }
+
+.sai-btn-primary:hover {
+	background: linear-gradient(160deg, #3d3c3a 0%, #2d2c2a 100%);
+	color:      #fff;
+	box-shadow: 0 1px 0 rgba(255,255,255,.1) inset, 0 4px 12px rgba(26,25,24,.4);
+}
 
 /* Accent — amber */
 .sai-btn-accent {
-	background: var(--cl-accent);
-	color:      #fff;
-	border-color: var(--cl-accent);
-	box-shadow: 0 1px 2px rgba(217,119,6,.3);
+	background:   linear-gradient(160deg, #f59e0b 0%, #d97706 100%);
+	color:        #fff;
+	border-color: #b45309;
+	box-shadow:   0 2px 4px rgba(217,119,6,.35);
 }
-.sai-btn-accent:hover { background: var(--cl-accent-dark); color: #fff; }
+
+.sai-btn-accent:hover {
+	background: linear-gradient(160deg, #fbbf24 0%, #f59e0b 100%);
+	color:      #fff;
+}
 
 /* Success */
 .sai-btn-success {
-	background:  var(--cl-success-bg);
-	color:       var(--cl-success);
+	background:   var(--cl-success-bg);
+	color:        var(--cl-success);
 	border-color: var(--cl-success-border);
 }
-.sai-btn-success:hover { background: var(--cl-success); color: #fff; border-color: var(--cl-success); }
+
+.sai-btn-success:hover {
+	background:   var(--cl-success);
+	color:        #fff;
+	border-color: var(--cl-success);
+	box-shadow:   0 3px 8px rgba(5,150,105,.3);
+}
 
 /* Danger */
 .sai-btn-danger {
-	background:  var(--cl-danger-bg);
-	color:       var(--cl-danger);
+	background:   var(--cl-danger-bg);
+	color:        var(--cl-danger);
 	border-color: var(--cl-danger-border);
 }
-.sai-btn-danger:hover { background: var(--cl-danger); color: #fff; border-color: var(--cl-danger); }
+
+.sai-btn-danger:hover {
+	background:   var(--cl-danger);
+	color:        #fff;
+	border-color: var(--cl-danger);
+	box-shadow:   0 3px 8px rgba(220,38,38,.3);
+}
 
 /* Ghost */
 .sai-btn-ghost {
-	background:  transparent;
-	color:       var(--cl-text-muted);
+	background:   transparent;
+	color:        var(--cl-text-muted);
 	border-color: var(--cl-border);
 }
-.sai-btn-ghost:hover { background: var(--cl-bg-2); color: var(--cl-text); }
+
+.sai-btn-ghost:hover {
+	background:   var(--cl-bg-2);
+	color:        var(--cl-text);
+	border-color: var(--cl-border-2);
+}
 
 /* Small */
 .sai-btn-sm { font-size: 11px; padding: 5px 10px; }
 .sai-btn-sm svg { width: 12px; height: 12px; }
 
 /* Disabled / loading */
-.sai-btn[disabled], .sai-btn.loading { opacity: .5; cursor: not-allowed; transform: none; }
+.sai-btn[disabled], .sai-btn.loading {
+	opacity:   .5;
+	cursor:    not-allowed;
+	transform: none;
+}
+
 .sai-btn.loading::before {
-	content: '';
-	width: 11px; height: 11px;
-	border: 2px solid currentColor;
+	content:       '';
+	width:         11px;
+	height:        11px;
+	border:        2px solid currentColor;
 	border-top-color: transparent;
 	border-radius: 50%;
-	animation: cl-spin .5s linear infinite;
+	animation:     cl-spin .5s linear infinite;
+	flex-shrink:   0;
 }
 
 /* -----------------------------------------------------------------------
@@ -700,9 +899,9 @@ body.wp-admin .sai-page {
 }
 
 .sai-filters label {
-	font-size:      11px;
-	font-weight:    600;
-	letter-spacing: .04em;
+	font-size:      10px;
+	font-weight:    700;
+	letter-spacing: .05em;
 	text-transform: uppercase;
 	color:          var(--cl-text-muted);
 	display:        flex;
@@ -722,12 +921,15 @@ body.wp-admin .sai-page {
 	border-radius: var(--cl-radius-sm);
 	padding:       6px 10px;
 	outline:       none;
-	transition:    border-color var(--cl-dur) var(--cl-ease), box-shadow var(--cl-dur) var(--cl-ease);
+	transition:    border-color var(--cl-dur), box-shadow var(--cl-dur);
 	min-width:     120px;
 }
 
+.sai-filters select:hover,
+.sai-filters input:hover { border-color: var(--cl-border-2); }
+
 .sai-filters select:focus,
-.sai-filters input:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 2px var(--cl-accent-bg); }
+.sai-filters input:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 3px var(--cl-accent-bg); }
 
 .sai-search-wrap { flex: 1; min-width: 200px; position: relative; }
 .sai-search-wrap input { width: 100%; padding-left: 32px; box-sizing: border-box; }
@@ -763,6 +965,7 @@ body.wp-admin .sai-page {
 }
 
 .sai-table tbody tr:last-child td { border-bottom: none; }
+.sai-table tbody tr { transition: background var(--cl-dur); }
 .sai-table tbody tr:hover td { background: var(--cl-bg); }
 
 .sai-table .col-num    { text-align: right; font-feature-settings: 'tnum'; }
@@ -790,12 +993,12 @@ body.wp-admin .sai-page {
 .sai-position.pos-lower { background: var(--cl-bg-2); color: var(--cl-text-muted); }
 
 .sai-delta {
-	display:     inline-flex;
-	align-items: center;
-	gap:         2px;
-	font-size:   11px;
-	font-weight: 700;
-	padding:     2px 6px;
+	display:       inline-flex;
+	align-items:   center;
+	gap:           2px;
+	font-size:     11px;
+	font-weight:   700;
+	padding:       2px 6px;
 	border-radius: var(--cl-radius-sm);
 }
 
@@ -849,32 +1052,32 @@ body.wp-admin .sai-page {
 .sai-dist-bars { margin: 0; }
 
 .sai-dist-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 12px; }
-.sai-dist-label { width: 108px; color: var(--cl-text-muted); flex-shrink: 0; font-size: 11px; }
-.sai-dist-bar-track { flex: 1; height: 8px; background: var(--cl-border); border-radius: 4px; overflow: hidden; }
-.sai-dist-bar-fill { height: 100%; border-radius: 4px; transition: width .7s cubic-bezier(.4,0,.2,1); }
-.sai-dist-count { width: 32px; text-align: right; font-weight: 700; color: var(--cl-text); flex-shrink: 0; }
+.sai-dist-label { width: 112px; color: var(--cl-text-muted); flex-shrink: 0; font-size: 11px; }
+.sai-dist-bar-track { flex: 1; height: 7px; background: var(--cl-border); border-radius: 4px; overflow: hidden; }
+.sai-dist-bar-fill { height: 100%; border-radius: 4px; transition: width .75s cubic-bezier(.4,0,.2,1); }
+.sai-dist-count { width: 32px; text-align: right; font-weight: 700; color: var(--cl-text); flex-shrink: 0; font-feature-settings: 'tnum'; }
 
 /* -----------------------------------------------------------------------
-   17. Toggle switch (Claude settings style)
+   17. Toggle switch
    ----------------------------------------------------------------------- */
 .sai-toggle-wrap {
 	display:       flex;
 	align-items:   flex-start;
-	gap:           12px;
+	gap:           14px;
 	padding:       16px 0;
 	border-bottom: 1px solid var(--cl-border);
 }
 
 .sai-toggle-wrap:last-child { border-bottom: none; }
 
-.sai-toggle { position: relative; width: 38px; height: 21px; flex-shrink: 0; margin-top: 1px; }
+.sai-toggle { position: relative; width: 38px; height: 21px; flex-shrink: 0; margin-top: 2px; }
 .sai-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
 
 .sai-toggle-slider {
 	position:      absolute;
 	inset:         0;
 	background:    var(--cl-border-2);
-	border-radius: 10px;
+	border-radius: 11px;
 	cursor:        pointer;
 	transition:    background var(--cl-dur) var(--cl-ease);
 }
@@ -888,13 +1091,13 @@ body.wp-admin .sai-page {
 	bottom:        3px;
 	background:    white;
 	border-radius: 50%;
-	box-shadow:    0 1px 3px rgba(26,25,24,.2);
+	box-shadow:    0 1px 3px rgba(26,25,24,.25);
 	transition:    transform var(--cl-dur) var(--cl-ease);
 }
 
 .sai-toggle input:checked + .sai-toggle-slider { background: var(--cl-text); }
 .sai-toggle input:checked + .sai-toggle-slider::before { transform: translateX(17px); }
-.sai-toggle input:focus-visible + .sai-toggle-slider { outline: 2px solid var(--cl-accent); outline-offset: 2px; }
+.sai-toggle input:focus-visible + .sai-toggle-slider { outline: 2px solid var(--cl-accent); outline-offset: 3px; }
 
 .sai-toggle-info { flex: 1; }
 .sai-toggle-title { font-size: 14px; font-weight: 600; color: var(--cl-text); margin: 0 0 3px; }
@@ -906,9 +1109,9 @@ body.wp-admin .sai-page {
 .sai-settings-section { margin-bottom: 32px; }
 
 .sai-settings-section-title {
-	font-size:      11px;
+	font-size:      10px;
 	font-weight:    700;
-	letter-spacing: .07em;
+	letter-spacing: .08em;
 	text-transform: uppercase;
 	color:          var(--cl-text-muted);
 	margin:         0 0 16px;
@@ -921,14 +1124,14 @@ body.wp-admin .sai-page {
 	grid-template-columns: 190px 1fr;
 	gap:           16px 24px;
 	align-items:   start;
-	padding:       15px 0;
+	padding:       16px 0;
 	border-bottom: 1px solid var(--cl-border);
 }
 
 .sai-field:last-child { border-bottom: none; }
 
 .sai-field-label { font-size: 13px; font-weight: 600; color: var(--cl-text); padding-top: 6px; }
-.sai-field-desc  { font-size: 12px; color: var(--cl-text-muted); margin-top: 3px; line-height: 1.4; }
+.sai-field-desc  { font-size: 12px; color: var(--cl-text-muted); margin-top: 3px; line-height: 1.45; }
 
 .sai-field-control input:not([type="radio"]):not([type="checkbox"]),
 .sai-field-control textarea,
@@ -946,11 +1149,14 @@ body.wp-admin .sai-page {
 	transition:    border-color var(--cl-dur), box-shadow var(--cl-dur);
 }
 
+.sai-field-control input:not([type="radio"]):not([type="checkbox"]):hover,
+.sai-field-control textarea:hover,
+.sai-field-control select:hover { border-color: var(--cl-border-2); }
+
 .sai-field-control input:not([type="radio"]):not([type="checkbox"]):focus,
 .sai-field-control textarea:focus,
-.sai-field-control select:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 2px var(--cl-accent-bg); }
+.sai-field-control select:focus { border-color: var(--cl-accent); box-shadow: 0 0 0 3px var(--cl-accent-bg); }
 
-/* Radio and checkbox: restore native rendering inside sai-field-control */
 .sai-field-control input[type="radio"],
 .sai-field-control input[type="checkbox"] {
 	-webkit-appearance: auto;
@@ -971,11 +1177,21 @@ body.wp-admin .sai-page {
 }
 
 .sai-key-input-wrap { position: relative; }
-.sai-key-input-wrap input { padding-right: 40px; font-family: var(--cl-mono); letter-spacing: .08em; }
+.sai-key-input-wrap input { padding-right: 40px; font-family: var(--cl-mono); letter-spacing: .06em; }
 
 .sai-key-reveal {
-	position:  absolute; right: 8px; top: 50%; transform: translateY(-50%);
-	background: none; border: none; cursor: pointer; color: var(--cl-text-faint); padding: 4px; display: flex;
+	position:   absolute;
+	right:      8px;
+	top:        50%;
+	transform:  translateY(-50%);
+	background: none;
+	border:     none;
+	cursor:     pointer;
+	color:      var(--cl-text-faint);
+	padding:    4px;
+	display:    flex;
+	border-radius: var(--cl-radius-xs);
+	transition: color var(--cl-dur);
 }
 
 .sai-key-reveal:hover { color: var(--cl-accent); }
@@ -987,32 +1203,40 @@ body.wp-admin .sai-page {
 .sai-connect-hero { text-align: center; padding: 48px 24px 36px; max-width: 520px; margin: 0 auto; }
 
 .sai-connect-hero-icon {
-	width:         56px; height: 56px;
+	width:         56px;
+	height:        56px;
 	border-radius: 14px;
-	background:    var(--cl-text);
-	display:       flex; align-items: center; justify-content: center;
+	background:    linear-gradient(145deg, #2d2c2a, #1a1918);
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
 	margin:        0 auto 18px;
-	box-shadow:    0 8px 24px rgba(26,25,24,.2);
+	box-shadow:    0 8px 24px rgba(26,25,24,.25);
 }
+
 .sai-connect-hero-icon svg { width: 28px; height: 28px; color: white; }
 
-.sai-connect-hero h2 { font-size: 20px; font-weight: 700; color: var(--cl-text); margin: 0 0 8px; }
+.sai-connect-hero h2 { font-size: 20px; font-weight: 700; color: var(--cl-text); margin: 0 0 8px; letter-spacing: -.02em; }
 .sai-connect-hero p  { font-size: 14px; color: var(--cl-text-muted); line-height: 1.6; margin: 0; }
 
 .sai-connect-status-row   { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
 
 .sai-connect-status-item {
-	display:       flex; align-items: center; gap: 12px;
-	padding:       13px 16px; border-radius: var(--cl-radius); border: 1px solid;
+	display:       flex;
+	align-items:   center;
+	gap:           12px;
+	padding:       13px 16px;
+	border-radius: var(--cl-radius);
+	border:        1px solid;
 }
 
-.csi-ok  { background: var(--cl-success-bg); border-color: var(--cl-success-border); }
-.csi-err { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border); }
-.csi-warn{ background: var(--cl-warning-bg); border-color: var(--cl-warning-border); }
+.csi-ok   { background: var(--cl-success-bg); border-color: var(--cl-success-border); }
+.csi-err  { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border); }
+.csi-warn { background: var(--cl-warning-bg); border-color: var(--cl-warning-border); }
 
 .sai-connect-icon-wrap { width: 32px; height: 32px; border-radius: var(--cl-radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.csi-ok  .sai-connect-icon-wrap { background: var(--cl-success); }
-.csi-err .sai-connect-icon-wrap { background: var(--cl-danger); }
+.csi-ok   .sai-connect-icon-wrap { background: var(--cl-success); }
+.csi-err  .sai-connect-icon-wrap { background: var(--cl-danger); }
 .csi-warn .sai-connect-icon-wrap { background: var(--cl-accent); }
 .sai-connect-icon-wrap svg { width: 16px; height: 16px; color: white; }
 
@@ -1020,17 +1244,24 @@ body.wp-admin .sai-page {
 .sai-connect-item-title { font-size: 13px; font-weight: 600; color: var(--cl-text); margin: 0 0 2px; }
 .sai-connect-item-sub   { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
 
-/* Google auth button */
 .sai-google-btn {
-	display:         inline-flex; align-items: center; gap: 11px;
-	background:      var(--cl-surface); color: var(--cl-text);
-	border:          1px solid var(--cl-border); border-radius: var(--cl-radius-sm);
-	padding:         10px 16px;
-	font-family:     var(--cl-font); font-size: 14px; font-weight: 500;
-	text-decoration: none; cursor: pointer;
+	display:         inline-flex;
+	align-items:     center;
+	gap:             11px;
+	background:      var(--cl-surface);
+	color:           var(--cl-text);
+	border:          1px solid var(--cl-border);
+	border-radius:   var(--cl-radius-sm);
+	padding:         10px 18px;
+	font-family:     var(--cl-font);
+	font-size:       14px;
+	font-weight:     500;
+	text-decoration: none;
+	cursor:          pointer;
 	box-shadow:      var(--cl-shadow);
-	transition:      box-shadow var(--cl-dur), transform var(--cl-dur);
+	transition:      box-shadow var(--cl-dur-md), transform var(--cl-dur-md);
 }
+
 .sai-google-btn:hover { box-shadow: var(--cl-shadow-md); transform: translateY(-1px); color: var(--cl-text); text-decoration: none; }
 .sai-google-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
@@ -1044,11 +1275,16 @@ body.wp-admin .sai-page {
 	border:        1px solid var(--cl-border);
 	border-radius: var(--cl-radius);
 	padding:       15px 16px;
-	display:       flex; align-items: flex-start; gap: 11px;
+	display:       flex;
+	align-items:   flex-start;
+	gap:           11px;
 	box-shadow:    var(--cl-shadow-xs);
+	transition:    box-shadow var(--cl-dur-md), border-color var(--cl-dur);
 }
 
-.sai-cron-indicator { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.sai-cron-job:hover { box-shadow: var(--cl-shadow); border-color: var(--cl-border-2); }
+
+.sai-cron-indicator { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
 .ci-ok   { background: var(--cl-success); }
 .ci-late { background: var(--cl-accent); }
 .ci-miss { background: var(--cl-danger); }
@@ -1061,56 +1297,107 @@ body.wp-admin .sai-page {
 /* -----------------------------------------------------------------------
    21. Empty states
    ----------------------------------------------------------------------- */
-.sai-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 52px 24px; }
+.sai-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 56px 24px; }
 
 .sai-empty-icon {
-	width:         52px; height: 52px; border-radius: var(--cl-radius);
-	background:    var(--cl-bg-2); border: 1px solid var(--cl-border);
-	display:       flex; align-items: center; justify-content: center; margin-bottom: 16px;
+	width:         52px;
+	height:        52px;
+	border-radius: var(--cl-radius);
+	background:    var(--cl-bg-2);
+	border:        1px solid var(--cl-border);
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
+	margin-bottom: 18px;
 }
+
 .sai-empty-icon svg { width: 24px; height: 24px; color: var(--cl-text-faint); }
 
-.sai-empty h3 { font-size: 16px; font-weight: 600; color: var(--cl-text); margin: 0 0 8px; }
-.sai-empty p  { font-size: 13px; color: var(--cl-text-muted); margin: 0 0 20px; max-width: 340px; line-height: 1.6; }
+.sai-empty h3 { font-size: 16px; font-weight: 700; color: var(--cl-text); margin: 0 0 8px; letter-spacing: -.01em; }
+.sai-empty p  { font-size: 13px; color: var(--cl-text-muted); margin: 0 0 22px; max-width: 340px; line-height: 1.6; }
 
 /* Onboarding steps */
-.sai-onboarding-step { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--cl-border); }
+.sai-onboarding-steps { list-style: none; margin: 0; padding: 0; }
+
+.sai-onboarding-step {
+	display:       flex;
+	gap:           14px;
+	padding:       14px 0;
+	border-bottom: 1px solid var(--cl-border);
+	align-items:   flex-start;
+	font-size:     13px;
+}
+
 .sai-onboarding-step:last-child { border-bottom: none; }
+.sai-onboarding-step.step-done  { opacity: .75; }
+.sai-onboarding-step.step-active { font-weight: 600; }
+
+.sai-step-hint { color: var(--cl-text-muted); font-size: 12px; }
 
 .sai-onboarding-num {
-	width: 28px; height: 28px; border-radius: 50%;
-	background:  var(--cl-bg-2); border: 2px solid var(--cl-border);
-	color: var(--cl-text-muted);
-	font-size: 12px; font-weight: 700;
-	display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+	width:         26px;
+	height:        26px;
+	border-radius: 50%;
+	background:    var(--cl-bg-2);
+	border:        2px solid var(--cl-border);
+	color:         var(--cl-text-muted);
+	font-size:     11px;
+	font-weight:   700;
+	display:       flex;
+	align-items:   center;
+	justify-content: center;
+	flex-shrink:   0;
 }
 
 .sai-onboarding-num.done { background: var(--cl-text); border-color: var(--cl-text); color: white; }
 
-.sai-onboarding-title { font-size: 13px; font-weight: 600; color: var(--cl-text); margin: 0 0 3px; }
+.sai-onboarding-title { font-size: 13px; font-weight: 600; color: var(--cl-text); margin: 0 0 2px; }
 .sai-onboarding-desc  { font-size: 12px; color: var(--cl-text-muted); margin: 0 0 8px; line-height: 1.5; }
 
 /* -----------------------------------------------------------------------
-   22. Scan progress
+   22. Scan progress bar
    ----------------------------------------------------------------------- */
 .sai-scan-progress {
-	display:       none; margin-top: 12px;
-	padding:       14px 16px;
-	background:    var(--cl-surface); border: 1px solid var(--cl-border);
-	border-radius: var(--cl-radius); box-shadow: var(--cl-shadow);
+	display:       none;
+	margin-top:    12px;
+	padding:       16px 18px;
+	background:    var(--cl-surface);
+	border:        1px solid var(--cl-border);
+	border-radius: var(--cl-radius);
+	box-shadow:    var(--cl-shadow);
 }
 
-.sai-scan-progress.visible { display: block; }
+.sai-scan-progress.visible { display: block; animation: cl-slide-down .2s var(--cl-ease-out); }
 
-.sai-scan-bar-track { height: 6px; background: var(--cl-border); border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
+.sai-scan-bar-track {
+	height:        6px;
+	background:    var(--cl-border);
+	border-radius: 3px;
+	overflow:      hidden;
+	margin-bottom: 10px;
+}
 
 .sai-scan-bar-fill {
-	height: 100%; border-radius: 3px; width: 0%;
-	background: var(--cl-text);
-	transition: width .3s ease;
+	height:     100%;
+	border-radius: 3px;
+	width:      0%;
+	background: linear-gradient(90deg, var(--cl-text) 0%, var(--cl-text-soft) 100%);
+	transition: width .35s var(--cl-ease);
+	position:   relative;
+}
+
+.sai-scan-bar-fill::after {
+	content:    '';
+	position:   absolute;
+	inset:      0;
+	background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%);
+	background-size: 200% 100%;
+	animation:  cl-shimmer 1.5s linear infinite;
 }
 
 .sai-scan-bar-fill.complete { background: var(--cl-success); }
+.sai-scan-bar-fill.complete::after { display: none; }
+
 .sai-scan-status { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
 
 /* -----------------------------------------------------------------------
@@ -1119,14 +1406,21 @@ body.wp-admin .sai-page {
 #sai-toasts { position: fixed; bottom: 22px; right: 22px; z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 
 .sai-toast {
-	display:       flex; align-items: center; gap: 9px;
-	padding:       11px 15px;
-	background:    var(--cl-surface); border: 1px solid var(--cl-border);
-	border-radius: var(--cl-radius); box-shadow: var(--cl-shadow-lg);
-	font-size:     13px; font-weight: 500; color: var(--cl-text);
+	display:        flex;
+	align-items:    center;
+	gap:            10px;
+	padding:        12px 16px;
+	background:     var(--cl-surface);
+	border:         1px solid var(--cl-border);
+	border-radius:  var(--cl-radius);
+	box-shadow:     var(--cl-shadow-lg);
+	font-size:      13px;
+	font-weight:    500;
+	color:          var(--cl-text);
 	pointer-events: auto;
-	animation:     cl-toast-in .22s ease forwards;
-	min-width:     240px; max-width: 340px;
+	animation:      cl-toast-in .22s var(--cl-ease-out) forwards;
+	min-width:      240px;
+	max-width:      360px;
 }
 
 .sai-toast.toast-success { border-left: 3px solid var(--cl-success); }
@@ -1135,14 +1429,26 @@ body.wp-admin .sai-page {
 
 .sai-toast svg { width: 15px; height: 15px; flex-shrink: 0; }
 .sai-toast.toast-success svg { color: var(--cl-success); }
-.sai-toast.toast-error svg   { color: var(--cl-danger); }
-.sai-toast.toast-info svg    { color: var(--cl-accent); }
-.sai-toast.hiding { animation: cl-toast-out .18s ease forwards; }
+.sai-toast.toast-error   svg { color: var(--cl-danger); }
+.sai-toast.toast-info    svg { color: var(--cl-accent); }
+
+.sai-toast.hiding { animation: cl-toast-out .18s var(--cl-ease) forwards; }
 
 /* -----------------------------------------------------------------------
    24. Notices
    ----------------------------------------------------------------------- */
-.sai-notice { display: flex; align-items: flex-start; gap: 11px; padding: 13px 16px; border-radius: var(--cl-radius); border: 1px solid; margin-bottom: 18px; font-size: 13px; line-height: 1.5; }
+.sai-notice {
+	display:       flex;
+	align-items:   flex-start;
+	gap:           11px;
+	padding:       13px 16px;
+	border-radius: var(--cl-radius);
+	border:        1px solid;
+	margin-bottom: 18px;
+	font-size:     13px;
+	line-height:   1.5;
+}
+
 .sai-notice svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
 
 .sai-notice.n-success { background: var(--cl-success-bg); border-color: var(--cl-success-border); color: #065f46; }
@@ -1151,24 +1457,39 @@ body.wp-admin .sai-page {
 .sai-notice.n-warning svg { color: var(--cl-accent); }
 .sai-notice.n-error   { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border);  color: #991b1b; }
 .sai-notice.n-error svg { color: var(--cl-danger); }
-.sai-notice.n-info    { background: var(--cl-info-bg); border-color: var(--cl-info-border); color: #1e40af; }
+.sai-notice.n-info    { background: var(--cl-info-bg);    border-color: var(--cl-info-border);    color: #1e40af; }
 .sai-notice.n-info svg { color: var(--cl-info); }
 
 /* -----------------------------------------------------------------------
    25. Pagination
    ----------------------------------------------------------------------- */
-.sai-pagination { display: flex; align-items: center; justify-content: center; gap: 5px; padding-top: 20px; }
+.sai-pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding-top: 22px; }
 
+.sai-pagination .page-numbers,
 .sai-page-btn {
-	display:         inline-flex; align-items: center; justify-content: center;
-	width:           32px; height: 32px; border-radius: var(--cl-radius-sm);
-	border:          1px solid var(--cl-border); background: var(--cl-surface);
-	font-size:       12px; font-weight: 500; color: var(--cl-text-muted);
+	display:         inline-flex;
+	align-items:     center;
+	justify-content: center;
+	min-width:       32px;
+	height:          32px;
+	padding:         0 8px;
+	border-radius:   var(--cl-radius-sm);
+	border:          1px solid var(--cl-border);
+	background:      var(--cl-surface);
+	font-size:       12px;
+	font-weight:     500;
+	color:           var(--cl-text-muted);
 	text-decoration: none;
-	transition:      background var(--cl-dur), color var(--cl-dur);
+	transition:      background var(--cl-dur), color var(--cl-dur), border-color var(--cl-dur);
 }
-.sai-page-btn:hover { background: var(--cl-bg-2); color: var(--cl-text); text-decoration: none; }
+
+.sai-pagination .page-numbers:hover,
+.sai-page-btn:hover { background: var(--cl-bg-2); color: var(--cl-text); border-color: var(--cl-border-2); text-decoration: none; }
+
+.sai-pagination .page-numbers.current,
 .sai-page-btn.current { background: var(--cl-text); border-color: var(--cl-text); color: white; font-weight: 700; }
+
+.sai-pagination .page-numbers.dots { border: none; background: transparent; }
 
 /* -----------------------------------------------------------------------
    26. Code / mono blocks
@@ -1189,18 +1510,31 @@ body.wp-admin .sai-page {
    27. Rollback / redirects
    ----------------------------------------------------------------------- */
 .sai-rollback-item {
-	display:       flex; gap: 13px; padding: 13px 16px; align-items: flex-start;
+	display:       flex;
+	gap:           13px;
+	padding:       14px 16px;
+	align-items:   flex-start;
 	border-bottom: 1px solid var(--cl-border);
+	transition:    background var(--cl-dur);
 }
+
 .sai-rollback-item:last-child { border-bottom: none; }
+.sai-rollback-item:hover { background: var(--cl-bg); }
+
+.sai-rollback-body  { flex: 1; min-width: 0; }
 .sai-rollback-title { font-size: 13px; font-weight: 600; margin: 0 0 2px; }
 .sai-rollback-meta  { font-size: 12px; color: var(--cl-text-muted); margin: 0; }
 
 .sai-redirect-type {
 	display:       inline-block;
-	font-family:   var(--cl-mono); font-size: 11px; font-weight: 700;
-	padding:       2px 7px; border-radius: var(--cl-radius-sm);
-	background:    var(--cl-accent-bg); color: var(--cl-accent-dark); border: 1px solid var(--cl-accent-border);
+	font-family:   var(--cl-mono);
+	font-size:     11px;
+	font-weight:   700;
+	padding:       2px 7px;
+	border-radius: var(--cl-radius-sm);
+	background:    var(--cl-accent-bg);
+	color:         var(--cl-accent-dark);
+	border:        1px solid var(--cl-accent-border);
 }
 
 /* -----------------------------------------------------------------------
@@ -1214,17 +1548,17 @@ body.wp-admin .sai-page {
 .sai-flex  { display: flex; align-items: center; gap: 8px; }
 .sai-grow  { flex: 1; }
 .sai-divider { border: none; border-top: 1px solid var(--cl-border); margin: 20px 0; }
-.sai-mt-8  { margin-top: 8px; }
-.sai-mt-16 { margin-top: 16px; }
-.sai-mt-24 { margin-top: 24px; }
+.sai-mt-8  { margin-top:    8px; }
+.sai-mt-16 { margin-top:   16px; }
+.sai-mt-24 { margin-top:   24px; }
 .sai-mb-8  { margin-bottom: 8px; }
-.sai-mb-16 { margin-bottom: 16px; }
-.sai-mb-24 { margin-bottom: 24px; }
+.sai-mb-16 { margin-bottom:16px; }
+.sai-mb-24 { margin-bottom:24px; }
 
 .sai-section-label {
 	font-size:      10px;
 	font-weight:    700;
-	letter-spacing: .07em;
+	letter-spacing: .08em;
 	text-transform: uppercase;
 	color:          var(--cl-text-muted);
 	margin:         0 0 10px;
@@ -1244,58 +1578,82 @@ body.wp-admin .sai-page {
 }
 
 @keyframes cl-pulse-ring {
-	0%   { transform: scale(1);   opacity: .22; }
-	100% { transform: scale(2.5); opacity: 0; }
+	0%   { transform: scale(1);   opacity: .2; }
+	100% { transform: scale(2.6); opacity: 0; }
 }
 
 @keyframes cl-spin {
 	to { transform: rotate(360deg); }
 }
 
-@keyframes cl-fade-in {
-	from { opacity: 0; transform: translateY(3px); }
+@keyframes cl-slide-up {
+	from { opacity: 0; transform: translateY(6px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cl-slide-down {
+	from { opacity: 0; transform: translateY(-6px); }
 	to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes cl-toast-in {
-	from { opacity: 0; transform: translateX(16px); }
-	to   { opacity: 1; transform: translateX(0); }
+	from { opacity: 0; transform: translateX(16px) scale(.96); }
+	to   { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 @keyframes cl-toast-out {
-	from { opacity: 1; }
+	from { opacity: 1; transform: translateX(0); }
 	to   { opacity: 0; transform: translateX(16px); }
 }
 
-/* -----------------------------------------------------------------------
-   29b. Metric variant aliases — support both old and new names
-   ----------------------------------------------------------------------- */
-.sai-metric.m-primary .sai-metric-stripe { background: var(--cl-accent); }
-.sai-metric.m-warning .sai-metric-stripe { background: var(--cl-accent); }
+@keyframes cl-shimmer {
+	0%   { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}
+
+@keyframes cl-fade-in {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
 
 /* -----------------------------------------------------------------------
-   30. Legacy shims — keep old class names working on pages not yet rewritten
+   30. Staggered animation delays for lists
    ----------------------------------------------------------------------- */
-.seo-agent-wrap        { max-width: 1200px; }
-.seo-agent-card        { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 20px 22px; margin-bottom: 20px; box-shadow: var(--cl-shadow); }
-.seo-agent-card h2     { margin-top: 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--cl-text-muted); border-bottom: 1px solid var(--cl-border); padding-bottom: 10px; margin-bottom: 14px; }
-.seo-agent-widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
-.seo-agent-widget      { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 18px 22px; box-shadow: var(--cl-shadow); }
-.seo-agent-stat-box    { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 14px 18px; text-align: center; }
+.sai-timeline-item:nth-child(1), .sai-decision:nth-child(1) { animation-delay:   0ms; }
+.sai-timeline-item:nth-child(2), .sai-decision:nth-child(2) { animation-delay:  30ms; }
+.sai-timeline-item:nth-child(3), .sai-decision:nth-child(3) { animation-delay:  60ms; }
+.sai-timeline-item:nth-child(4), .sai-decision:nth-child(4) { animation-delay:  90ms; }
+.sai-timeline-item:nth-child(5), .sai-decision:nth-child(5) { animation-delay: 120ms; }
+.sai-timeline-item:nth-child(6), .sai-decision:nth-child(6) { animation-delay: 150ms; }
+.sai-timeline-item:nth-child(7), .sai-decision:nth-child(7) { animation-delay: 180ms; }
+.sai-timeline-item:nth-child(n+8), .sai-decision:nth-child(n+8) { animation-delay: 200ms; }
+
+/* -----------------------------------------------------------------------
+   31. Legacy shims — keep old class names working
+   ----------------------------------------------------------------------- */
+.seo-agent-wrap         { max-width: 1200px; }
+.seo-agent-card         { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 20px 22px; margin-bottom: 20px; box-shadow: var(--cl-shadow); }
+.seo-agent-card h2      { margin-top: 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--cl-text-muted); border-bottom: 1px solid var(--cl-border); padding-bottom: 10px; margin-bottom: 14px; }
+.seo-agent-widget-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.seo-agent-widget       { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 18px 22px; box-shadow: var(--cl-shadow); }
+.seo-agent-stat-box     { background: var(--cl-surface); border: 1px solid var(--cl-border); border-radius: var(--cl-radius); padding: 14px 18px; text-align: center; }
 .seo-agent-stat-box .stat-value { font-size: 28px; font-weight: 700; color: var(--cl-text); }
-.seo-agent-stat-box .stat-label { font-size: 11px; color: var(--cl-text-muted); text-transform: uppercase; letter-spacing: .05em; }
-.seo-agent-stats-row   { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
-.seo-agent-pill.safe   { background: var(--cl-success-bg); color: #065f46; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
-.seo-agent-pill.risky  { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
-.seo-agent-pill.high   { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
-.seo-agent-pill.medium { background: var(--cl-warning-bg); color: #92400e; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
-.seo-agent-pill.low    { background: var(--cl-info-bg); color: #1e40af; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
-.risk-badge.safe  { background: var(--cl-success-bg); color: #065f46; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
-.risk-badge.medium { background: var(--cl-warning-bg); color: #92400e; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
-.risk-badge.high  { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
-.opportunity-type { font-size: 10px; font-weight: 700; font-family: var(--cl-mono); padding: 2px 6px; background: var(--cl-accent-bg); border: 1px solid var(--cl-accent-border); border-radius: var(--cl-radius-sm); color: var(--cl-accent-dark); }
-.cron-status.cron-ok    { background: var(--cl-success-bg); color: #065f46; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
-.cron-status.cron-error { background: var(--cl-danger-bg); color: #991b1b; border-radius: 10px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
-.trend-change.positive  { background: var(--cl-success-bg); color: #065f46; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
-.trend-change.negative  { background: var(--cl-danger-bg); color: #991b1b; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
-.seo-agent-table th { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; background: var(--cl-bg); color: var(--cl-text-muted); padding: 9px 14px; border-bottom: 1px solid var(--cl-border); }
+.seo-agent-stat-box .stat-label { font-size: 10px; color: var(--cl-text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.seo-agent-stats-row    { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+
+.seo-agent-pill.safe    { background: var(--cl-success-bg); color: #065f46; border-radius: 20px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.risky   { background: var(--cl-danger-bg); color: #991b1b; border-radius: 20px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.high    { background: var(--cl-danger-bg); color: #991b1b; border-radius: 20px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.medium  { background: var(--cl-warning-bg); color: #92400e; border-radius: 20px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.seo-agent-pill.low     { background: var(--cl-info-bg); color: #1e40af; border-radius: 20px; font-size: 10px; font-weight: 700; padding: 2px 8px; }
+
+.risk-badge.safe        { background: var(--cl-success-bg); color: #065f46; border-radius: 20px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.risk-badge.medium      { background: var(--cl-warning-bg); color: #92400e; border-radius: 20px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.risk-badge.high        { background: var(--cl-danger-bg); color: #991b1b; border-radius: 20px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+
+.opportunity-type       { font-size: 10px; font-weight: 700; font-family: var(--cl-mono); padding: 2px 6px; background: var(--cl-accent-bg); border: 1px solid var(--cl-accent-border); border-radius: var(--cl-radius-sm); color: var(--cl-accent-dark); }
+.cron-status.cron-ok    { background: var(--cl-success-bg); color: #065f46; border-radius: 20px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.cron-status.cron-error { background: var(--cl-danger-bg); color: #991b1b; border-radius: 20px; font-size: 10px; padding: 2px 8px; font-weight: 700; }
+.trend-change.positive  { background: var(--cl-success-bg); color: #065f46; border-radius: var(--cl-radius-sm); padding: 1px 6px; font-size: 11px; font-weight: 700; }
+.trend-change.negative  { background: var(--cl-danger-bg); color: #991b1b; border-radius: var(--cl-radius-sm); padding: 1px 6px; font-size: 11px; font-weight: 700; }
+.seo-agent-table th     { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; background: var(--cl-bg); color: var(--cl-text-muted); padding: 9px 14px; border-bottom: 1px solid var(--cl-border); }

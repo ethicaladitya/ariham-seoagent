@@ -1,5 +1,5 @@
 /**
- * SEO Agent AI — Admin JS v4.0
+ * SEO Agent AI — Admin JS v5.0
  * Interactions, AJAX helpers, animations, toast notifications.
  */
 /* global seoAgentAI, ajaxurl */
@@ -88,47 +88,41 @@
 			var circ       = 2 * Math.PI * r;
 			var dashOffset = circ - ( circ * score / 100 );
 
-			// Trigger animation after paint
 			requestAnimationFrame( function () {
 				fill.style.strokeDasharray  = circ;
-				fill.style.strokeDashoffset = circ; // start empty
+				fill.style.strokeDashoffset = circ;
 				requestAnimationFrame( function () {
 					fill.style.transition       = 'stroke-dashoffset .9s cubic-bezier(0.4,0,0.2,1)';
 					fill.style.strokeDashoffset = dashOffset;
 				} );
 			} );
 
-			// Animate counter
 			if ( numEl ) {
-				var start = 0;
-				var dur   = 900;
-				var t0    = performance.now();
-				function tick( now ) {
+				var dur = 900;
+				var t0  = performance.now();
+				(function tick( now ) {
 					var progress = Math.min( ( now - t0 ) / dur, 1 );
 					var eased    = 1 - Math.pow( 1 - progress, 3 );
 					numEl.textContent = Math.round( eased * score );
 					if ( progress < 1 ) { requestAnimationFrame( tick ); }
-				}
-				requestAnimationFrame( tick );
+				})( performance.now() );
 			}
 		} );
 	}
 
-	// Animate score bars (width set to 0 in HTML, animated to data-width).
+	// Animate score distribution bars (start at 0%, animate to data-w).
 	function animateBars() {
 		document.querySelectorAll( '.sai-score-bar-fill[data-w], .sai-dist-bar-fill[data-w]' ).forEach( function ( bar ) {
 			var w = bar.dataset.w || '0';
+			bar.style.width = '0%';
 			requestAnimationFrame( function () {
-				bar.style.width = '0%';
-				requestAnimationFrame( function () {
-					bar.style.width = w + '%';
-				} );
+				requestAnimationFrame( function () { bar.style.width = w + '%'; } );
 			} );
 		} );
 	}
 
 	// -------------------------------------------------------------------------
-	// Async batch scan (dashboard)
+	// Async batch scan (dashboard + opportunities)
 	// -------------------------------------------------------------------------
 	function initScan() {
 		var btns   = document.querySelectorAll( '.sai-run-scan' );
@@ -141,10 +135,16 @@
 
 		function setScanning( active ) {
 			btns.forEach( function ( b ) {
-				if ( active ) { btnLoading( b ); }
-				else { btnReset( b ); }
+				if ( active ) { btnLoading( b ); } else { btnReset( b ); }
 			} );
-			if ( prog ) { prog.classList.toggle( 'visible', active ); }
+			if ( prog ) {
+				if ( active ) {
+					prog.style.display = 'block';
+					prog.classList.add( 'visible' );
+				} else {
+					prog.classList.remove( 'visible' );
+				}
+			}
 		}
 
 		function updateProgress( pct, text ) {
@@ -170,7 +170,7 @@
 					var pct = d.percent || 0;
 					var msg = d.done
 						? ( i18n.scan_done || 'Scan complete! ' ) + d.with_recs + ' ' + ( i18n.recommendations || 'recommendation(s) generated.' )
-						: ( i18n.scanning || 'Scanning' ) + ' ' + pct + '%' + ( d.current_title ? ' — ' + d.current_title : '' );
+						: ( i18n.scanning  || 'Scanning' ) + ' ' + pct + '%' + ( d.current_title ? ' — ' + d.current_title : '' );
 					updateProgress( pct, msg );
 
 					if ( d.done ) {
@@ -190,34 +190,32 @@
 		btns.forEach( function ( b ) {
 			b.addEventListener( 'click', function () {
 				setScanning( true );
-				updateProgress( 0, cfg.i18n && cfg.i18n.starting ? cfg.i18n.starting : 'Starting scan…' );
+				updateProgress( 0, i18n.starting || 'Starting scan…' );
 				runBatch( 0 );
 			} );
 		} );
 	}
 
 	// -------------------------------------------------------------------------
-	// Decision approve / reject (AJAX path — only when no inline form is present)
-	// Pages that render #sai-decision-form handle clicks themselves via inline JS.
+	// Decision approve / reject (AJAX — only when no inline form is present)
 	// -------------------------------------------------------------------------
 	function initDecisionActions() {
-		// If the page uses the form-based submission path, bail out entirely.
 		if ( document.getElementById( 'sai-decision-form' ) ) { return; }
 
 		document.addEventListener( 'click', function ( e ) {
 			var btn = e.target.closest( '[data-decision-action]' );
 			if ( ! btn ) { return; }
 
-			var action     = btn.dataset.decisionAction; // 'approve' | 'reject'
+			var action     = btn.dataset.decisionAction;
 			var decisionId = btn.dataset.decisionId;
 			if ( ! decisionId ) { return; }
 
 			btnLoading( btn );
 
 			var fd = new FormData();
-			fd.append( 'action',      'seo_agent_ai_decision_action' );
-			fd.append( '_ajax_nonce', cfg.nonce || '' );
-			fd.append( 'decision_id', decisionId );
+			fd.append( 'action',          'seo_agent_ai_decision_action' );
+			fd.append( '_ajax_nonce',     cfg.nonce || '' );
+			fd.append( 'decision_id',     decisionId );
 			fd.append( 'decision_action', action );
 
 			fetch( ajaxUrl, { method: 'POST', body: fd } )
@@ -230,10 +228,10 @@
 					}
 					var card = btn.closest( '.sai-decision' );
 					if ( card ) {
-						card.style.transition = 'opacity .3s, transform .3s';
+						card.style.transition = 'opacity .28s ease, transform .28s ease, max-height .28s ease';
 						card.style.opacity    = '0';
 						card.style.transform  = 'translateX(-12px)';
-						setTimeout( function () { card.remove(); updateDecisionCount(); }, 320 );
+						setTimeout( function () { card.remove(); updateDecisionCount(); }, 300 );
 					}
 					toast( res.data || ( 'approve' === action ? 'Applied!' : 'Discarded.' ), 'success' );
 				} )
@@ -257,18 +255,21 @@
 	}
 
 	// -------------------------------------------------------------------------
-	// Collapsible decision cards (expand diff on click)
-	// Only active when no inline JS is handling it (no #sai-decision-form).
+	// Collapsible decision cards — expand/collapse diff on header click
+	// CSS drives the expand indicator arrow via ::after + .expanded class.
 	// -------------------------------------------------------------------------
 	function initDecisionExpand() {
 		if ( document.getElementById( 'sai-decision-form' ) ) { return; }
+
 		document.addEventListener( 'click', function ( e ) {
 			var header = e.target.closest( '.sai-decision-header' );
 			if ( ! header ) { return; }
 			if ( e.target.closest( 'button, a' ) ) { return; }
-			var card   = header.closest( '.sai-decision' );
-			var body   = card && card.querySelector( '.sai-decision-body' );
+
+			var card = header.closest( '.sai-decision' );
+			var body = card && card.querySelector( '.sai-decision-body' );
 			if ( ! body ) { return; }
+
 			var open = card.classList.toggle( 'expanded' );
 			body.style.display = open ? 'block' : 'none';
 		} );
@@ -313,8 +314,10 @@
 	function initKeyReveal() {
 		document.querySelectorAll( '.sai-key-reveal' ).forEach( function ( btn ) {
 			btn.addEventListener( 'click', function () {
-				var input = btn.closest( '.sai-key-input-wrap' ) && btn.closest( '.sai-key-input-wrap' ).querySelector( 'input' );
+				var wrap  = btn.closest( '.sai-key-input-wrap' );
+				var input = wrap && wrap.querySelector( 'input' );
 				if ( ! input ) { return; }
+
 				var hidden = 'password' === input.type;
 				input.type = hidden ? 'text' : 'password';
 				btn.setAttribute( 'aria-label', hidden ? 'Hide key' : 'Show key' );
@@ -359,7 +362,7 @@
 	}
 
 	// -------------------------------------------------------------------------
-	// Autopilot toggle (settings page live save)
+	// Autopilot toggle (settings page — live visual update)
 	// -------------------------------------------------------------------------
 	function initAutopilotToggle() {
 		var toggle = document.querySelector( '[data-autopilot-toggle]' );
@@ -370,7 +373,10 @@
 			var label = document.querySelector( '.sai-ap-label' );
 			var on    = toggle.checked;
 
-			if ( bar )   { bar.classList.toggle( 'ap-on', on );  bar.classList.toggle( 'ap-off', ! on ); }
+			if ( bar ) {
+				bar.classList.toggle( 'ap-on',  on );
+				bar.classList.toggle( 'ap-off', ! on );
+			}
 			if ( label ) { label.textContent = on ? 'Autopilot ON' : 'Autopilot OFF'; }
 		} );
 	}
@@ -402,31 +408,28 @@
 	}
 
 	// -------------------------------------------------------------------------
-	// Sticky header shrink on scroll
+	// Sticky header — add class on scroll for CSS shadow transition
 	// -------------------------------------------------------------------------
 	function initStickyHeader() {
 		var header = document.querySelector( '.sai-header' );
 		if ( ! header ) { return; }
 
-		var lastY = 0;
-		window.addEventListener( 'scroll', function () {
-			var y = window.pageYOffset;
-			if ( y > 60 && y > lastY ) {
-				header.style.boxShadow = '0 2px 12px rgba(0,0,0,.08)';
-			} else {
-				header.style.boxShadow = '';
-			}
-			lastY = y;
-		}, { passive: true } );
+		function onScroll() {
+			header.classList.toggle( 'scrolled', window.pageYOffset > 50 );
+		}
+
+		window.addEventListener( 'scroll', onScroll, { passive: true } );
+		onScroll();
 	}
 
 	// -------------------------------------------------------------------------
-	// Intersection observer — animate elements when in view
+	// Intersection observer — reveal metric cards on scroll
+	// Decision cards and timeline items use CSS animation-delay instead.
 	// -------------------------------------------------------------------------
 	function initScrollAnimations() {
 		if ( ! window.IntersectionObserver ) { return; }
 
-		var items = document.querySelectorAll( '.sai-metric, .sai-cron-job, .sai-decision' );
+		var items = document.querySelectorAll( '.sai-metric, .sai-cron-job' );
 		var io    = new IntersectionObserver( function ( entries ) {
 			entries.forEach( function ( entry ) {
 				if ( entry.isIntersecting ) {
@@ -435,42 +438,38 @@
 					io.unobserve( entry.target );
 				}
 			} );
-		}, { threshold: 0.1 } );
+		}, { threshold: 0.08 } );
 
 		items.forEach( function ( el, i ) {
-			el.style.opacity   = '0';
-			el.style.transform = 'translateY(8px)';
-			el.style.transition = 'opacity .35s ease ' + ( i * 40 ) + 'ms, transform .35s ease ' + ( i * 40 ) + 'ms';
+			el.style.opacity    = '0';
+			el.style.transform  = 'translateY(10px)';
+			el.style.transition = 'opacity .32s ease ' + ( i * 45 ) + 'ms, transform .32s ease ' + ( i * 45 ) + 'ms';
 			io.observe( el );
 		} );
 	}
 
 	// -------------------------------------------------------------------------
-	// Close WP admin notices on plugin pages (we use toasts instead)
+	// Close WP admin notices on plugin pages (use toasts instead)
 	// -------------------------------------------------------------------------
 	function suppressWPNotices() {
 		if ( ! document.querySelector( '.sai-page' ) ) { return; }
 		document.querySelectorAll( '.notice-success, .updated' ).forEach( function ( n ) {
-			// Only suppress notices above the plugin page, not inside it.
-			if ( ! n.closest( '.sai-page' ) ) {
-				n.style.display = 'none';
-			}
+			if ( ! n.closest( '.sai-page' ) ) { n.style.display = 'none'; }
 		} );
 	}
 
 	// -------------------------------------------------------------------------
-	// Auto-dismiss URL-based success notice
+	// Auto-dismiss URL-based success / error notices
 	// -------------------------------------------------------------------------
 	function initUrlNotice() {
 		var url = new URL( window.location.href );
 		if ( url.searchParams.get( 'sai_saved' ) ) {
 			toast( cfg.i18n && cfg.i18n.saved ? cfg.i18n.saved : 'Settings saved!', 'success' );
-			// Clean the URL without reload.
 			url.searchParams.delete( 'sai_saved' );
 			window.history.replaceState( {}, '', url.toString() );
 		}
 		if ( url.searchParams.get( 'sai_error' ) ) {
-			toast( decodeURIComponent( url.searchParams.get( 'sai_error' ) ), 'error' );
+			toast( decodeURIComponent( url.searchParams.get( 'sai_error' ) || '' ), 'error' );
 			url.searchParams.delete( 'sai_error' );
 			window.history.replaceState( {}, '', url.toString() );
 		}
