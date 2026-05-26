@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       SiteAgent SEO
- * Plugin URI:        https://adityashah.blog/
+ * Plugin URI:        https://github.com/ethicaladitya/WP-SEO-Agent
  * Description:       Autonomous SEO growth engine — continuously analyzes Search Console and GA4 signals, then proposes prioritized SEO recommendations with full audit trail, optional autopilot, and AI-powered content intelligence.
  * Version:           0.0.1
  * Requires at least: 6.4
