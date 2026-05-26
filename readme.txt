@@ -1,149 +1,151 @@
 === SEO Agent AI ===
-Contributors: seoagentai
-Tags: seo, analytics, search-console, ga4, recommendations
+Contributors: ethicaladitya
+Tags: seo, google-search-console, analytics, ai, automation
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.2.1
+Stable tag: 0.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Autonomous SEO agent that connects Google Search Console and GA4, surfaces post-level opportunities, and proposes safe, reversible metadata fixes.
+An autonomous SEO agent that connects Google Search Console, Google Analytics 4, and your existing SEO plugins to continuously analyse, score, and fix your content — so your site keeps improving on its own.
 
 == Description ==
 
-SEO Agent AI continuously analyzes your blog using Google Search Console and Google Analytics 4 data, scores each post for SEO opportunities, and proposes prioritized recommendations.
+**SEO Agent AI is a hands-free SEO growth engine for WordPress.** It connects to Google Search Console and Google Analytics 4 to read real traffic and ranking data for every post on your site, then uses that data — optionally combined with Gemini or OpenAI — to detect problems, generate prioritised recommendations, and apply safe fixes automatically.
 
-Where it adds value:
+Unlike traditional SEO plugins that show you a checklist to fill in, SEO Agent AI acts like a background analyst that never sleeps: it scores every page on a 0–100 SEO scale, surfaces the highest-impact opportunities first, and can apply safe metadata updates for you on a schedule — with full rollback if anything looks wrong.
 
-* Pulls real Search Console queries, impressions, clicks, CTR, and average position per post.
-* Pulls GA4 sessions, engagement rate, and average time-on-page per post.
-* Detects six SEO signals per post: missing meta basics, title/meta optimization opportunity, thin content, content refresh needed, intent mismatch, and declining performance.
-* Builds prioritized recommendations with confidence scores and a clear "safe vs risky" classification.
-* Optional Gemini AI integration to generate keyword-rich meta titles, meta descriptions, and focus-keyword suggestions.
-* Writes meta updates to all detected SEO plugins (Yoast, RankMath, SmartCrawl, The SEO Framework) plus the plugin's own meta keys.
-* Every change is recorded in an activity log table with full before/after, signals, and confidence — and is one-click reversible.
-* Optional autopilot mode applies only safe recommendations above a confidence floor, capped at a configurable daily limit.
+**Connect your existing tools — SEO Agent AI enhances what you already have:**
 
-This plugin makes no remote calls until you connect a Google account and provide an OAuth client ID and secret. The Gemini integration is fully optional and is gated on a user-supplied API key.
+SEO Agent AI reads and writes to the SEO plugins you already use. It does not replace them.
+
+* **Google Search Console** — pulls real queries, impressions, clicks, average position, and CTR per post so recommendations are based on actual search performance, not guesses.
+* **Google Analytics 4** — pulls sessions, engagement rate, and average time-on-page to identify pages losing traffic or readers leaving quickly.
+* **Yoast SEO** — reads and writes meta titles, descriptions, and focus keywords to Yoast's fields.
+* **Rank Math** — reads and writes meta and focus keywords to Rank Math's meta keys.
+* **SmartCrawl** — integrates with SmartCrawl's redirect manager and meta fields.
+* **The SEO Framework** — reads and writes to TSF's post meta.
+* **AIOSEO & SEOPress** — meta write support included.
+* **Redirection plugin** — can create and manage 301 redirects through Redirection's database when it is active.
+
+**What it does on a daily basis:**
+
+1. Fetches fresh Search Console and GA4 data for all published posts.
+2. Scores each post across seven SEO dimensions: metadata completeness, title/description optimisation opportunity, content depth, content freshness, search-intent alignment, internal linking, and image alt text.
+3. Detects six signals per post: missing meta, optimisation opportunity, thin content, content refresh needed, intent mismatch, and declining performance.
+4. Builds a prioritised queue of recommendations — each with a confidence score, a "safe vs risky" classification, and a before/after preview.
+5. In manual mode: presents the queue in the Pending Approvals admin screen for you to approve or dismiss one by one.
+6. In Autopilot mode: automatically applies recommendations classified as "safe" above a confidence threshold you configure, capped at a daily limit.
+7. Every applied change is logged with full before/after values and is one-click reversible from the Rollback Center.
+
+**Core features:**
+
+* **Real-data scoring** — every decision is backed by actual Search Console and GA4 numbers, not keyword-density calculations.
+* **AI-powered suggestions** — optional Gemini (Google AI) and OpenAI/OpenAI-compatible integrations generate keyword-rich meta titles, meta descriptions, and focus-keyword suggestions tuned to your existing ranking data.
+* **Autopilot with guardrails** — safe-only auto-apply mode, configurable confidence floor, daily change limit, and instant rollback. You stay in control.
+* **Full audit trail** — every recommendation, every applied fix, and every rollback is recorded in the Activity Log with timestamps, before/after values, confidence scores, and what triggered the change.
+* **Internal link engine** — detects orphan pages and inserts contextual internal links to help distribute PageRank and reduce crawl depth.
+* **Schema injection** — auto-injects Article, BlogPosting, FAQPage, HowTo, and BreadcrumbList JSON-LD structured data via `wp_head`.
+* **404 monitoring and redirect management** — logs 404s and creates 301 redirects through whichever redirect plugin you already have active.
+* **WP-CLI suite** — 10 CLI subcommands for power users: `analyze`, `optimize`, `report`, `rollback`, `fetch-gsc`, `fetch-ga4`, `score`, `opportunities`, `status`, `logs`.
+* **Clean uninstall** — removes every custom table, option, post meta key, transient, and scheduled event when uninstalled.
+
+**Privacy and data handling:**
+
+No data leaves your server until you explicitly connect a Google account. No remote call is made on activation. OAuth tokens and API keys are stored encrypted (AES-256-CBC) in your WordPress database.
 
 == Installation ==
 
-1. Upload the `seo-agent-ai` folder to `/wp-content/plugins/`, or install via the WordPress plugin browser.
-2. Activate SEO Agent AI from the Plugins screen.
-3. Open SEO Agent AI → Settings and enter your Google OAuth Client ID + Client Secret. (Create a project at https://console.cloud.google.com/, enable the Search Console API and the Google Analytics Data API, and add the wp-admin URL of your "Connect Google" page as an authorized redirect URI.)
-4. Open SEO Agent AI → Connect Google and complete the OAuth flow.
-5. In Settings, pick your verified Search Console property and your GA4 property.
-6. Optionally paste a Gemini API key to enable AI-powered meta-title and description generation.
-7. Click "Run Analysis Now" once to seed the data; daily WP-Cron will keep it fresh.
+1. Upload the `seo-agent-ai` folder to `/wp-content/plugins/`, or install via the WordPress Plugins screen.
+2. Activate the plugin.
+3. Go to **SEO Agent AI → Settings** and enter your Google OAuth Client ID and Client Secret.
+   - Create a project at [Google Cloud Console](https://console.cloud.google.com/), enable the Search Console API and Google Analytics Data API, and add your wp-admin Connect Google page URL as an authorised redirect URI.
+4. Go to **SEO Agent AI → Connect Google** and complete the OAuth flow.
+5. In Settings, select your verified Search Console property and your GA4 property.
+6. Optionally paste a Gemini or OpenAI API key to enable AI-powered meta generation.
+7. Click **Run Full Scan** once to seed data. Daily WP-Cron keeps everything fresh from then on.
 
 == Frequently Asked Questions ==
 
-= Does the plugin auto-publish changes to my live posts? =
+= Does it automatically change my live posts without me knowing? =
 
-No. Default mode is recommendation-only. You must click "Approve & Apply" on each safe recommendation. Autopilot mode is opt-in, applies only "safe" classifications above your confidence floor, and is capped to a daily limit you set.
+No — not by default. In the default manual mode you must click "Apply" on each recommendation in the Pending Approvals screen. Autopilot mode is an explicit opt-in setting and only applies changes classified as "safe" above the confidence threshold you set, capped at a daily limit you choose.
 
-= Does it call any external service before I configure it? =
+= Do I need to have a specific SEO plugin installed? =
 
-No. The plugin makes no remote calls until you supply OAuth credentials and connect a Google account. The optional Gemini integration is only invoked when you save an API key.
+No. SEO Agent AI works standalone and writes meta to its own post-meta keys. If you have Yoast SEO, Rank Math, SmartCrawl, The SEO Framework, AIOSEO, or SEOPress installed and active, the plugin will also write to those plugins' meta fields automatically, so your existing SEO plugin always shows the correct values.
 
-= Where are my OAuth tokens stored? =
+= Does it send any data to external servers before I configure it? =
 
-In the WordPress options table, encrypted with AES-256-CBC using a key derived from your `wp_salt('secure_auth')`. Refresh tokens, access tokens, and (since v2.1.0) the Gemini API key are all encrypted at rest.
+No. The plugin makes zero remote calls until you provide OAuth credentials and complete the Google connection. The Gemini and OpenAI integrations are only invoked after you save an API key. No telemetry, no phone-home.
 
-= Which SEO plugins does it write to? =
+= Where are my API keys and OAuth tokens stored? =
 
-Yoast SEO, RankMath, SmartCrawl, and The SEO Framework — all that are detected as active. The plugin also stores its own copy in dedicated post-meta keys, so you keep your data even if you swap SEO plugins later.
+In your WordPress options table, encrypted at rest with AES-256-CBC using a key derived from your site's `wp_salt('secure_auth')`. They never leave your server except when making authorised API requests.
 
-= How do I roll back a change? =
+= Which SEO plugins does it read from and write to? =
 
-Open SEO Agent AI → Activity Report, find the entry, click Rollback. The previous value is restored across every SEO plugin meta key that was originally written.
+Yoast SEO, Rank Math, SmartCrawl, The SEO Framework, AIOSEO, and SEOPress — whichever are active. It detects them automatically and writes to all of them at once, so you never have a mismatch between plugins.
 
-= Will the plugin uninstall cleanly? =
+= How do I undo a change? =
 
-Yes. Uninstalling removes the activity log table, every plugin option, every plugin post-meta key, all transients, and unschedules the cron event.
+Open **SEO Agent AI → Rollback Center**, find the entry, and click Rollback. The previous meta value is restored across every SEO plugin that was written to.
+
+= Will it slow down my site? =
+
+No. All analysis and API calls happen inside WP-Cron jobs that run in the background. Nothing runs on the front-end. Admin pages load data from local database tables, not live API calls.
+
+= Does it work with Google Site Kit? =
+
+Yes. If Google Site Kit is installed and authorised, SEO Agent AI can use the Site Kit bridge to access Search Console data without requiring a separate OAuth setup.
 
 == External Services ==
 
-This plugin connects to third-party services **only after you provide credentials and authorize the connection**. No external call is made on plugin activation.
+This plugin communicates with the following third-party services **only after you provide credentials and authorise the connection**. No external call is made on plugin activation or on the front-end.
 
-**Google APIs (mandatory for core functionality)**
-When you complete the Google OAuth flow, the plugin communicates with:
-- `accounts.google.com` — OAuth 2.0 authorization and token exchange
-- `oauth2.googleapis.com` — Access-token refresh
-- `searchconsole.googleapis.com` — Fetching Search Console query data, impressions, clicks, and ranking positions for your verified property
-- `analyticsdata.googleapis.com` — Fetching GA4 sessions, engagement rate, and time-on-page
-- `analyticsadmin.googleapis.com` — Listing available GA4 properties
-- Privacy policy: https://policies.google.com/privacy | Terms: https://policies.google.com/terms
+**Google APIs (required for core functionality)**
 
-**Gemini AI (optional)**
-When you save a Gemini API key in Settings, AI-generated meta titles and descriptions are fetched from:
-- `generativelanguage.googleapis.com`
-- Privacy policy: https://ai.google.dev/gemini-api/terms
+After you complete the Google OAuth flow, the plugin communicates with:
 
-**OpenAI-compatible endpoint (optional)**
-When you configure an API key and base URL for an OpenAI-compatible provider (defaults to `https://api.openai.com/v1`), AI meta suggestions are fetched from your configured endpoint. This could be the standard OpenAI endpoint or any compatible alternative you specify.
-- OpenAI privacy policy: https://openai.com/policies/privacy-policy | Terms: https://openai.com/policies/terms-of-use
+* `accounts.google.com` — OAuth 2.0 authorisation and token exchange
+* `oauth2.googleapis.com` — Access-token refresh
+* `searchconsole.googleapis.com` — Search Console query data (impressions, clicks, position, CTR) for your verified property
+* `analyticsdata.googleapis.com` — GA4 sessions, engagement rate, and time-on-page
+* `analyticsadmin.googleapis.com` — Listing your GA4 properties
 
-No data is sent to any service until you explicitly configure and connect it.
+[Google Privacy Policy](https://policies.google.com/privacy) | [Google Terms of Service](https://policies.google.com/terms)
+
+**Google Gemini AI (optional)**
+
+When you save a Gemini API key, AI-generated meta suggestions are fetched from `generativelanguage.googleapis.com`.
+
+[Gemini API Terms](https://ai.google.dev/gemini-api/terms)
+
+**OpenAI / OpenAI-compatible endpoint (optional)**
+
+When you configure an OpenAI API key, meta suggestions are fetched from `api.openai.com` (or a custom base URL you specify). This can point to any OpenAI-compatible provider.
+
+[OpenAI Privacy Policy](https://openai.com/policies/privacy-policy) | [OpenAI Terms of Use](https://openai.com/policies/terms-of-use)
+
+No user data is sent to any third-party service until you explicitly configure and activate that integration.
 
 == Screenshots ==
 
-1. Overview dashboard showing per-post signals and recommendations.
-2. Connect Google page (OAuth flow).
-3. Settings page with Google + Gemini configuration and autopilot controls.
-4. Activity Report with filters and one-click rollback.
-5. Per-post recommendation card with proposed metadata.
+1. Dashboard — activity feed, score distribution, traffic trends, and key metrics at a glance.
+2. Opportunities — prioritised list of SEO recommendations with confidence scores and before/after previews.
+3. Pending Approvals — review and apply AI-generated meta improvements one at a time or in bulk.
+4. Connect Google — step-by-step OAuth flow for Search Console and GA4.
+5. Settings — configure AI provider, autopilot mode, confidence threshold, and daily change cap.
+6. Rollback Center — full audit trail with one-click restore for every applied change.
+7. Cron Status — real-time view of all background jobs and manual trigger controls.
 
 == Changelog ==
 
-= 3.0.0 =
-* Full autonomous SEO growth engine: multi-dimensional 0-100 SEO scoring per page, AI decision queue with confidence tiers, admin approval workflow.
-* Five new database tables: keyword_history, page_insights, ai_decisions, daily_reports, internal_links.
-* Seven specialized cron jobs: dedicated GSC fetch, GA4 fetch, daily report generation, weekly page scoring, content decay detection, internal link scan, old-data purge.
-* OpenAI-compatible AI provider: configure any OpenAI-compatible endpoint (standard OpenAI or custom base URL) alongside or instead of Gemini; auto-fallback logic.
-* New admin pages: SEO Dashboard with widgets, Opportunities ranked list, Keyword Rankings chart, Pending Approvals queue, Rollback Center with search, Cron Status table.
-* Internal link engine: detects orphan pages, inserts up to 3 contextual links per post per run, fully reversible via internal_links table.
-* Schema engine: auto-injects Article, BlogPosting, FAQPage, HowTo, and BreadcrumbList JSON-LD via wp_head.
-* WP-CLI suite: 10 subcommands (analyze, optimize, report, rollback, fetch-gsc, fetch-ga4, score, opportunities, status, logs).
-* Dry-run mode throughout the analysis and fix chain; --dry-run flag in all WP-CLI commands.
-* Deduplication of AI decisions: repeated cron runs update existing pending decisions rather than inserting duplicates.
-* SEO plugin bridge expanded: added AIOSEO and SEOPress support alongside Yoast, RankMath, SmartCrawl, The SEO Framework.
-* Verbose logger: configurable log levels (debug/info/warning/error) written to WP debug log or seo-agent-ai.log.
-* Queue manager: persistent batch processing with API rate limiting and exponential backoff on 429/503 responses.
-
-= 2.1.1 =
-* Always-visible authentication health banner on the Connect page that explains the most likely cause when token refresh fails (rotated client secret vs revoked refresh token).
-* Health probe result cached for 60 seconds so reloading does not hit Google's token endpoint repeatedly.
-
-= 2.1.0 =
-* Added uninstall.php for clean removal of all options, post meta, transients, custom table, and cron.
-* Encrypted Gemini API key at rest using shared crypto helper.
-* Activity-log schema upgrades automatically on plugin update (no deactivate/reactivate needed).
-* Activity-log rollback now restores meta keys across all detected SEO plugins (previously only Yoast/RankMath).
-* Replaced synchronous "Run Analysis Now" with a single-shot scheduled event to avoid PHP timeouts on slow hosts.
-* Persistent admin notice on consecutive Search Console / GA4 API failures.
-* Defensive cron rescheduling on init survives migrations and clones.
-* Wrapped previously untranslated user-facing strings; full i18n coverage under text domain seo-agent-ai.
-* Plugin header completed with Plugin URI, Author URI, License URI, Requires at least, Requires PHP, Domain Path.
-* Removed dead legacy auth class.
-
-= 2.0.0 =
-* OAuth-based Google integration (Search Console + Analytics 4).
-* AJAX batch analysis path with progress reporting.
-* Gemini AI-assisted meta title / description / focus-keyword generation.
-* Multi-SEO-plugin write bridge.
-
-= 1.0.0 =
-* Initial production release with analysis, recommendations, and safe metadata execution.
+= 0.0.1 =
+* Initial release.
 
 == Upgrade Notice ==
 
-= 3.0.0 =
-Major release. Run database upgrade automatically on activation. Adds autonomous SEO scoring, AI decision queue, 5 new DB tables, OpenAI provider support, 7 cron jobs, 6 new admin pages, and WP-CLI suite.
-
-= 2.1.1 =
-Adds an always-visible authentication health banner on the Connect page so credential failures are obvious without clicking Test Connection.
-
-= 2.1.0 =
-Hardening release: clean uninstall, encrypted API key storage, automatic schema upgrade, full rollback parity across SEO plugins, async manual analysis, persistent error notices.
+= 0.0.1 =
+Initial release.
