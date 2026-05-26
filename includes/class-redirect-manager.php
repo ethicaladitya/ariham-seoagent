@@ -331,8 +331,7 @@ class SEO_Agent_AI_Redirect_Manager {
 
 		// Use the first available group or fall back to 1.
 		$groups_table = esc_sql( $wpdb->prefix . 'redirection_groups' );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$group_id = (int) $wpdb->get_var( "SELECT id FROM `{$groups_table}` WHERE status = 'enabled' ORDER BY id ASC LIMIT 1" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+		$group_id = (int) $wpdb->get_var( "SELECT id FROM `{$groups_table}` WHERE status = 'enabled' ORDER BY id ASC LIMIT 1" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( ! $group_id ) {
 			$group_id = 1;
 		}

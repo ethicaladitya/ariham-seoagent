@@ -675,8 +675,7 @@ class SEO_Agent_AI_Plugin {
 		 GROUP BY post_id, keyword
 		 HAVING total_impressions >= 20
 		 ORDER BY keyword, total_impressions DESC';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $since ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $since ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if ( empty( $rows ) ) {
 			$this->logger->info( 'No keyword history data for cannibalization check.' );

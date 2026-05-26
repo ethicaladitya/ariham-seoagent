@@ -72,7 +72,7 @@ class SEO_Agent_AI_Rollback_Center_Page {
 					echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'seo-agent-ai' ), $pid ) ); ?></p></div>
 				<?php endif; ?>
 				<?php if ( ! empty( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
-					<div class="sai-notice n-error" style="margin-bottom:16px"><p><?php echo esc_html( sanitize_text_field( urldecode( wp_unslash( $_GET['error'] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?></p></div>
+					<div class="sai-notice n-error" style="margin-bottom:16px"><p><?php echo esc_html( sanitize_text_field( urldecode( wp_unslash( $_GET['error'] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized ?></p></div>
 				<?php endif; ?>
 
 				<div class="sai-notice n-warning" style="margin-bottom:20px">

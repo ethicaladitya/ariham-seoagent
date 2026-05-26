@@ -177,7 +177,8 @@ class SEO_Agent_AI_Rankings_Page {
 		$table  = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
-		$rows = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare(
 			"SELECT keyword, position, impressions, clicks, recorded_at
 			 FROM {$table}
 			 WHERE post_id = %d AND recorded_at >= %s
@@ -185,6 +186,7 @@ class SEO_Agent_AI_Rankings_Page {
 			$post_id,
 			$cutoff
 		), ARRAY_A );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$post  = get_post( $post_id );
 		$title = $post instanceof WP_Post ? $post->post_title : "(#{$post_id})";
@@ -223,7 +225,8 @@ class SEO_Agent_AI_Rankings_Page {
 		$table  = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
-		$rows = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare(
 			"SELECT post_id, keyword, position, impressions, clicks, recorded_at
 			 FROM {$table}
 			 WHERE keyword LIKE %s AND recorded_at >= %s
@@ -232,6 +235,7 @@ class SEO_Agent_AI_Rankings_Page {
 			'%' . $wpdb->esc_like( $keyword ) . '%',
 			$cutoff
 		), ARRAY_A );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		echo '<div class="sai-card">';
 		// translators: %s is the search keyword.
@@ -296,12 +300,13 @@ class SEO_Agent_AI_Rankings_Page {
 
 	private function render_top_movers( $days ) {
 		global $wpdb;
-		$table      = $wpdb->prefix . 'seo_agent_keyword_history';
+		$table      = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
 		$recent_cut = gmdate( 'Y-m-d', strtotime( '-' . (int) round( $days / 2 ) . ' days' ) );
 		$prior_cut  = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// Rising — wrap in subquery to avoid HAVING-alias restriction in strict MySQL.
-		$rising = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$rising = $wpdb->get_results( $wpdb->prepare(
 			"SELECT * FROM (
 			     SELECT post_id, keyword,
 			         AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,
@@ -319,7 +324,7 @@ class SEO_Agent_AI_Rankings_Page {
 		), ARRAY_A );
 
 		// Declining.
-		$declining = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$declining = $wpdb->get_results( $wpdb->prepare(
 			"SELECT * FROM (
 			     SELECT post_id, keyword,
 			         AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,
@@ -335,6 +340,7 @@ class SEO_Agent_AI_Rankings_Page {
 			$recent_cut,
 			$prior_cut
 		), ARRAY_A );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		echo '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';
 

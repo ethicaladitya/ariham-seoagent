@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 class SEO_Agent_AI_DB_Manager {
 
 	const DB_VERSION        = 2;
@@ -953,3 +954,4 @@ class SEO_Agent_AI_DB_Manager {
 		return max( 0, min( 100, (int) round( $score ) ) );
 	}
 }
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
