@@ -5,24 +5,24 @@
  * Tab 1 — Activity Log: every SEO change recorded in the DB (who, what, when, status).
  * Tab 2 — Debug Log: last N lines of the file-based logger output.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Activity_Log_Page {
+class Ariham_SEOAgent_Activity_Log_Page {
 
-	/** @var SEO_Agent_AI_Activity_Log */
+	/** @var Ariham_SEOAgent_Activity_Log */
 	private $activity_log;
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
 	public function __construct(
-		SEO_Agent_AI_Activity_Log $activity_log,
-		SEO_Agent_AI_Logger $logger
+		Ariham_SEOAgent_Activity_Log $activity_log,
+		Ariham_SEOAgent_Logger $logger
 	) {
 		$this->activity_log = $activity_log;
 		$this->logger       = $logger;
@@ -38,16 +38,16 @@ class SEO_Agent_AI_Activity_Log_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Audit &amp; Debug Log', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<nav class="sai-nav">
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=activity' ) ); ?>"
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-log&tab=activity' ) ); ?>"
 							class="sai-nav-tab<?php echo 'activity' === $tab ? ' active' : ''; ?>">
 							<?php esc_html_e( 'Activity Log', 'ariham-seoagent' ); ?>
 						</a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug' ) ); ?>"
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-log&tab=debug' ) ); ?>"
 							class="sai-nav-tab<?php echo 'debug' === $tab ? ' active' : ''; ?>">
 							<?php esc_html_e( 'Debug Log', 'ariham-seoagent' ); ?>
 						</a>
@@ -91,7 +91,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 
 		// Filter bar.
 		echo '<form method="get" class="sai-filters" style="margin-bottom:16px">';
-		echo '<input type="hidden" name="page" value="seo-agent-log">';
+		echo '<input type="hidden" name="page" value="ariham-seoagent-log">';
 		echo '<input type="hidden" name="tab" value="activity">';
 
 		echo '<label>';
@@ -117,7 +117,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 			echo '<div class="sai-empty">';
 			echo '<div class="sai-empty-icon">&#128203;</div>';
 			echo '<h3>' . esc_html__( 'No activity yet', 'ariham-seoagent' ) . '</h3>';
-			echo '<p>' . esc_html__( 'Changes made by SEO Agent AI will appear here.', 'ariham-seoagent' ) . '</p>';
+			echo '<p>' . esc_html__( 'Changes made by Ariham SEOAgent will appear here.', 'ariham-seoagent' ) . '</p>';
 			echo '</div>';
 			return;
 		}
@@ -216,7 +216,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 		echo '<div class="sai-card" style="margin-bottom:16px">';
 		echo '<div class="sai-card-body">';
 		echo '<form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
-		echo '<input type="hidden" name="page" value="seo-agent-log">';
+		echo '<input type="hidden" name="page" value="ariham-seoagent-log">';
 		echo '<input type="hidden" name="tab" value="debug">';
 
 		echo '<label>';
@@ -240,7 +240,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 
 		if ( ! file_exists( $log_path ) ) {
 			echo '<div class="sai-notice n-info"><p>' .
-				esc_html__( 'No debug log file yet — it will appear here once SEO Agent AI processes its first cron or analysis.', 'ariham-seoagent' ) .
+				esc_html__( 'No debug log file yet — it will appear here once Ariham SEOAgent processes its first cron or analysis.', 'ariham-seoagent' ) .
 				'</p></div>';
 			return;
 		}
@@ -282,16 +282,16 @@ class SEO_Agent_AI_Activity_Log_Page {
 		echo '</div></div>';
 
 		echo '<p style="margin-top:8px">';
-		echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug&clear=1&_wpnonce=' . wp_create_nonce( 'seo_agent_ai_clear_log' ) ) ) . '" class="sai-btn sai-btn-danger sai-btn-sm" onclick="return confirm(\'' . esc_js( __( 'Clear the debug log file?', 'ariham-seoagent' ) ) . '\')">';
+		echo '<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-log&tab=debug&clear=1&_wpnonce=' . wp_create_nonce( 'ariham_seoagent_clear_log' ) ) ) . '" class="sai-btn sai-btn-danger sai-btn-sm" onclick="return confirm(\'' . esc_js( __( 'Clear the debug log file?', 'ariham-seoagent' ) ) . '\')">';
 		echo '<span class="btn-label">' . esc_html__( 'Clear Log', 'ariham-seoagent' ) . '</span>';
 		echo '</a>';
 		echo '</p>';
 
 		// Handle clear action.
 		if ( ! empty( $_GET['clear'] ) && ! empty( $_GET['_wpnonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'seo_agent_ai_clear_log' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'ariham_seoagent_clear_log' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 				@file_put_contents( $log_path, '' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-				wp_safe_redirect( admin_url( 'admin.php?page=seo-agent-log&tab=debug' ) );
+				wp_safe_redirect( admin_url( 'admin.php?page=ariham-seoagent-log&tab=debug' ) );
 				exit;
 			}
 		}

@@ -2,35 +2,35 @@
 /**
  * Image SEO — alt text scoring, generation, and bulk operations.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Image_SEO {
+class Ariham_SEOAgent_Image_SEO {
 
-	/** @var SEO_Agent_AI_Gemini_Client */
+	/** @var Ariham_SEOAgent_Gemini_Client */
 	private $gemini;
 
-	/** @var SEO_Agent_AI_OpenAI_Client */
+	/** @var Ariham_SEOAgent_OpenAI_Client */
 	private $openai;
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param SEO_Agent_AI_Gemini_Client $gemini  Gemini AI client.
-	 * @param SEO_Agent_AI_OpenAI_Client $openai  OpenAI client.
-	 * @param SEO_Agent_AI_Logger        $logger  Logger.
+	 * @param Ariham_SEOAgent_Gemini_Client $gemini  Gemini AI client.
+	 * @param Ariham_SEOAgent_OpenAI_Client $openai  OpenAI client.
+	 * @param Ariham_SEOAgent_Logger        $logger  Logger.
 	 */
 	public function __construct(
-		SEO_Agent_AI_Gemini_Client $gemini,
-		SEO_Agent_AI_OpenAI_Client $openai,
-		SEO_Agent_AI_Logger $logger
+		Ariham_SEOAgent_Gemini_Client $gemini,
+		Ariham_SEOAgent_OpenAI_Client $openai,
+		Ariham_SEOAgent_Logger $logger
 	) {
 		$this->gemini = $gemini;
 		$this->openai = $openai;
@@ -42,8 +42,8 @@ class SEO_Agent_AI_Image_SEO {
 	// -------------------------------------------------------------------
 
 	public function init_hooks() {
-		add_action( 'wp_ajax_seo_agent_ai_generate_alt', array( $this, 'ajax_generate_alt' ) );
-		add_action( 'wp_ajax_seo_agent_ai_bulk_generate_alt', array( $this, 'ajax_bulk_generate_alt' ) );
+		add_action( 'wp_ajax_ariham_seoagent_generate_alt', array( $this, 'ajax_generate_alt' ) );
+		add_action( 'wp_ajax_ariham_seoagent_bulk_generate_alt', array( $this, 'ajax_bulk_generate_alt' ) );
 	}
 
 	// -------------------------------------------------------------------
@@ -130,7 +130,7 @@ class SEO_Agent_AI_Image_SEO {
 
 		$ai_generated = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			"SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta}
-			 WHERE meta_key = '_seo_agent_ai_alt_generated' AND meta_value = '1'"
+			 WHERE meta_key = '_ariham_seoagent_alt_generated' AND meta_value = '1'"
 		);
 
 		return compact( 'total', 'missing_alt', 'ai_generated' );
@@ -267,13 +267,13 @@ class SEO_Agent_AI_Image_SEO {
 			$parent = get_post( (int) $post_id );
 			if ( $parent ) {
 				$post_title = $parent->post_title;
-				$keyword    = (string) get_post_meta( (int) $post_id, '_seo_agent_ai_focus_keyword', true );
+				$keyword    = (string) get_post_meta( (int) $post_id, '_ariham_seoagent_focus_keyword', true );
 			}
 		} elseif ( $post->post_parent ) {
 			$parent = get_post( $post->post_parent );
 			if ( $parent ) {
 				$post_title = $parent->post_title;
-				$keyword    = (string) get_post_meta( $post->post_parent, '_seo_agent_ai_focus_keyword', true );
+				$keyword    = (string) get_post_meta( $post->post_parent, '_ariham_seoagent_focus_keyword', true );
 			}
 		}
 
@@ -288,7 +288,7 @@ class SEO_Agent_AI_Image_SEO {
 			$keyword
 		);
 
-		$provider = get_option( 'seo_agent_ai_ai_provider', 'gemini' );
+		$provider = get_option( 'ariham_seoagent_ai_provider', 'gemini' );
 
 		// Use vision (complete_with_image) when an image URL is available.
 		// Both clients fall back to text-only internally if vision fails.
@@ -346,7 +346,7 @@ class SEO_Agent_AI_Image_SEO {
 		}
 
 		update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $alt_text ) );
-		update_post_meta( $attachment_id, '_seo_agent_ai_alt_generated', '1' );
+		update_post_meta( $attachment_id, '_ariham_seoagent_alt_generated', '1' );
 
 		$this->logger->info( 'Generated alt text for attachment ' . $attachment_id );
 
@@ -390,7 +390,7 @@ class SEO_Agent_AI_Image_SEO {
 	// -------------------------------------------------------------------
 
 	public function ajax_generate_alt() {
-		check_ajax_referer( 'seo_agent_ai_image_seo', 'nonce' );
+		check_ajax_referer( 'ariham_seoagent_image_seo', 'nonce' );
 
 		if ( ! current_user_can( 'upload_files' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'ariham-seoagent' ), 403 );
@@ -413,7 +413,7 @@ class SEO_Agent_AI_Image_SEO {
 	}
 
 	public function ajax_bulk_generate_alt() {
-		check_ajax_referer( 'seo_agent_ai_image_seo', 'nonce' );
+		check_ajax_referer( 'ariham_seoagent_image_seo', 'nonce' );
 
 		if ( ! current_user_can( 'upload_files' ) ) {
 			wp_send_json_error( __( 'Unauthorized.', 'ariham-seoagent' ), 403 );

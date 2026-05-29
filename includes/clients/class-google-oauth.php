@@ -10,26 +10,26 @@
  *   - Scopes: webmasters.readonly, analytics.readonly, userinfo.email
  *   - Redirect URI: value returned by ::get_redirect_uri()
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Google_OAuth {
+class Ariham_SEOAgent_Google_OAuth {
 
 	// -----------------------------------------------------------------------
 	// Option / transient keys
 	// -----------------------------------------------------------------------
 
-	const OPTION_CLIENT_ID        = 'seo_agent_ai_google_client_id';
-	const OPTION_CLIENT_SECRET    = 'seo_agent_ai_google_client_secret';
-	const OPTION_REFRESH_TOKEN    = 'seo_agent_ai_google_refresh_token';
-	const OPTION_ACCESS_TOKEN     = 'seo_agent_ai_google_access_token';
-	const OPTION_TOKEN_EXPIRES_AT = 'seo_agent_ai_google_access_token_expires_at';
-	const OPTION_CONNECTED_EMAIL  = 'seo_agent_ai_google_connected_email';
-	const TRANSIENT_OAUTH_STATE   = 'seo_agent_ai_oauth_state';
+	const OPTION_CLIENT_ID        = 'ariham_seoagent_google_client_id';
+	const OPTION_CLIENT_SECRET    = 'ariham_seoagent_google_client_secret';
+	const OPTION_REFRESH_TOKEN    = 'ariham_seoagent_google_refresh_token';
+	const OPTION_ACCESS_TOKEN     = 'ariham_seoagent_google_access_token';
+	const OPTION_TOKEN_EXPIRES_AT = 'ariham_seoagent_google_access_token_expires_at';
+	const OPTION_CONNECTED_EMAIL  = 'ariham_seoagent_google_connected_email';
+	const TRANSIENT_OAUTH_STATE   = 'ariham_seoagent_oauth_state';
 
 	// -----------------------------------------------------------------------
 	// OAuth parameters
@@ -82,7 +82,7 @@ class SEO_Agent_AI_Google_OAuth {
 	public function get_authorize_url() {
 		if ( ! $this->is_configured() ) {
 			return new WP_Error(
-				'seo_agent_ai_oauth_not_configured',
+				'ariham_seoagent_oauth_not_configured',
 				__( 'Enter your OAuth Client ID and Client Secret before connecting.', 'ariham-seoagent' )
 			);
 		}
@@ -117,7 +117,7 @@ class SEO_Agent_AI_Google_OAuth {
 
 		if ( $saved_state === false || ! hash_equals( (string) $saved_state, (string) $state ) ) {
 			return new WP_Error(
-				'seo_agent_ai_oauth_state_mismatch',
+				'ariham_seoagent_oauth_state_mismatch',
 				__( 'OAuth state mismatch. Possible CSRF attempt. Please try connecting again.', 'ariham-seoagent' )
 			);
 		}
@@ -137,7 +137,7 @@ class SEO_Agent_AI_Google_OAuth {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return new WP_Error( 'seo_agent_ai_oauth_request_failed', $response->get_error_message() );
+			return new WP_Error( 'ariham_seoagent_oauth_request_failed', $response->get_error_message() );
 		}
 
 		$status = (int) wp_remote_retrieve_response_code( $response );
@@ -146,7 +146,7 @@ class SEO_Agent_AI_Google_OAuth {
 		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) ) {
 			$msg = isset( $data['error_description'] ) ? (string) $data['error_description']
 				: __( 'Token exchange failed.', 'ariham-seoagent' );
-			return new WP_Error( 'seo_agent_ai_oauth_token_error', $msg );
+			return new WP_Error( 'ariham_seoagent_oauth_token_error', $msg );
 		}
 
 		$this->store_tokens( $data );
@@ -161,9 +161,9 @@ class SEO_Agent_AI_Google_OAuth {
 	 * banner and the API-failure notice flip back to green immediately.
 	 */
 	private function reset_auth_health_signals() {
-		delete_transient( 'seo_agent_ai_auth_health' );
-		delete_option( 'seo_agent_ai_consecutive_api_failures' );
-		delete_option( 'seo_agent_ai_last_api_error' );
+		delete_transient( 'ariham_seoagent_auth_health' );
+		delete_option( 'ariham_seoagent_consecutive_api_failures' );
+		delete_option( 'ariham_seoagent_last_api_error' );
 	}
 
 	/**
@@ -181,8 +181,8 @@ class SEO_Agent_AI_Google_OAuth {
 		$refresh_token = $this->get_stored_refresh_token();
 		if ( $refresh_token === '' ) {
 			return new WP_Error(
-				'seo_agent_ai_not_connected',
-				__( 'Google account is not connected. Go to SEO Agent AI → Connect Google to authenticate.', 'ariham-seoagent' )
+				'ariham_seoagent_not_connected',
+				__( 'Google account is not connected. Go to Ariham SEOAgent → Connect Google to authenticate.', 'ariham-seoagent' )
 			);
 		}
 
@@ -229,7 +229,7 @@ class SEO_Agent_AI_Google_OAuth {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return new WP_Error( 'seo_agent_ai_oauth_refresh_failed', $response->get_error_message() );
+			return new WP_Error( 'ariham_seoagent_oauth_refresh_failed', $response->get_error_message() );
 		}
 
 		$status = (int) wp_remote_retrieve_response_code( $response );
@@ -238,7 +238,7 @@ class SEO_Agent_AI_Google_OAuth {
 		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) ) {
 			$msg = isset( $data['error_description'] ) ? (string) $data['error_description']
 				: __( 'Could not refresh access token.', 'ariham-seoagent' );
-			return new WP_Error( 'seo_agent_ai_oauth_refresh_error', $msg );
+			return new WP_Error( 'ariham_seoagent_oauth_refresh_error', $msg );
 		}
 
 		$access_token = sanitize_text_field( (string) $data['access_token'] );
@@ -310,16 +310,16 @@ class SEO_Agent_AI_Google_OAuth {
 	}
 
 	private function encrypt( $value ) {
-		return SEO_Agent_AI_Crypto::encrypt( $value );
+		return Ariham_SEOAgent_Crypto::encrypt( $value );
 	}
 
 	private function decrypt( $value ) {
-		return SEO_Agent_AI_Crypto::decrypt( $value );
+		return Ariham_SEOAgent_Crypto::decrypt( $value );
 	}
 
 	private function get_client_id() {
-		if ( defined( 'SEO_AGENT_AI_GOOGLE_CLIENT_ID' ) ) {
-			$v = constant( 'SEO_AGENT_AI_GOOGLE_CLIENT_ID' );
+		if ( defined( 'ARIHAM_SEOAGENT_GOOGLE_CLIENT_ID' ) ) {
+			$v = constant( 'ARIHAM_SEOAGENT_GOOGLE_CLIENT_ID' );
 			if ( is_string( $v ) && trim( $v ) !== '' ) {
 				return trim( $v );
 			}
@@ -328,13 +328,13 @@ class SEO_Agent_AI_Google_OAuth {
 	}
 
 	private function get_client_secret() {
-		if ( defined( 'SEO_AGENT_AI_GOOGLE_CLIENT_SECRET' ) ) {
-			$v = constant( 'SEO_AGENT_AI_GOOGLE_CLIENT_SECRET' );
+		if ( defined( 'ARIHAM_SEOAGENT_GOOGLE_CLIENT_SECRET' ) ) {
+			$v = constant( 'ARIHAM_SEOAGENT_GOOGLE_CLIENT_SECRET' );
 			if ( is_string( $v ) && trim( $v ) !== '' ) {
 				return trim( $v );
 			}
 		}
 		$stored = (string) get_option( self::OPTION_CLIENT_SECRET, '' );
-		return $stored !== '' ? SEO_Agent_AI_Crypto::decrypt( $stored ) : '';
+		return $stored !== '' ? Ariham_SEOAgent_Crypto::decrypt( $stored ) : '';
 	}
 }

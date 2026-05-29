@@ -2,19 +2,19 @@
 /**
  * Image SEO admin page — stats, missing alt text table, bulk generation.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Image_SEO_Page {
+class Ariham_SEOAgent_Image_SEO_Page {
 
-	/** @var SEO_Agent_AI_Image_SEO */
+	/** @var Ariham_SEOAgent_Image_SEO */
 	private $image_seo;
 
-	public function __construct( SEO_Agent_AI_Image_SEO $image_seo ) {
+	public function __construct( Ariham_SEOAgent_Image_SEO $image_seo ) {
 		$this->image_seo = $image_seo;
 	}
 
@@ -33,7 +33,7 @@ class SEO_Agent_AI_Image_SEO_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Image SEO', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
@@ -140,12 +140,12 @@ class SEO_Agent_AI_Image_SEO_Page {
 
 		<?php ob_start(); ?>
 		(function($){
-			var nonce = '<?php echo esc_js( wp_create_nonce( 'seo_agent_ai_image_seo' ) ); ?>';
+			var nonce = '<?php echo esc_js( wp_create_nonce( 'ariham_seoagent_image_seo' ) ); ?>';
 
 			function generateAlt( id, btn, resultEl, onDone ) {
 				btn.prop('disabled', true).find('.btn-label').text('<?php echo esc_js( __( 'Generating…', 'ariham-seoagent' ) ); ?>');
 				$.post(ajaxurl, {
-					action: 'seo_agent_ai_generate_alt',
+					action: 'ariham_seoagent_generate_alt',
 					attachment_id: id,
 					nonce: nonce
 				}, function(res){

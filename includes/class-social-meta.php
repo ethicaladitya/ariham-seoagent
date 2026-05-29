@@ -2,14 +2,14 @@
 /**
  * Social Meta — Open Graph and Twitter Card tags, plus webmaster verification.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Social_Meta {
+class Ariham_SEOAgent_Social_Meta {
 
 	// -------------------------------------------------------------------
 	// Hooks
@@ -25,7 +25,7 @@ class SEO_Agent_AI_Social_Meta {
 	// -------------------------------------------------------------------
 
 	public function output_meta_tags() {
-		if ( ! (bool) get_option( 'seo_agent_ai_social_meta_enabled', true ) ) {
+		if ( ! (bool) get_option( 'ariham_seoagent_social_meta_enabled', true ) ) {
 			return;
 		}
 
@@ -47,12 +47,12 @@ class SEO_Agent_AI_Social_Meta {
 		$post_id = (int) $post->ID;
 
 		// Determine values — custom overrides take precedence.
-		$og_title = (string) get_post_meta( $post_id, '_seo_agent_ai_og_title', true );
+		$og_title = (string) get_post_meta( $post_id, '_ariham_seoagent_og_title', true );
 		if ( ! $og_title ) {
 			$og_title = get_the_title( $post_id );
 		}
 
-		$og_desc = (string) get_post_meta( $post_id, '_seo_agent_ai_og_description', true );
+		$og_desc = (string) get_post_meta( $post_id, '_ariham_seoagent_og_description', true );
 		if ( ! $og_desc ) {
 			$og_desc = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : wp_trim_words( wp_strip_all_tags( $post->post_content ), 30, '' );
 		}
@@ -62,7 +62,7 @@ class SEO_Agent_AI_Social_Meta {
 
 		// Image — custom override first.
 		$og_image    = '';
-		$og_image_id = (int) get_post_meta( $post_id, '_seo_agent_ai_og_image_id', true );
+		$og_image_id = (int) get_post_meta( $post_id, '_ariham_seoagent_og_image_id', true );
 		if ( $og_image_id ) {
 			$src      = wp_get_attachment_image_src( $og_image_id, 'large' );
 			$og_image = $src ? (string) $src[0] : '';
@@ -108,9 +108,9 @@ class SEO_Agent_AI_Social_Meta {
 	// -------------------------------------------------------------------
 
 	private function output_homepage_tags() {
-		$title     = (string) get_option( 'seo_agent_ai_homepage_og_title', '' );
-		$desc      = (string) get_option( 'seo_agent_ai_homepage_og_description', '' );
-		$image_url = (string) get_option( 'seo_agent_ai_homepage_og_image', '' );
+		$title     = (string) get_option( 'ariham_seoagent_homepage_og_title', '' );
+		$desc      = (string) get_option( 'ariham_seoagent_homepage_og_description', '' );
+		$image_url = (string) get_option( 'ariham_seoagent_homepage_og_image', '' );
 		$site_name = get_bloginfo( 'name' );
 
 		if ( ! $title ) {
@@ -174,9 +174,9 @@ class SEO_Agent_AI_Social_Meta {
 	// -------------------------------------------------------------------
 
 	public function output_verification_tags() {
-		$google = (string) get_option( 'seo_agent_ai_google_verification', '' );
-		$bing   = (string) get_option( 'seo_agent_ai_bing_verification', '' );
-		$yandex = (string) get_option( 'seo_agent_ai_yandex_verification', '' );
+		$google = (string) get_option( 'ariham_seoagent_google_verification', '' );
+		$bing   = (string) get_option( 'ariham_seoagent_bing_verification', '' );
+		$yandex = (string) get_option( 'ariham_seoagent_yandex_verification', '' );
 
 		if ( $google ) {
 			echo '<meta name="google-site-verification" content="' . esc_attr( $google ) . '" />' . "\n";
@@ -202,9 +202,9 @@ class SEO_Agent_AI_Social_Meta {
 	public function get_post_social_data( $post_id ) {
 		$post_id  = (int) $post_id;
 		$post     = get_post( $post_id );
-		$og_title = (string) get_post_meta( $post_id, '_seo_agent_ai_og_title', true );
-		$og_desc  = (string) get_post_meta( $post_id, '_seo_agent_ai_og_description', true );
-		$img_id   = (int) get_post_meta( $post_id, '_seo_agent_ai_og_image_id', true );
+		$og_title = (string) get_post_meta( $post_id, '_ariham_seoagent_og_title', true );
+		$og_desc  = (string) get_post_meta( $post_id, '_ariham_seoagent_og_description', true );
+		$img_id   = (int) get_post_meta( $post_id, '_ariham_seoagent_og_image_id', true );
 
 		return array(
 			'og_title'       => $og_title,

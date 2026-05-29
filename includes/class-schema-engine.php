@@ -11,25 +11,25 @@
  * to that plugin and only add what it cannot detect: FAQPage items found in the
  * post content.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Schema_Engine {
+class Ariham_SEOAgent_Schema_Engine {
 
-	/** @var SEO_Agent_AI_Content_Analyzer */
+	/** @var Ariham_SEOAgent_Content_Analyzer */
 	private $content_analyzer;
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
-	const CACHE_PREFIX = 'seo_agent_schema_';
+	const CACHE_PREFIX = 'ariham_seoagent_schema_';
 	const CACHE_TTL    = 12 * HOUR_IN_SECONDS;
 
-	public function __construct( SEO_Agent_AI_Content_Analyzer $content_analyzer, SEO_Agent_AI_Logger $logger ) {
+	public function __construct( Ariham_SEOAgent_Content_Analyzer $content_analyzer, Ariham_SEOAgent_Logger $logger ) {
 		$this->content_analyzer = $content_analyzer;
 		$this->logger           = $logger;
 	}
@@ -262,7 +262,7 @@ class SEO_Agent_AI_Schema_Engine {
 	private function build_webpage( WP_Post $post, array $content ) {
 		$description = trim( wp_strip_all_tags( $post->post_excerpt ) );
 		if ( '' === $description ) {
-			$meta_desc = get_post_meta( $post->ID, '_seo_agent_ai_meta_description', true );
+			$meta_desc = get_post_meta( $post->ID, '_ariham_seoagent_meta_description', true );
 			if ( $meta_desc ) {
 				$description = trim( wp_strip_all_tags( (string) $meta_desc ) );
 			}

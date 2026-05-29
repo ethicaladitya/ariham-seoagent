@@ -6,26 +6,26 @@
  * including before/after diffs, the reasoning behind each change, and a
  * one-click rollback button per entry.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Report_Page {
+class Ariham_SEOAgent_Report_Page {
 
 	const PER_PAGE = 20;
 
-	/** @var SEO_Agent_AI_Activity_Log */
+	/** @var Ariham_SEOAgent_Activity_Log */
 	private $activity_log;
 
-	/** @var SEO_Agent_AI_Data_Store */
+	/** @var Ariham_SEOAgent_Data_Store */
 	private $data_store;
 
 	public function __construct(
-		SEO_Agent_AI_Activity_Log $activity_log,
-		SEO_Agent_AI_Data_Store $data_store
+		Ariham_SEOAgent_Activity_Log $activity_log,
+		Ariham_SEOAgent_Data_Store $data_store
 	) {
 		$this->activity_log = $activity_log;
 		$this->data_store   = $data_store;
@@ -40,7 +40,7 @@ class SEO_Agent_AI_Report_Page {
 			return;
 		}
 
-		$notice  = filter_input( INPUT_GET, 'seo_agent_ai_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$notice  = filter_input( INPUT_GET, 'ariham_seoagent_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$notice  = is_string( $notice ) ? sanitize_key( wp_unslash( $notice ) ) : '';
 		$filters = $this->get_filters_from_request();
 		$page    = max( 1, (int) filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) );
@@ -49,14 +49,14 @@ class SEO_Agent_AI_Report_Page {
 		$pages   = (int) ceil( $total / self::PER_PAGE );
 
 		// Summary stats (always without filters).
-		$applied_count   = $this->activity_log->get_count( array( 'status' => SEO_Agent_AI_Activity_Log::STATUS_APPLIED ) );
-		$rolled_back     = $this->activity_log->get_count( array( 'status' => SEO_Agent_AI_Activity_Log::STATUS_ROLLED_BACK ) );
-		$autopilot_count = $this->activity_log->get_count( array( 'triggered_by' => SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT ) );
+		$applied_count   = $this->activity_log->get_count( array( 'status' => Ariham_SEOAgent_Activity_Log::STATUS_APPLIED ) );
+		$rolled_back     = $this->activity_log->get_count( array( 'status' => Ariham_SEOAgent_Activity_Log::STATUS_ROLLED_BACK ) );
+		$autopilot_count = $this->activity_log->get_count( array( 'triggered_by' => Ariham_SEOAgent_Activity_Log::TRIGGER_AUTOPILOT ) );
 		?>
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Analysis Report', 'ariham-seoagent' ); ?></h1>
 				</div>
 			</div>
@@ -218,7 +218,7 @@ class SEO_Agent_AI_Report_Page {
 		$post       = $entry_post ? get_post( $entry_post ) : null;
 		$post_title = $post instanceof WP_Post ? get_the_title( $entry_post ) : __( '(deleted)', 'ariham-seoagent' );
 		$edit_link  = $post instanceof WP_Post ? get_edit_post_link( $entry_post ) : '';
-		$is_applied = $status === SEO_Agent_AI_Activity_Log::STATUS_APPLIED;
+		$is_applied = $status === Ariham_SEOAgent_Activity_Log::STATUS_APPLIED;
 
 		echo '<tr>';
 
@@ -321,8 +321,8 @@ class SEO_Agent_AI_Report_Page {
 		echo '<td>';
 		if ( $is_applied && $entry_post ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			wp_nonce_field( 'seo_agent_ai_rollback' );
-			echo '<input type="hidden" name="action" value="seo_agent_ai_rollback">';
+			wp_nonce_field( 'ariham_seoagent_rollback' );
+			echo '<input type="hidden" name="action" value="ariham_seoagent_rollback">';
 			echo '<input type="hidden" name="log_id" value="' . esc_attr( (string) $entry_id ) . '">';
 			echo '<input type="hidden" name="post_id" value="' . esc_attr( (string) $entry_post ) . '">';
 			echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"'

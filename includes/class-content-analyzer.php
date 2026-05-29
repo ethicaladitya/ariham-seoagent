@@ -5,14 +5,14 @@
  * Provides heading audit, FAQ detection, schema detection, entity extraction,
  * freshness signals, and content decay indicators — all without external API calls.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Content_Analyzer {
+class Ariham_SEOAgent_Content_Analyzer {
 
 	// -------------------------------------------------------------------
 	// Main entry point

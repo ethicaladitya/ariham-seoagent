@@ -2,19 +2,19 @@
 /**
  * SEO Opportunities admin page.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Opportunities_Page {
+class Ariham_SEOAgent_Opportunities_Page {
 
-	/** @var SEO_Agent_AI_Decision_Engine */
+	/** @var Ariham_SEOAgent_Decision_Engine */
 	private $decision_engine;
 
-	public function __construct( SEO_Agent_AI_Decision_Engine $decision_engine ) {
+	public function __construct( Ariham_SEOAgent_Decision_Engine $decision_engine ) {
 		$this->decision_engine = $decision_engine;
 	}
 
@@ -23,14 +23,14 @@ class SEO_Agent_AI_Opportunities_Page {
 			wp_die( esc_html__( 'You do not have sufficient permissions.', 'ariham-seoagent' ) );
 		}
 
-		$autopilot   = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
+		$autopilot   = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
 		$filter_type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$filter_risk = isset( $_GET['risk'] ) ? sanitize_text_field( wp_unslash( $_GET['risk'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$paged       = max( 1, absint( wp_unslash( $_GET['paged'] ?? 1 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$per_page    = 20;
 
 		$args = array(
-			'status' => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+			'status' => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 			'limit'  => $per_page,
 			'offset' => ( $paged - 1 ) * $per_page,
 		);
@@ -41,8 +41,8 @@ class SEO_Agent_AI_Opportunities_Page {
 			$args['risk_level'] = $filter_risk;
 		}
 
-		$decisions = SEO_Agent_AI_DB_Manager::get_decisions( $args );
-		$total     = SEO_Agent_AI_DB_Manager::count_decisions( SEO_Agent_AI_DB_Manager::STATUS_PENDING );
+		$decisions = Ariham_SEOAgent_DB_Manager::get_decisions( $args );
+		$total     = Ariham_SEOAgent_DB_Manager::count_decisions( Ariham_SEOAgent_DB_Manager::STATUS_PENDING );
 
 		?>
 		<div class="wrap sai-page">
@@ -51,7 +51,7 @@ class SEO_Agent_AI_Opportunities_Page {
 				<div class="sai-header-left">
 					<p class="sai-header-eyebrow">
 						<span class="sai-dot pulsing-green"></span>
-						<?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?>
+						<?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?>
 					</p>
 					<h1 class="sai-header-title">
 						<?php esc_html_e( 'Opportunities', 'ariham-seoagent' ); ?>
@@ -61,8 +61,8 @@ class SEO_Agent_AI_Opportunities_Page {
 				<div class="sai-header-actions">
 					<?php if ( $autopilot ) : ?>
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-						<?php wp_nonce_field( 'seo_agent_ai_bulk_apply_safe', '_wpnonce' ); ?>
-						<input type="hidden" name="action" value="seo_agent_ai_bulk_apply_safe">
+						<?php wp_nonce_field( 'ariham_seoagent_bulk_apply_safe', '_wpnonce' ); ?>
+						<input type="hidden" name="action" value="ariham_seoagent_bulk_apply_safe">
 						<button type="submit" class="sai-btn sai-btn-success"
 							onclick="return confirm('<?php echo esc_js( __( 'Apply all safe opportunities now?', 'ariham-seoagent' ) ); ?>')">
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
@@ -211,11 +211,11 @@ class SEO_Agent_AI_Opportunities_Page {
 
 			echo '<div class="sai-decision-actions">';
 			if ( $autopilot && $is_safe ) {
-				echo '<button class="sai-btn sai-btn-success sai-btn-sm" data-decision-action="approve" data-decision-id="' . esc_attr( $dec_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'seo_agent_ai_decision_' . $dec_id ) ) . '"><span class="btn-label">' . esc_html__( 'Apply', 'ariham-seoagent' ) . '</span></button>';
+				echo '<button class="sai-btn sai-btn-success sai-btn-sm" data-decision-action="approve" data-decision-id="' . esc_attr( $dec_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'ariham_seoagent_decision_' . $dec_id ) ) . '"><span class="btn-label">' . esc_html__( 'Apply', 'ariham-seoagent' ) . '</span></button>';
 			} else {
-				echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-approvals&decision_id=' . $dec_id ) ) . '" class="sai-btn sai-btn-success sai-btn-sm"><span class="btn-label">' . esc_html__( 'Review', 'ariham-seoagent' ) . '</span></a>';
+				echo '<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-approvals&decision_id=' . $dec_id ) ) . '" class="sai-btn sai-btn-success sai-btn-sm"><span class="btn-label">' . esc_html__( 'Review', 'ariham-seoagent' ) . '</span></a>';
 			}
-			echo '<button class="sai-btn sai-btn-danger sai-btn-sm" data-decision-action="reject" data-decision-id="' . esc_attr( $dec_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'seo_agent_ai_decision_' . $dec_id ) ) . '"><span class="btn-label">' . esc_html__( 'Dismiss', 'ariham-seoagent' ) . '</span></button>';
+			echo '<button class="sai-btn sai-btn-danger sai-btn-sm" data-decision-action="reject" data-decision-id="' . esc_attr( $dec_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'ariham_seoagent_decision_' . $dec_id ) ) . '"><span class="btn-label">' . esc_html__( 'Dismiss', 'ariham-seoagent' ) . '</span></button>';
 			echo '</div>';
 
 			echo '</div>';// .sai-decision-header
@@ -242,11 +242,11 @@ class SEO_Agent_AI_Opportunities_Page {
 
 		// Hidden forms for AJAX-backed approve/reject actions.
 		echo '<form id="sai-decision-form" method="post" action="' . esc_url( $admin_post_url ) . '" style="display:none">';
-		echo '<input type="hidden" name="action" value="seo_agent_ai_decision">';
+		echo '<input type="hidden" name="action" value="ariham_seoagent_decision">';
 		echo '<input type="hidden" name="seo_action" id="sai-decision-seo-action" value="">';
 		echo '<input type="hidden" name="decision_id" id="sai-decision-id" value="">';
 		echo '<input type="hidden" name="_wpnonce" id="sai-decision-nonce" value="">';
-		echo '<input type="hidden" name="redirect_to" value="seo-agent-opportunities">';
+		echo '<input type="hidden" name="redirect_to" value="ariham-seoagent-opportunities">';
 		echo '</form>';
 	}
 
@@ -265,7 +265,7 @@ class SEO_Agent_AI_Opportunities_Page {
 		);
 
 		echo '<form method="get" class="sai-filters">';
-		echo '<input type="hidden" name="page" value="seo-agent-opportunities">';
+		echo '<input type="hidden" name="page" value="ariham-seoagent-opportunities">';
 
 		echo '<label>' . esc_html__( 'Type', 'ariham-seoagent' ) . '<select name="type">';
 		foreach ( $types as $val => $label ) {
@@ -355,7 +355,7 @@ class SEO_Agent_AI_Opportunities_Page {
 	// -------------------------------------------------------------------
 
 	private function render_scan_js() {
-		$nonce = wp_create_nonce( 'seo_agent_ai_analyze_batch' );
+		$nonce = wp_create_nonce( 'ariham_seoagent_analyze_batch' );
 		?>
 		<?php ob_start(); ?>
 		(function () {
@@ -391,7 +391,7 @@ class SEO_Agent_AI_Opportunities_Page {
 
 			function runBatch(offset) {
 				var body = new FormData();
-				body.append('action',      'seo_agent_ai_analyze_batch');
+				body.append('action',      'ariham_seoagent_analyze_batch');
 				body.append('_ajax_nonce', nonce);
 				body.append('offset',      offset);
 

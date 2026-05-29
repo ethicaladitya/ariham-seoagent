@@ -11,14 +11,14 @@
  *   - All in One SEO (AIOSEO)
  *   - SEOPress
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_SEO_Plugin_Bridge {
+class Ariham_SEOAgent_SEO_Plugin_Bridge {
 
 	/**
 	 * Meta key definitions keyed by plugin slug.
@@ -149,7 +149,7 @@ class SEO_Agent_AI_SEO_Plugin_Bridge {
 	 * @return string
 	 */
 	public function get_meta_title( $post_id ) {
-		$own = (string) get_post_meta( $post_id, '_seo_agent_ai_meta_title', true );
+		$own = (string) get_post_meta( $post_id, '_ariham_seoagent_meta_title', true );
 		if ( $own !== '' ) {
 			return $own;
 		}
@@ -163,7 +163,7 @@ class SEO_Agent_AI_SEO_Plugin_Bridge {
 	 * @return string
 	 */
 	public function get_meta_description( $post_id ) {
-		$own = (string) get_post_meta( $post_id, '_seo_agent_ai_meta_description', true );
+		$own = (string) get_post_meta( $post_id, '_ariham_seoagent_meta_description', true );
 		if ( $own !== '' ) {
 			return $own;
 		}
@@ -192,7 +192,7 @@ class SEO_Agent_AI_SEO_Plugin_Bridge {
 	 */
 	public function set_meta_title( $post_id, $value ) {
 		$value = sanitize_text_field( (string) $value );
-		update_post_meta( $post_id, '_seo_agent_ai_meta_title', $value );
+		update_post_meta( $post_id, '_ariham_seoagent_meta_title', $value );
 		$this->write_field( $post_id, 'title', $value );
 	}
 
@@ -204,7 +204,7 @@ class SEO_Agent_AI_SEO_Plugin_Bridge {
 	 */
 	public function set_meta_description( $post_id, $value ) {
 		$value = sanitize_textarea_field( (string) $value );
-		update_post_meta( $post_id, '_seo_agent_ai_meta_description', $value );
+		update_post_meta( $post_id, '_ariham_seoagent_meta_description', $value );
 		$this->write_field( $post_id, 'description', $value );
 	}
 
@@ -265,7 +265,7 @@ class SEO_Agent_AI_SEO_Plugin_Bridge {
 	 * @return string[]
 	 */
 	public function get_all_backup_keys( $field ) {
-		$keys = array( '_seo_agent_ai_meta_' . $field );
+		$keys = array( '_ariham_seoagent_meta_' . $field );
 		foreach ( self::PLUGIN_META as $plugin_meta ) {
 			if ( ! empty( $plugin_meta[ $field ] ) ) {
 				$keys[] = $plugin_meta[ $field ];

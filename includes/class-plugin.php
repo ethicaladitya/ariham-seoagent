@@ -5,129 +5,136 @@
  * Wires all modules together, registers WordPress hooks, and coordinates
  * analysis, autopilot, rollbacks, and OAuth.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Plugin {
+class Ariham_SEOAgent_Plugin {
 
-	const ANALYSIS_LOCK_KEY         = 'seo_agent_ai_analysis_lock';
+	const ANALYSIS_LOCK_KEY         = 'ariham_seoagent_analysis_lock';
 	const ANALYSIS_LOCK_TTL         = 15 * MINUTE_IN_SECONDS;
-	const CONNECTION_TEST_TRANSIENT = 'seo_agent_ai_connection_test_result';
-	const DAILY_AP_TRANSIENT_PREFIX = 'seo_agent_ai_ap_count_';
-	const BATCH_ANALYSIS_KEY        = 'seo_agent_ai_batch_state';
-	const OPTION_API_FAILURES       = 'seo_agent_ai_consecutive_api_failures';
-	const OPTION_LAST_API_ERROR     = 'seo_agent_ai_last_api_error';
+	const CONNECTION_TEST_TRANSIENT = 'ariham_seoagent_connection_test_result';
+	const DAILY_AP_TRANSIENT_PREFIX = 'ariham_seoagent_ap_count_';
+	const BATCH_ANALYSIS_KEY        = 'ariham_seoagent_batch_state';
+	const OPTION_API_FAILURES       = 'ariham_seoagent_consecutive_api_failures';
+	const OPTION_LAST_API_ERROR     = 'ariham_seoagent_last_api_error';
 	const API_FAILURE_NOTICE_AFTER  = 2;
-	const CRON_HOOK_DAILY           = 'seo_agent_ai_daily_analysis';
-	const CRON_HOOK_MANUAL          = 'seo_agent_ai_run_manual_analysis';
-	const CRON_HOOK_GSC             = 'seo_agent_fetch_gsc_data';
-	const CRON_HOOK_GA4             = 'seo_agent_fetch_ga4_data';
-	const CRON_HOOK_REPORT          = 'seo_agent_generate_report';
-	const CRON_HOOK_SCORE           = 'seo_agent_score_pages';
-	const CRON_HOOK_DECAY           = 'seo_agent_detect_decay';
-	const CRON_HOOK_LINKS           = 'seo_agent_run_internal_links';
-	const CRON_HOOK_PURGE           = 'seo_agent_purge_old_data';
-	const CRON_HOOK_CANNIBAL        = 'seo_agent_detect_cannibalization';
-	const CRON_HOOK_IMPROVE         = 'seo_agent_score_and_improve';
-	const CRON_HOOK_ORPHAN          = 'seo_agent_detect_orphans';
-	const CRON_HOOK_IMAGE_ALTS      = 'seo_agent_generate_image_alts';
-	const CRON_HOOK_OBSERVE         = 'seo_agent_observe_results';
-	const CRON_HOOK_CWV             = 'seo_agent_fetch_cwv_data';
-	const CRON_HOOK_HEALTH          = 'seo_agent_health_check';
-	const CRON_HOOK_AUTO_REDIRECT   = 'seo_agent_auto_redirect_404s';
-	const CRON_HOOK_WEEKLY_EMAIL    = 'seo_agent_weekly_ranking_email';
+	const CRON_HOOK_DAILY           = 'ariham_seoagent_daily_analysis';
+	const CRON_HOOK_MANUAL          = 'ariham_seoagent_run_manual_analysis';
+	const CRON_HOOK_GSC             = 'ariham_seoagent_fetch_gsc_data';
+	const CRON_HOOK_GA4             = 'ariham_seoagent_fetch_ga4_data';
+	const CRON_HOOK_REPORT          = 'ariham_seoagent_generate_report';
+	const CRON_HOOK_SCORE           = 'ariham_seoagent_score_pages';
+	const CRON_HOOK_DECAY           = 'ariham_seoagent_detect_decay';
+	const CRON_HOOK_LINKS           = 'ariham_seoagent_run_internal_links';
+	const CRON_HOOK_PURGE           = 'ariham_seoagent_purge_old_data';
+	const CRON_HOOK_CANNIBAL        = 'ariham_seoagent_detect_cannibalization';
+	const CRON_HOOK_IMPROVE         = 'ariham_seoagent_score_and_improve';
+	const CRON_HOOK_ORPHAN          = 'ariham_seoagent_detect_orphans';
+	const CRON_HOOK_IMAGE_ALTS      = 'ariham_seoagent_generate_image_alts';
+	const CRON_HOOK_OBSERVE         = 'ariham_seoagent_observe_results';
+	const CRON_HOOK_CWV             = 'ariham_seoagent_fetch_cwv_data';
+	const CRON_HOOK_HEALTH          = 'ariham_seoagent_health_check';
+	const CRON_HOOK_AUTO_REDIRECT   = 'ariham_seoagent_auto_redirect_404s';
+	const CRON_HOOK_WEEKLY_EMAIL    = 'ariham_seoagent_weekly_ranking_email';
+
+	/**
+	 * Opt-in toggle for the weekly Core Web Vitals fetch. Disabled by default
+	 * because it sends published post URLs to Google's PageSpeed Insights API.
+	 * No remote PageSpeed requests are made unless the site owner enables this.
+	 */
+	const OPTION_CWV_ENABLED        = 'ariham_seoagent_cwv_enabled';
 
 	private static $instance = null;
 
-	/** @var SEO_Agent_AI_Data_Store */
+	/** @var Ariham_SEOAgent_Data_Store */
 	private $data_store;
 
-	/** @var SEO_Agent_AI_Google_OAuth */
+	/** @var Ariham_SEOAgent_Google_OAuth */
 	private $oauth;
 
-	/** @var SEO_Agent_AI_GSC_Client */
+	/** @var Ariham_SEOAgent_GSC_Client */
 	private $gsc_client;
 
-	/** @var SEO_Agent_AI_GA4_Client */
+	/** @var Ariham_SEOAgent_GA4_Client */
 	private $ga4_client;
 
-	/** @var SEO_Agent_AI_SEO_Analyzer */
+	/** @var Ariham_SEOAgent_SEO_Analyzer */
 	private $analyzer;
 
-	/** @var SEO_Agent_AI_Recommendation_Engine */
+	/** @var Ariham_SEOAgent_Recommendation_Engine */
 	private $recommendation_engine;
 
-	/** @var SEO_Agent_AI_Fix_Executor */
+	/** @var Ariham_SEOAgent_Fix_Executor */
 	private $fix_executor;
 
-	/** @var SEO_Agent_AI_Activity_Log */
+	/** @var Ariham_SEOAgent_Activity_Log */
 	private $activity_log;
 
-	/** @var SEO_Agent_AI_SEO_Plugin_Bridge */
+	/** @var Ariham_SEOAgent_SEO_Plugin_Bridge */
 	private $bridge;
 
-	/** @var SEO_Agent_AI_Gemini_Client */
+	/** @var Ariham_SEOAgent_Gemini_Client */
 	private $gemini;
 
-	/** @var SEO_Agent_AI_OpenAI_Client */
+	/** @var Ariham_SEOAgent_OpenAI_Client */
 	private $openai;
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
-	/** @var SEO_Agent_AI_Content_Analyzer */
+	/** @var Ariham_SEOAgent_Content_Analyzer */
 	private $content_analyzer;
 
-	/** @var SEO_Agent_AI_Keyword_Cluster */
+	/** @var Ariham_SEOAgent_Keyword_Cluster */
 	private $keyword_cluster;
 
-	/** @var SEO_Agent_AI_SEO_Scoring_Engine */
+	/** @var Ariham_SEOAgent_SEO_Scoring_Engine */
 	private $scoring_engine;
 
-	/** @var SEO_Agent_AI_Decision_Engine */
+	/** @var Ariham_SEOAgent_Decision_Engine */
 	private $decision_engine;
 
-	/** @var SEO_Agent_AI_Schema_Engine */
+	/** @var Ariham_SEOAgent_Schema_Engine */
 	private $schema_engine;
 
-	/** @var SEO_Agent_AI_Internal_Link_Engine */
+	/** @var Ariham_SEOAgent_Internal_Link_Engine */
 	private $internal_link_engine;
 
-	/** @var SEO_Agent_AI_Report_Engine */
+	/** @var Ariham_SEOAgent_Report_Engine */
 	private $report_engine;
 
-	/** @var SEO_Agent_AI_Queue_Manager */
+	/** @var Ariham_SEOAgent_Queue_Manager */
 	private $queue_manager;
 
-	/** @var SEO_Agent_AI_GSC_Opportunity_Analyzer */
+	/** @var Ariham_SEOAgent_GSC_Opportunity_Analyzer */
 	private $gsc_opportunity_analyzer;
 
-	/** @var SEO_Agent_AI_Admin_Page */
+	/** @var Ariham_SEOAgent_Admin_Page */
 	private $admin_page;
 
-	/** @var SEO_Agent_AI_Image_SEO */
+	/** @var Ariham_SEOAgent_Image_SEO */
 	private $image_seo;
 
-	/** @var SEO_Agent_AI_Social_Meta */
+	/** @var Ariham_SEOAgent_Social_Meta */
 	private $social_meta;
 
-	/** @var SEO_Agent_AI_Meta_Box */
+	/** @var Ariham_SEOAgent_Meta_Box */
 	private $meta_box;
 
-	/** @var SEO_Agent_AI_Taxonomy_SEO */
+	/** @var Ariham_SEOAgent_Taxonomy_SEO */
 	private $taxonomy_seo;
 
-	/** @var SEO_Agent_AI_Redirect_Manager */
+	/** @var Ariham_SEOAgent_Redirect_Manager */
 	private $redirect_manager;
 
-	/** @var SEO_Agent_AI_PageSpeed_Client */
+	/** @var Ariham_SEOAgent_PageSpeed_Client */
 	private $pagespeed_client;
 
-	/** @var SEO_Agent_AI_Content_Expander */
+	/** @var Ariham_SEOAgent_Content_Expander */
 	private $content_expander;
 
 	// -------------------------------------------------------------------
@@ -143,63 +150,63 @@ class SEO_Agent_AI_Plugin {
 
 	private function __construct() {
 		// Core infrastructure.
-		$this->logger       = new SEO_Agent_AI_Logger();
-		$this->data_store   = new SEO_Agent_AI_Data_Store();
-		$this->activity_log = new SEO_Agent_AI_Activity_Log();
-		$this->oauth        = new SEO_Agent_AI_Google_OAuth();
-		$this->bridge       = new SEO_Agent_AI_SEO_Plugin_Bridge();
+		$this->logger       = new Ariham_SEOAgent_Logger();
+		$this->data_store   = new Ariham_SEOAgent_Data_Store();
+		$this->activity_log = new Ariham_SEOAgent_Activity_Log();
+		$this->oauth        = new Ariham_SEOAgent_Google_OAuth();
+		$this->bridge       = new Ariham_SEOAgent_SEO_Plugin_Bridge();
 
 		// API clients.
-		$this->gemini           = new SEO_Agent_AI_Gemini_Client();
-		$this->openai           = new SEO_Agent_AI_OpenAI_Client();
-		$this->gsc_client       = new SEO_Agent_AI_GSC_Client( $this->oauth );
-		$this->ga4_client       = new SEO_Agent_AI_GA4_Client( $this->oauth );
-		$this->pagespeed_client = new SEO_Agent_AI_PageSpeed_Client();
+		$this->gemini           = new Ariham_SEOAgent_Gemini_Client();
+		$this->openai           = new Ariham_SEOAgent_OpenAI_Client();
+		$this->gsc_client       = new Ariham_SEOAgent_GSC_Client( $this->oauth );
+		$this->ga4_client       = new Ariham_SEOAgent_GA4_Client( $this->oauth );
+		$this->pagespeed_client = new Ariham_SEOAgent_PageSpeed_Client();
 
 		// Analysis engines.
-		$this->content_analyzer = new SEO_Agent_AI_Content_Analyzer();
-		$this->keyword_cluster  = new SEO_Agent_AI_Keyword_Cluster();
-		$this->scoring_engine   = new SEO_Agent_AI_SEO_Scoring_Engine( $this->content_analyzer );
-		$this->decision_engine  = new SEO_Agent_AI_Decision_Engine();
+		$this->content_analyzer = new Ariham_SEOAgent_Content_Analyzer();
+		$this->keyword_cluster  = new Ariham_SEOAgent_Keyword_Cluster();
+		$this->scoring_engine   = new Ariham_SEOAgent_SEO_Scoring_Engine( $this->content_analyzer );
+		$this->decision_engine  = new Ariham_SEOAgent_Decision_Engine();
 
 		// Schema injection (wp_head, priority 5).
-		$this->schema_engine = new SEO_Agent_AI_Schema_Engine( $this->content_analyzer, $this->logger );
+		$this->schema_engine = new Ariham_SEOAgent_Schema_Engine( $this->content_analyzer, $this->logger );
 
 		// Analyzer + recommendation engine (depend on above).
-		$this->analyzer              = new SEO_Agent_AI_SEO_Analyzer( $this->content_analyzer, $this->keyword_cluster );
-		$this->recommendation_engine = new SEO_Agent_AI_Recommendation_Engine( $this->gemini, $this->openai, $this->decision_engine );
-		$this->fix_executor          = new SEO_Agent_AI_Fix_Executor( $this->activity_log, $this->bridge );
+		$this->analyzer              = new Ariham_SEOAgent_SEO_Analyzer( $this->content_analyzer, $this->keyword_cluster );
+		$this->recommendation_engine = new Ariham_SEOAgent_Recommendation_Engine( $this->gemini, $this->openai, $this->decision_engine );
+		$this->fix_executor          = new Ariham_SEOAgent_Fix_Executor( $this->activity_log, $this->bridge );
 
 		// Autonomous systems.
-		$this->internal_link_engine     = new SEO_Agent_AI_Internal_Link_Engine( $this->logger );
-		$this->report_engine            = new SEO_Agent_AI_Report_Engine( $this->logger );
-		$this->queue_manager            = new SEO_Agent_AI_Queue_Manager( $this->logger );
-		$this->gsc_opportunity_analyzer = new SEO_Agent_AI_GSC_Opportunity_Analyzer( $this->gsc_client );
+		$this->internal_link_engine     = new Ariham_SEOAgent_Internal_Link_Engine( $this->logger );
+		$this->report_engine            = new Ariham_SEOAgent_Report_Engine( $this->logger );
+		$this->queue_manager            = new Ariham_SEOAgent_Queue_Manager( $this->logger );
+		$this->gsc_opportunity_analyzer = new Ariham_SEOAgent_GSC_Opportunity_Analyzer( $this->gsc_client );
 
 		// Content generation.
-		$this->content_expander = new SEO_Agent_AI_Content_Expander( $this->openai, $this->gemini );
+		$this->content_expander = new Ariham_SEOAgent_Content_Expander( $this->openai, $this->gemini );
 
 		// Feature modules.
-		$this->image_seo        = new SEO_Agent_AI_Image_SEO( $this->gemini, $this->openai, $this->logger );
-		$this->social_meta      = new SEO_Agent_AI_Social_Meta();
-		$this->meta_box         = new SEO_Agent_AI_Meta_Box();
-		$this->taxonomy_seo     = new SEO_Agent_AI_Taxonomy_SEO();
-		$this->redirect_manager = new SEO_Agent_AI_Redirect_Manager();
+		$this->image_seo        = new Ariham_SEOAgent_Image_SEO( $this->gemini, $this->openai, $this->logger );
+		$this->social_meta      = new Ariham_SEOAgent_Social_Meta();
+		$this->meta_box         = new Ariham_SEOAgent_Meta_Box();
+		$this->taxonomy_seo     = new Ariham_SEOAgent_Taxonomy_SEO();
+		$this->redirect_manager = new Ariham_SEOAgent_Redirect_Manager();
 
 		// Admin page sub-page instances.
-		$connect_page           = new SEO_Agent_AI_Connect_Page( $this->oauth );
-		$report_page            = new SEO_Agent_AI_Report_Page( $this->activity_log, $this->data_store );
-		$dashboard_page         = new SEO_Agent_AI_Dashboard_Page( $this->decision_engine, $this->report_engine, $this->activity_log );
-		$opportunities_page     = new SEO_Agent_AI_Opportunities_Page( $this->decision_engine );
-		$rankings_page          = new SEO_Agent_AI_Rankings_Page();
-		$pending_approvals_page = new SEO_Agent_AI_Pending_Approvals_Page( $this->decision_engine, $this->fix_executor, $this->internal_link_engine );
-		$rollback_center_page   = new SEO_Agent_AI_Rollback_Center_Page( $this->fix_executor, $this->activity_log );
-		$cron_status_page       = new SEO_Agent_AI_Cron_Status_Page();
-		$image_seo_page         = new SEO_Agent_AI_Image_SEO_Page( $this->image_seo );
-		$redirects_page         = new SEO_Agent_AI_Redirects_Page( $this->redirect_manager );
-		$activity_log_page      = new SEO_Agent_AI_Activity_Log_Page( $this->activity_log, $this->logger );
+		$connect_page           = new Ariham_SEOAgent_Connect_Page( $this->oauth );
+		$report_page            = new Ariham_SEOAgent_Report_Page( $this->activity_log, $this->data_store );
+		$dashboard_page         = new Ariham_SEOAgent_Dashboard_Page( $this->decision_engine, $this->report_engine, $this->activity_log );
+		$opportunities_page     = new Ariham_SEOAgent_Opportunities_Page( $this->decision_engine );
+		$rankings_page          = new Ariham_SEOAgent_Rankings_Page();
+		$pending_approvals_page = new Ariham_SEOAgent_Pending_Approvals_Page( $this->decision_engine, $this->fix_executor, $this->internal_link_engine );
+		$rollback_center_page   = new Ariham_SEOAgent_Rollback_Center_Page( $this->fix_executor, $this->activity_log );
+		$cron_status_page       = new Ariham_SEOAgent_Cron_Status_Page();
+		$image_seo_page         = new Ariham_SEOAgent_Image_SEO_Page( $this->image_seo );
+		$redirects_page         = new Ariham_SEOAgent_Redirects_Page( $this->redirect_manager );
+		$activity_log_page      = new Ariham_SEOAgent_Activity_Log_Page( $this->activity_log, $this->logger );
 
-		$this->admin_page = new SEO_Agent_AI_Admin_Page(
+		$this->admin_page = new Ariham_SEOAgent_Admin_Page(
 			$this->data_store,
 			$connect_page,
 			$report_page,
@@ -218,30 +225,30 @@ class SEO_Agent_AI_Plugin {
 
 		// Admin hooks.
 		add_action( 'admin_menu', array( $this->admin_page, 'register_menu' ) );
-		add_action( 'admin_post_seo_agent_ai_apply_fix', array( $this, 'handle_apply_fix' ) );
-		add_action( 'admin_post_seo_agent_ai_run_analysis', array( $this, 'handle_manual_analysis' ) );
-		add_action( 'admin_post_seo_agent_ai_save_settings', array( $this, 'handle_save_settings' ) );
-		add_action( 'admin_post_seo_agent_ai_test_connection', array( $this, 'handle_test_connection' ) );
-		add_action( 'admin_post_seo_agent_ai_google_disconnect', array( $this, 'handle_google_disconnect' ) );
-		add_action( 'admin_post_seo_agent_ai_rollback_backup', array( $this, 'handle_rollback_backup' ) );
-		add_action( 'admin_post_seo_agent_ai_rollback', array( $this, 'handle_activity_rollback' ) );
+		add_action( 'admin_post_ariham_seoagent_apply_fix', array( $this, 'handle_apply_fix' ) );
+		add_action( 'admin_post_ariham_seoagent_run_analysis', array( $this, 'handle_manual_analysis' ) );
+		add_action( 'admin_post_ariham_seoagent_save_settings', array( $this, 'handle_save_settings' ) );
+		add_action( 'admin_post_ariham_seoagent_test_connection', array( $this, 'handle_test_connection' ) );
+		add_action( 'admin_post_ariham_seoagent_google_disconnect', array( $this, 'handle_google_disconnect' ) );
+		add_action( 'admin_post_ariham_seoagent_rollback_backup', array( $this, 'handle_rollback_backup' ) );
+		add_action( 'admin_post_ariham_seoagent_rollback', array( $this, 'handle_activity_rollback' ) );
 
 		// New v3.0 admin-post handlers.
-		add_action( 'admin_post_seo_agent_ai_decision', array( $pending_approvals_page, 'handle_action' ) );
-		add_action( 'admin_post_seo_agent_ai_bulk_apply_safe', array( $pending_approvals_page, 'handle_bulk_apply_safe' ) );
-		add_action( 'admin_post_seo_agent_ai_rollback_new', array( $rollback_center_page, 'handle_rollback' ) );
-		add_action( 'admin_post_seo_agent_ai_trigger_cron', array( $cron_status_page, 'handle_trigger' ) );
-		add_action( 'admin_post_seo_agent_ai_manage_redirect', array( $redirects_page, 'handle_action' ) );
+		add_action( 'admin_post_ariham_seoagent_decision', array( $pending_approvals_page, 'handle_action' ) );
+		add_action( 'admin_post_ariham_seoagent_bulk_apply_safe', array( $pending_approvals_page, 'handle_bulk_apply_safe' ) );
+		add_action( 'admin_post_ariham_seoagent_rollback_new', array( $rollback_center_page, 'handle_rollback' ) );
+		add_action( 'admin_post_ariham_seoagent_trigger_cron', array( $cron_status_page, 'handle_trigger' ) );
+		add_action( 'admin_post_ariham_seoagent_manage_redirect', array( $redirects_page, 'handle_action' ) );
 
 		// OAuth callback — must run before page output.
 		add_action( 'admin_init', array( $this, 'maybe_handle_oauth_callback' ) );
 
 		// AJAX: property listing for Settings page.
-		add_action( 'wp_ajax_seo_agent_ai_list_gsc_sites', array( $this, 'ajax_list_gsc_sites' ) );
-		add_action( 'wp_ajax_seo_agent_ai_list_ga4_properties', array( $this, 'ajax_list_ga4_properties' ) );
+		add_action( 'wp_ajax_ariham_seoagent_list_gsc_sites', array( $this, 'ajax_list_gsc_sites' ) );
+		add_action( 'wp_ajax_ariham_seoagent_list_ga4_properties', array( $this, 'ajax_list_ga4_properties' ) );
 
 		// AJAX: interactive batch analysis.
-		add_action( 'wp_ajax_seo_agent_ai_analyze_batch', array( $this, 'ajax_analyze_batch' ) );
+		add_action( 'wp_ajax_ariham_seoagent_analyze_batch', array( $this, 'ajax_analyze_batch' ) );
 
 		// Cron hooks — daily.
 		add_action( self::CRON_HOOK_DAILY, array( $this, 'run_daily_analysis' ) );
@@ -297,8 +304,8 @@ class SEO_Agent_AI_Plugin {
 	// -------------------------------------------------------------------
 
 	public static function activate() {
-		SEO_Agent_AI_Activity_Log::create_table();
-		SEO_Agent_AI_DB_Manager::create_tables();
+		Ariham_SEOAgent_Activity_Log::create_table();
+		Ariham_SEOAgent_DB_Manager::create_tables();
 
 		$daily_hooks = array(
 			self::CRON_HOOK_DAILY,
@@ -328,17 +335,19 @@ class SEO_Agent_AI_Plugin {
 			self::CRON_HOOK_IMPROVE,
 			self::CRON_HOOK_ORPHAN,
 			self::CRON_HOOK_OBSERVE,
-			self::CRON_HOOK_CWV,
 			self::CRON_HOOK_AUTO_REDIRECT,
 			self::CRON_HOOK_WEEKLY_EMAIL,
 		);
+		// CRON_HOOK_CWV is intentionally excluded — the Core Web Vitals fetch
+		// contacts Google PageSpeed Insights and is only scheduled once the site
+		// owner opts in via settings (see ensure_cron_schedules()).
 		foreach ( $weekly_hooks as $hook ) {
 			if ( ! wp_next_scheduled( $hook ) ) {
 				wp_schedule_event( time() + DAY_IN_SECONDS, 'weekly', $hook );
 			}
 		}
 
-		add_option( SEO_Agent_AI_Data_Store::OPTION_LAST_RUN, array(), '', false );
+		add_option( Ariham_SEOAgent_Data_Store::OPTION_LAST_RUN, array(), '', false );
 	}
 
 	public static function deactivate() {
@@ -368,11 +377,11 @@ class SEO_Agent_AI_Plugin {
 	}
 
 	public static function maybe_upgrade() {
-		$installed = (int) get_option( SEO_Agent_AI_Activity_Log::DB_VERSION_OPTION, 0 );
-		if ( $installed < SEO_Agent_AI_Activity_Log::DB_VERSION ) {
-			SEO_Agent_AI_Activity_Log::create_table();
+		$installed = (int) get_option( Ariham_SEOAgent_Activity_Log::DB_VERSION_OPTION, 0 );
+		if ( $installed < Ariham_SEOAgent_Activity_Log::DB_VERSION ) {
+			Ariham_SEOAgent_Activity_Log::create_table();
 		}
-		SEO_Agent_AI_DB_Manager::maybe_upgrade();
+		Ariham_SEOAgent_DB_Manager::maybe_upgrade();
 	}
 
 	/**
@@ -380,7 +389,7 @@ class SEO_Agent_AI_Plugin {
 	 * Guarded by a 1-hour transient to avoid 9 DB queries on every page load.
 	 */
 	public function ensure_cron_schedules() {
-		if ( get_transient( 'seo_agent_ai_cron_checked' ) ) {
+		if ( get_transient( 'ariham_seoagent_cron_checked' ) ) {
 			return;
 		}
 
@@ -423,8 +432,15 @@ class SEO_Agent_AI_Plugin {
 		if ( ! wp_next_scheduled( self::CRON_HOOK_OBSERVE ) ) {
 			wp_schedule_event( time() + DAY_IN_SECONDS + 5 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_OBSERVE );
 		}
-		if ( ! wp_next_scheduled( self::CRON_HOOK_CWV ) ) {
-			wp_schedule_event( time() + DAY_IN_SECONDS + 6 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_CWV );
+		// Core Web Vitals fetch is opt-in (it sends URLs to Google PageSpeed Insights).
+		// Only schedule it when the site owner has explicitly enabled it; otherwise
+		// make sure any previously scheduled event is cleared.
+		if ( (bool) get_option( self::OPTION_CWV_ENABLED, false ) ) {
+			if ( ! wp_next_scheduled( self::CRON_HOOK_CWV ) ) {
+				wp_schedule_event( time() + DAY_IN_SECONDS + 6 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_CWV );
+			}
+		} elseif ( wp_next_scheduled( self::CRON_HOOK_CWV ) ) {
+			wp_clear_scheduled_hook( self::CRON_HOOK_CWV );
 		}
 		if ( ! wp_next_scheduled( self::CRON_HOOK_HEALTH ) ) {
 			wp_schedule_event( time() + 6 * HOUR_IN_SECONDS, 'twicedaily', self::CRON_HOOK_HEALTH );
@@ -436,7 +452,7 @@ class SEO_Agent_AI_Plugin {
 			wp_schedule_event( time() + DAY_IN_SECONDS + 8 * HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_WEEKLY_EMAIL );
 		}
 
-		set_transient( 'seo_agent_ai_cron_checked', 1, HOUR_IN_SECONDS );
+		set_transient( 'ariham_seoagent_cron_checked', 1, HOUR_IN_SECONDS );
 	}
 
 	// -------------------------------------------------------------------
@@ -445,7 +461,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function run_fetch_gsc() {
 		$this->logger->info( 'Starting dedicated GSC keyword history fetch.' );
-		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+		$post_types = (array) get_option( 'ariham_seoagent_post_types', array( 'post' ) );
 		$posts      = get_posts(
 			array(
 				'post_type'   => $post_types ?: array( 'post' ),
@@ -463,11 +479,11 @@ class SEO_Agent_AI_Plugin {
 			if ( is_array( $history ) ) {
 				foreach ( $history as $kw => $data ) {
 					if ( is_string( $kw ) && is_array( $data ) ) {
-						SEO_Agent_AI_DB_Manager::upsert_keyword_history( (int) $post->ID, $kw, $data );
+						Ariham_SEOAgent_DB_Manager::upsert_keyword_history( (int) $post->ID, $kw, $data );
 					}
 				}
 			}
-			update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_GSC, current_time( 'mysql' ), false );
+			update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_GSC, current_time( 'mysql' ), false );
 		}
 
 		$this->logger->info( 'GSC keyword history fetch complete. Posts: ' . count( $posts ) );
@@ -502,7 +518,7 @@ class SEO_Agent_AI_Plugin {
 				continue;
 			}
 
-			SEO_Agent_AI_DB_Manager::insert_decision(
+			Ariham_SEOAgent_DB_Manager::insert_decision(
 				array(
 					'post_id'         => (int) $post->ID,
 					'decision_type'   => 'gsc_ctr_gap',
@@ -522,7 +538,7 @@ class SEO_Agent_AI_Plugin {
 					),
 					'expected_impact' => __( 'High — even a 1% CTR improvement on 50+ impressions yields meaningful traffic gains.', 'ariham-seoagent' ),
 					'risk_level'      => 'safe',
-					'status'          => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+					'status'          => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 				)
 			);
 		}
@@ -535,11 +551,11 @@ class SEO_Agent_AI_Plugin {
 			foreach ( $quality as $item ) {
 				$post_id = url_to_postid( $item['page'] ?? '' );
 				if ( $post_id ) {
-					SEO_Agent_AI_DB_Manager::upsert_page_insight_engagement( $post_id, $item );
+					Ariham_SEOAgent_DB_Manager::upsert_page_insight_engagement( $post_id, $item );
 				}
 			}
 		}
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_GA4, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_GA4, current_time( 'mysql' ), false );
 		$this->logger->info( 'GA4 engagement fetch complete.' );
 	}
 
@@ -551,6 +567,13 @@ class SEO_Agent_AI_Plugin {
 	 * A 0.2s sleep between requests avoids hitting the API rate limit.
 	 */
 	public function run_fetch_cwv_data() {
+		// Hard gate: never contact the PageSpeed Insights API unless the site
+		// owner has explicitly opted in. Also self-heals a stale schedule.
+		if ( ! (bool) get_option( self::OPTION_CWV_ENABLED, false ) ) {
+			wp_clear_scheduled_hook( self::CRON_HOOK_CWV );
+			return;
+		}
+
 		$this->logger->info( 'Starting weekly Core Web Vitals data fetch.' );
 
 		$posts   = $this->get_posts_for_analysis( 50 );
@@ -575,7 +598,7 @@ class SEO_Agent_AI_Plugin {
 			usleep( 200000 ); // 0.2 seconds.
 		}
 
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_CWV, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_CWV, current_time( 'mysql' ), false );
 		$this->logger->info(
 			sprintf( 'CWV data fetch complete. Fetched: %d, Failed: %d.', $fetched, $failed )
 		);
@@ -584,7 +607,7 @@ class SEO_Agent_AI_Plugin {
 	public function run_generate_report() {
 		$this->logger->info( 'Generating daily SEO report.' );
 		$result = $this->report_engine->generate( '', false );
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_REPORT, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_REPORT, current_time( 'mysql' ), false );
 		if ( is_wp_error( $result ) ) {
 			$this->logger->error( 'Report generation failed: ' . $result->get_error_message() );
 		} else {
@@ -594,7 +617,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function run_score_pages() {
 		$this->logger->info( 'Starting weekly SEO scoring pass.' );
-		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+		$post_types = (array) get_option( 'ariham_seoagent_post_types', array( 'post' ) );
 		$posts      = get_posts(
 			array(
 				'post_type'   => $post_types ?: array( 'post' ),
@@ -606,17 +629,17 @@ class SEO_Agent_AI_Plugin {
 		foreach ( $posts as $post ) {
 			$score_data = $this->scoring_engine->score( $post );
 			if ( is_array( $score_data ) ) {
-				SEO_Agent_AI_DB_Manager::upsert_page_insight( (int) $post->ID, $score_data );
-				update_post_meta( (int) $post->ID, '_seo_agent_ai_score', $score_data['overall'] ?? 0 );
+				Ariham_SEOAgent_DB_Manager::upsert_page_insight( (int) $post->ID, $score_data );
+				update_post_meta( (int) $post->ID, '_ariham_seoagent_score', $score_data['overall'] ?? 0 );
 			}
 		}
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_SCORE, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_SCORE, current_time( 'mysql' ), false );
 		$this->logger->info( 'Scoring pass complete. Posts: ' . count( $posts ) );
 	}
 
 	public function run_detect_decay() {
 		$this->logger->info( 'Running content decay detection.' );
-		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+		$post_types = (array) get_option( 'ariham_seoagent_post_types', array( 'post' ) );
 		$posts      = get_posts(
 			array(
 				'post_type'   => $post_types ?: array( 'post' ),
@@ -649,7 +672,7 @@ class SEO_Agent_AI_Plugin {
 			++$flagged;
 		}
 
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_DECAY, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_DECAY, current_time( 'mysql' ), false );
 		$this->logger->info( "Decay detection complete. Flagged: {$flagged}" );
 	}
 
@@ -663,7 +686,7 @@ class SEO_Agent_AI_Plugin {
 
 		$this->logger->info( 'Running cannibalization detection from keyword history.' );
 
-		$table = esc_sql( SEO_Agent_AI_DB_Manager::keyword_history_table() );
+		$table = esc_sql( Ariham_SEOAgent_DB_Manager::keyword_history_table() );
 		$since = gmdate( 'Y-m-d', strtotime( '-28 days' ) );
 
 		// Aggregate impressions per (post_id, keyword) over the last 28 days.
@@ -679,7 +702,7 @@ class SEO_Agent_AI_Plugin {
 
 		if ( empty( $rows ) ) {
 			$this->logger->info( 'No keyword history data for cannibalization check.' );
-			update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_CANNIBAL, current_time( 'mysql' ), false );
+			update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_CANNIBAL, current_time( 'mysql' ), false );
 			return;
 		}
 
@@ -740,24 +763,24 @@ class SEO_Agent_AI_Plugin {
 			}
 		}
 
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_CANNIBAL, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_CANNIBAL, current_time( 'mysql' ), false );
 		$this->logger->info( "Cannibalization detection complete. Flagged: {$flagged}" );
 	}
 
 	public function run_internal_links() {
 		$this->logger->info( 'Running internal link opportunity pass.' );
-		$dry_run = (bool) get_option( 'seo_agent_ai_debug_mode', false );
+		$dry_run = (bool) get_option( 'ariham_seoagent_debug_mode', false );
 		$result  = $this->internal_link_engine->run_pass( 5, $dry_run );
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_LINKS, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_LINKS, current_time( 'mysql' ), false );
 		$this->logger->info( sprintf( 'Internal links pass complete. Inserted: %d, Skipped: %d', (int) ( $result['inserted'] ?? 0 ), (int) ( $result['skipped'] ?? 0 ) ) );
 	}
 
 	public function run_purge_old_data() {
 		$this->logger->info( 'Running data purge.' );
-		$retention = (int) get_option( 'seo_agent_ai_log_retention_days', 90 );
-		SEO_Agent_AI_DB_Manager::purge_old_data( $retention );
+		$retention = (int) get_option( 'ariham_seoagent_log_retention_days', 90 );
+		Ariham_SEOAgent_DB_Manager::purge_old_data( $retention );
 		$this->activity_log->purge_old_entries( $retention );
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_PURGE, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_PURGE, current_time( 'mysql' ), false );
 		$this->logger->info( 'Data purge complete.' );
 	}
 
@@ -775,7 +798,7 @@ class SEO_Agent_AI_Plugin {
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( '-28 days' ) );
 		$until = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
 
-		$decisions = SEO_Agent_AI_DB_Manager::get_applied_decisions_for_observation( $since, $until );
+		$decisions = Ariham_SEOAgent_DB_Manager::get_applied_decisions_for_observation( $since, $until );
 
 		$observed = 0;
 		$improved = 0;
@@ -794,7 +817,7 @@ class SEO_Agent_AI_Plugin {
 				continue;
 			}
 
-			SEO_Agent_AI_DB_Manager::update_decision_metrics( (int) $dec['id'], null, $current_gsc );
+			Ariham_SEOAgent_DB_Manager::update_decision_metrics( (int) $dec['id'], null, $current_gsc );
 
 			$before_raw    = $dec['metrics_before'];
 			$before        = is_string( $before_raw ) ? json_decode( $before_raw, true ) : array();
@@ -811,7 +834,7 @@ class SEO_Agent_AI_Plugin {
 				++$declined;
 				// Flag the post so get_posts_for_analysis() picks it up as
 				// a priority target on the next daily analysis run.
-				update_post_meta( $post_id, '_seo_agent_ai_needs_reanalysis', '1' );
+				update_post_meta( $post_id, '_ariham_seoagent_needs_reanalysis', '1' );
 				$this->logger->info(
 					sprintf( 'Post %d showed no improvement after optimization — re-queued.', $post_id )
 				);
@@ -826,14 +849,14 @@ class SEO_Agent_AI_Plugin {
 				$declined
 			)
 		);
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_OBSERVE, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_OBSERVE, current_time( 'mysql' ), false );
 	}
 
 	/**
 	 * Weekly cron: find posts scoring below the target threshold and generate
 	 * targeted improvements for the weakest SEO dimensions.
 	 *
-	 * The target threshold is configurable via the `seo_agent_ai_score_target`
+	 * The target threshold is configurable via the `ariham_seoagent_score_target`
 	 * option (default 70). Up to 30 lowest-scoring posts are processed per run.
 	 * Safe fixes are auto-applied when autopilot is on; everything else is
 	 * routed to the pending-approval queue.
@@ -841,13 +864,13 @@ class SEO_Agent_AI_Plugin {
 	public function run_improve_low_scoring_posts() {
 		$this->logger->info( 'Starting score-targeted improvement pass.' );
 
-		$target    = max( 1, min( 100, (int) get_option( 'seo_agent_ai_score_target', 70 ) ) );
-		$autopilot = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
-		$post_ids  = SEO_Agent_AI_DB_Manager::get_posts_below_score_threshold( $target, 30 );
+		$target    = max( 1, min( 100, (int) get_option( 'ariham_seoagent_score_target', 70 ) ) );
+		$autopilot = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
+		$post_ids  = Ariham_SEOAgent_DB_Manager::get_posts_below_score_threshold( $target, 30 );
 
 		if ( empty( $post_ids ) ) {
 			$this->logger->info( 'Score improvement pass: no posts below threshold ' . $target . '.' );
-			update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_IMPROVE, current_time( 'mysql' ), false );
+			update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_IMPROVE, current_time( 'mysql' ), false );
 			return;
 		}
 
@@ -864,8 +887,8 @@ class SEO_Agent_AI_Plugin {
 				continue;
 			}
 
-			SEO_Agent_AI_DB_Manager::upsert_page_insight( $post_id, $score_data );
-			update_post_meta( $post_id, '_seo_agent_ai_score', $score_data['overall'] ?? 0 );
+			Ariham_SEOAgent_DB_Manager::upsert_page_insight( $post_id, $score_data );
+			update_post_meta( $post_id, '_ariham_seoagent_score', $score_data['overall'] ?? 0 );
 
 			// Skip if the freshly-computed score already meets the target.
 			if ( ( $score_data['overall'] ?? 0 ) >= $target ) {
@@ -876,7 +899,7 @@ class SEO_Agent_AI_Plugin {
 			++$queued;
 		}
 
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_IMPROVE, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_IMPROVE, current_time( 'mysql' ), false );
 		$this->logger->info(
 			sprintf(
 				'Score improvement pass complete. Checked: %d, queued improvements for: %d (target ≥ %d).',
@@ -898,7 +921,7 @@ class SEO_Agent_AI_Plugin {
 	private function generate_score_improvements( WP_Post $post, array $score_data, $autopilot ) {
 		$overall    = (int) ( $score_data['overall'] ?? 0 );
 		$dimensions = is_array( $score_data['dimensions'] ?? null ) ? $score_data['dimensions'] : array();
-		$target     = max( 1, min( 100, (int) get_option( 'seo_agent_ai_score_target', 70 ) ) );
+		$target     = max( 1, min( 100, (int) get_option( 'ariham_seoagent_score_target', 70 ) ) );
 		$url        = get_permalink( $post );
 
 		// Reuse already-cached API data (populated by daily GSC/GA4 cron jobs).
@@ -909,7 +932,7 @@ class SEO_Agent_AI_Plugin {
 
 		$seo_audit = $this->bridge->audit_post( (int) $post->ID, $post );
 		$analysis  = $this->analyzer->analyze( $post, $gsc_safe, $ga4_safe, $seo_audit );
-		$min_conf  = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
+		$min_conf  = (float) get_option( 'ariham_seoagent_autopilot_min_confidence', 0.7 );
 
 		$recommendations = $this->recommendation_engine->generate(
 			$post,
@@ -955,7 +978,7 @@ class SEO_Agent_AI_Plugin {
 		);
 
 		$date_key      = self::DAILY_AP_TRANSIENT_PREFIX . gmdate( 'Y-m-d' );
-		$max_daily     = (int) get_option( 'seo_agent_ai_autopilot_max_daily', 5 );
+		$max_daily     = (int) get_option( 'ariham_seoagent_autopilot_max_daily', 5 );
 		$applied_today = (int) get_transient( $date_key );
 
 		foreach ( $recommendations as $rec ) {
@@ -1010,13 +1033,13 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_run_analysis' );
+		check_admin_referer( 'ariham_seoagent_run_analysis' );
 
 		if ( ! wp_next_scheduled( self::CRON_HOOK_MANUAL ) ) {
 			wp_schedule_single_event( time() + 5, self::CRON_HOOK_MANUAL );
 		}
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'analysis_scheduled', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'analysis_scheduled', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 		exit;
 	}
 
@@ -1033,8 +1056,8 @@ class SEO_Agent_AI_Plugin {
 		$processed     = 0;
 		$with_recs     = 0;
 		$failed        = 0;
-		$autopilot     = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
-		$log_retention = (int) get_option( 'seo_agent_ai_log_retention_days', 90 );
+		$autopilot     = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
+		$log_retention = (int) get_option( 'ariham_seoagent_log_retention_days', 90 );
 
 		try {
 			$posts = $this->get_posts_for_analysis( 50 );
@@ -1077,7 +1100,7 @@ class SEO_Agent_AI_Plugin {
 				$this->drain_pending_decisions();
 			}
 
-			update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_DAILY, current_time( 'mysql' ), false );
+			update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_DAILY, current_time( 'mysql' ), false );
 
 		} finally {
 			$this->release_lock();
@@ -1114,7 +1137,7 @@ class SEO_Agent_AI_Plugin {
 		}
 
 		$analysis        = $this->analyzer->analyze( $post, $gsc_safe, $ga4_safe, $seo_audit );
-		$autopilot_conf  = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
+		$autopilot_conf  = (float) get_option( 'ariham_seoagent_autopilot_min_confidence', 0.7 );
 		$recommendations = $this->recommendation_engine->generate(
 			$post,
 			$analysis,
@@ -1141,7 +1164,7 @@ class SEO_Agent_AI_Plugin {
 		$this->data_store->save_post_metrics( (int) $post->ID, $metrics );
 		$this->data_store->save_recommendations( (int) $post->ID, $recommendations );
 
-		update_post_meta( (int) $post->ID, '_seo_agent_ai_last_analyzed', current_time( 'mysql' ) );
+		update_post_meta( (int) $post->ID, '_ariham_seoagent_last_analyzed', current_time( 'mysql' ) );
 
 		$had_recs = ! empty( $recommendations );
 		if ( $had_recs ) {
@@ -1151,7 +1174,7 @@ class SEO_Agent_AI_Plugin {
 		}
 
 		// Clear the re-analysis flag set by the observation pass.
-		delete_post_meta( (int) $post->ID, '_seo_agent_ai_needs_reanalysis' );
+		delete_post_meta( (int) $post->ID, '_ariham_seoagent_needs_reanalysis' );
 
 		return array(
 			'had_recommendations' => $had_recs,
@@ -1177,7 +1200,7 @@ class SEO_Agent_AI_Plugin {
 	 * @return WP_Post[]
 	 */
 	private function get_posts_for_analysis( $count = 50 ) {
-		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+		$post_types = (array) get_option( 'ariham_seoagent_post_types', array( 'post' ) );
 		if ( empty( $post_types ) ) {
 			$post_types = array( 'post' );
 		}
@@ -1216,7 +1239,7 @@ class SEO_Agent_AI_Plugin {
 				'numberposts'   => 20,
 				'no_found_rows' => true,
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_key'      => '_seo_agent_ai_needs_reanalysis',
+				'meta_key'      => '_ariham_seoagent_needs_reanalysis',
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				'meta_value'    => '1',
 			)
@@ -1260,7 +1283,7 @@ class SEO_Agent_AI_Plugin {
 
 		$round_robin_posts = array();
 		if ( $total > 0 ) {
-			$offset = (int) get_option( 'seo_agent_ai_analysis_offset', 0 );
+			$offset = (int) get_option( 'ariham_seoagent_analysis_offset', 0 );
 			if ( $offset >= $total ) {
 				$offset = 0;
 			}
@@ -1280,7 +1303,7 @@ class SEO_Agent_AI_Plugin {
 
 			// Advance offset for next run.
 			$new_offset = $offset + count( $batch );
-			update_option( 'seo_agent_ai_analysis_offset', $new_offset >= $total ? 0 : $new_offset, false );
+			update_option( 'ariham_seoagent_analysis_offset', $new_offset >= $total ? 0 : $new_offset, false );
 
 			// Dedup: skip posts already in the priority list.
 			foreach ( $batch as $p ) {
@@ -1303,7 +1326,7 @@ class SEO_Agent_AI_Plugin {
 			wp_send_json_error( 'Unauthorized', 403 );
 			return;
 		}
-		check_ajax_referer( 'seo_agent_ai_analyze_batch' );
+		check_ajax_referer( 'ariham_seoagent_analyze_batch' );
 
 		if ( get_transient( self::ANALYSIS_LOCK_KEY ) ) {
 			wp_send_json_error( __( 'Analysis already in progress (scheduled task). Please wait.', 'ariham-seoagent' ) );
@@ -1312,10 +1335,10 @@ class SEO_Agent_AI_Plugin {
 
 		$offset     = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
 		$batch_size = 5;
-		$autopilot  = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
+		$autopilot  = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
 
 		// For AJAX batch we get a consistent snapshot of posts for the session.
-		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post' ) );
+		$post_types = (array) get_option( 'ariham_seoagent_post_types', array( 'post' ) );
 		$posts      = get_posts(
 			array(
 				'post_type'   => $post_types ?: array( 'post' ),
@@ -1376,7 +1399,8 @@ class SEO_Agent_AI_Plugin {
 					'mode'                       => 'manual',
 				)
 			);
-			$log_retention = (int) get_option( 'seo_agent_ai_log_retention_days', 90 );
+			update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_DAILY, current_time( 'mysql' ), false );
+			$log_retention = (int) get_option( 'ariham_seoagent_log_retention_days', 90 );
 			if ( $log_retention > 0 ) {
 				$this->activity_log->purge_old_entries( $log_retention );
 			}
@@ -1428,8 +1452,8 @@ class SEO_Agent_AI_Plugin {
 	);
 
 	private function route_recommendations( $post_id, array $recommendations, array $gsc_metrics, array $analysis, $autopilot ) {
-		$autopilot_threshold = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
-		$max_daily           = (int) get_option( 'seo_agent_ai_autopilot_max_daily', 5 );
+		$autopilot_threshold = (float) get_option( 'ariham_seoagent_autopilot_min_confidence', 0.7 );
+		$max_daily           = (int) get_option( 'ariham_seoagent_autopilot_max_daily', 5 );
 		$date_key            = self::DAILY_AP_TRANSIENT_PREFIX . gmdate( 'Y-m-d' );
 		$applied_today       = (int) get_transient( $date_key );
 
@@ -1486,7 +1510,7 @@ class SEO_Agent_AI_Plugin {
 		if ( 'internal_link_needed' === $type ) {
 			$result = $this->internal_link_engine->run_for_post( $post_id );
 		} elseif ( 'schema_update' === $type ) {
-			update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+			update_post_meta( $post_id, '_ariham_seoagent_schema_approved', 1 );
 			$result = true;
 		} elseif ( 'content_expansion' === $type ) {
 			$focus   = isset( $rec['proposed']['focus_topic'] ) ? (string) $rec['proposed']['focus_topic'] : '';
@@ -1501,7 +1525,7 @@ class SEO_Agent_AI_Plugin {
 			$result = $this->fix_executor->apply(
 				$post_id,
 				$rec,
-				SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT,
+				Ariham_SEOAgent_Activity_Log::TRIGGER_AUTOPILOT,
 				$signal_data
 			);
 		}
@@ -1513,7 +1537,7 @@ class SEO_Agent_AI_Plugin {
 				// Store current GSC metrics as the before-snapshot for the
 				// observation pass that will run 7–28 days later.
 				if ( ! empty( $gsc_metrics ) ) {
-					SEO_Agent_AI_DB_Manager::update_decision_metrics( $decision_id, $gsc_metrics, null );
+					Ariham_SEOAgent_DB_Manager::update_decision_metrics( $decision_id, $gsc_metrics, null );
 				}
 			}
 		}
@@ -1537,9 +1561,9 @@ class SEO_Agent_AI_Plugin {
 	 * execute call). Called at the end of every daily analysis run.
 	 */
 	private function drain_approved_decisions() {
-		$approved = SEO_Agent_AI_DB_Manager::get_decisions(
+		$approved = Ariham_SEOAgent_DB_Manager::get_decisions(
 			array(
-				'status' => SEO_Agent_AI_DB_Manager::STATUS_APPROVED,
+				'status' => Ariham_SEOAgent_DB_Manager::STATUS_APPROVED,
 				'limit'  => 100,
 			)
 		);
@@ -1552,7 +1576,7 @@ class SEO_Agent_AI_Plugin {
 			$dec_id  = (int) $dec['id'];
 
 			if ( 'schema_update' === $type ) {
-				update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+				update_post_meta( $post_id, '_ariham_seoagent_schema_approved', 1 );
 				$this->decision_engine->mark_applied( $dec_id );
 
 			} elseif ( 'internal_link_needed' === $type ) {
@@ -1582,7 +1606,7 @@ class SEO_Agent_AI_Plugin {
 							'reason'     => $dec['reasoning'] ?? '',
 							'confidence' => (float) ( $dec['confidence'] ?? 0.7 ),
 						),
-						SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT
+						Ariham_SEOAgent_Activity_Log::TRIGGER_AUTOPILOT
 					);
 					if ( ! is_wp_error( $result ) ) {
 						$this->decision_engine->mark_applied( $dec_id );
@@ -1604,9 +1628,9 @@ class SEO_Agent_AI_Plugin {
 	// -------------------------------------------------------------------
 
 	private function drain_pending_decisions() {
-		$pending = SEO_Agent_AI_DB_Manager::get_decisions(
+		$pending = Ariham_SEOAgent_DB_Manager::get_decisions(
 			array(
-				'status' => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+				'status' => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 				'limit'  => 500,
 			)
 		);
@@ -1622,7 +1646,7 @@ class SEO_Agent_AI_Plugin {
 
 			if ( 'content_expansion' === $type || 'content_refresh_plan' === $type ) {
 				// Skip if a draft already exists for this post.
-				if ( get_post_meta( $post_id, '_seo_agent_ai_pending_draft_id', true ) ) {
+				if ( get_post_meta( $post_id, '_ariham_seoagent_pending_draft_id', true ) ) {
 					continue;
 				}
 				if ( 'content_expansion' === $type ) {
@@ -1645,7 +1669,7 @@ class SEO_Agent_AI_Plugin {
 			}
 
 			if ( 'schema_update' === $type ) {
-				update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+				update_post_meta( $post_id, '_ariham_seoagent_schema_approved', 1 );
 				$this->decision_engine->mark_applied( $dec_id );
 				++$processed;
 				continue;
@@ -1673,7 +1697,7 @@ class SEO_Agent_AI_Plugin {
 						'reason'     => $dec['reasoning'] ?? '',
 						'confidence' => (float) ( $dec['confidence'] ?? 0.7 ),
 					),
-					SEO_Agent_AI_Activity_Log::TRIGGER_AUTOPILOT
+					Ariham_SEOAgent_Activity_Log::TRIGGER_AUTOPILOT
 				);
 				if ( ! is_wp_error( $result ) ) {
 					$this->decision_engine->mark_applied( $dec_id );
@@ -1691,19 +1715,19 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_apply_fix' );
+		check_admin_referer( 'ariham_seoagent_apply_fix' );
 
 		$post_id   = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 		$rec_index = isset( $_POST['rec_index'] ) ? absint( $_POST['rec_index'] ) : -1;
 
 		if ( ! $post_id || $rec_index < 0 || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
+			wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 			exit;
 		}
 
 		$recommendations = $this->data_store->get_recommendations( $post_id );
 		if ( ! isset( $recommendations[ $rec_index ] ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'recommendation_not_found', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
+			wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'recommendation_not_found', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 			exit;
 		}
 
@@ -1717,12 +1741,12 @@ class SEO_Agent_AI_Plugin {
 		$result = $this->fix_executor->apply(
 			$post_id,
 			$recommendations[ $rec_index ],
-			SEO_Agent_AI_Activity_Log::TRIGGER_MANUAL,
+			Ariham_SEOAgent_Activity_Log::TRIGGER_MANUAL,
 			$signal_data
 		);
 
 		$notice = is_wp_error( $result ) ? 'apply_failed' : 'fix_applied';
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', $notice, admin_url( 'admin.php?page=ariham-seoagent' ) ) );
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', $notice, admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 		exit;
 	}
 
@@ -1734,17 +1758,17 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_rollback_backup' );
+		check_admin_referer( 'ariham_seoagent_rollback_backup' );
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
+			wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 			exit;
 		}
 
 		$result = $this->fix_executor->rollback( $post_id );
 		$notice = is_wp_error( $result ) ? 'rollback_failed' : 'rollback_done';
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', $notice, admin_url( 'admin.php?page=ariham-seoagent' ) ) );
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', $notice, admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 		exit;
 	}
 
@@ -1756,19 +1780,19 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_rollback' );
+		check_admin_referer( 'ariham_seoagent_rollback' );
 
 		$log_id  = isset( $_POST['log_id'] ) ? absint( $_POST['log_id'] ) : 0;
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 
 		if ( ! $log_id || ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
+			wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
 			exit;
 		}
 
 		$entry = $this->activity_log->get_entry( $log_id );
 		if ( ! $entry || (int) $entry['post_id'] !== $post_id ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'rollback_failed', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
+			wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'rollback_failed', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
 			exit;
 		}
 
@@ -1788,7 +1812,7 @@ class SEO_Agent_AI_Plugin {
 
 			$this->activity_log->log(
 				$post_id,
-				SEO_Agent_AI_Activity_Log::TRIGGER_ROLLBACK,
+				Ariham_SEOAgent_Activity_Log::TRIGGER_ROLLBACK,
 				$field,
 				(string) $entry['value_after'],
 				$before,
@@ -1796,13 +1820,13 @@ class SEO_Agent_AI_Plugin {
 				sprintf( __( 'Rolled back log entry #%d.', 'ariham-seoagent' ), $log_id ),
 				array(),
 				1.0,
-				SEO_Agent_AI_Activity_Log::TRIGGER_ROLLBACK
+				Ariham_SEOAgent_Activity_Log::TRIGGER_ROLLBACK
 			);
 
-			$this->activity_log->update_status( $log_id, SEO_Agent_AI_Activity_Log::STATUS_ROLLED_BACK );
+			$this->activity_log->update_status( $log_id, Ariham_SEOAgent_Activity_Log::STATUS_ROLLED_BACK );
 		}
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'rollback_done', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'rollback_done', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
 		exit;
 	}
 
@@ -1814,7 +1838,7 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_save_settings' );
+		check_admin_referer( 'ariham_seoagent_save_settings' );
 
 		$client_id     = isset( $_POST['google_client_id'] ) ? sanitize_text_field( wp_unslash( $_POST['google_client_id'] ) ) : '';
 		$client_secret = isset( $_POST['google_client_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['google_client_secret'] ) ) : '';
@@ -1844,46 +1868,60 @@ class SEO_Agent_AI_Plugin {
 		$openai_model  = isset( $_POST['openai_model'] ) ? sanitize_text_field( wp_unslash( $_POST['openai_model'] ) ) : '';
 		$email_reports = ! empty( $_POST['email_reports'] );
 		$email_address = isset( $_POST['email_address'] ) ? sanitize_email( wp_unslash( $_POST['email_address'] ) ) : '';
+		$cwv_enabled   = ! empty( $_POST['cwv_enabled'] );
 
 		if ( ! in_array( $ai_provider, array( 'gemini', 'openai', 'auto' ), true ) ) {
 			$ai_provider = 'gemini';
 		}
 
 		if ( $client_id !== '' ) {
-			update_option( SEO_Agent_AI_Google_OAuth::OPTION_CLIENT_ID, $client_id, false );
+			update_option( Ariham_SEOAgent_Google_OAuth::OPTION_CLIENT_ID, $client_id, false );
 		}
 		if ( $client_secret !== '' ) {
-			update_option( SEO_Agent_AI_Google_OAuth::OPTION_CLIENT_SECRET, SEO_Agent_AI_Crypto::encrypt( $client_secret ), false );
+			update_option( Ariham_SEOAgent_Google_OAuth::OPTION_CLIENT_SECRET, Ariham_SEOAgent_Crypto::encrypt( $client_secret ), false );
 		}
 		if ( $gemini_key !== '' ) {
-			update_option( SEO_Agent_AI_Gemini_Client::OPTION_API_KEY, SEO_Agent_AI_Crypto::encrypt( $gemini_key ), false );
+			update_option( Ariham_SEOAgent_Gemini_Client::OPTION_API_KEY, Ariham_SEOAgent_Crypto::encrypt( $gemini_key ), false );
 		}
 		if ( $openai_key !== '' ) {
-			update_option( SEO_Agent_AI_OpenAI_Client::OPTION_API_KEY, SEO_Agent_AI_Crypto::encrypt( $openai_key ), false );
+			update_option( Ariham_SEOAgent_OpenAI_Client::OPTION_API_KEY, Ariham_SEOAgent_Crypto::encrypt( $openai_key ), false );
 		}
 
-		update_option( SEO_Agent_AI_GSC_Client::OPTION_GSC_SITE_URL, $gsc_site_url, false );
-		update_option( SEO_Agent_AI_GA4_Client::OPTION_GA4_PROPERTY_ID, $ga4_property, false );
-		$was_autopilot = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
-		update_option( 'seo_agent_ai_autopilot_enabled', $autopilot, false );
+		update_option( Ariham_SEOAgent_GSC_Client::OPTION_GSC_SITE_URL, $gsc_site_url, false );
+		update_option( Ariham_SEOAgent_GA4_Client::OPTION_GA4_PROPERTY_ID, $ga4_property, false );
+		$was_autopilot = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
+		update_option( 'ariham_seoagent_autopilot_enabled', $autopilot, false );
 
 		// If autopilot was just switched ON, immediately drain the pending queue.
 		if ( $autopilot && ! $was_autopilot ) {
 			$this->drain_pending_decisions();
 		}
 
-		update_option( 'seo_agent_ai_autopilot_max_daily', $max_daily, false );
-		update_option( 'seo_agent_ai_autopilot_min_confidence', $min_conf, false );
-		update_option( 'seo_agent_ai_log_retention_days', $log_retention, false );
-		update_option( 'seo_agent_ai_score_target', $score_target, false );
-		update_option( 'seo_agent_ai_post_types', $post_types, false );
-		update_option( 'seo_agent_ai_ai_provider', $ai_provider, false );
-		update_option( SEO_Agent_AI_OpenAI_Client::OPTION_BASE_URL, $openai_url, false );
-		update_option( SEO_Agent_AI_OpenAI_Client::OPTION_MODEL, $openai_model, false );
-		update_option( 'seo_agent_ai_email_reports', $email_reports, false );
-		update_option( 'seo_agent_ai_email_address', $email_address, false );
+		update_option( 'ariham_seoagent_autopilot_max_daily', $max_daily, false );
+		update_option( 'ariham_seoagent_autopilot_min_confidence', $min_conf, false );
+		update_option( 'ariham_seoagent_log_retention_days', $log_retention, false );
+		update_option( 'ariham_seoagent_score_target', $score_target, false );
+		update_option( 'ariham_seoagent_post_types', $post_types, false );
+		update_option( 'ariham_seoagent_ai_provider', $ai_provider, false );
+		update_option( Ariham_SEOAgent_OpenAI_Client::OPTION_BASE_URL, $openai_url, false );
+		update_option( Ariham_SEOAgent_OpenAI_Client::OPTION_MODEL, $openai_model, false );
+		update_option( 'ariham_seoagent_email_reports', $email_reports, false );
+		update_option( 'ariham_seoagent_email_address', $email_address, false );
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'settings_saved', admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) );
+		// Core Web Vitals opt-in. Schedule or clear the PageSpeed Insights cron
+		// immediately so the user's choice takes effect without waiting on the
+		// hourly ensure_cron_schedules() guard.
+		$was_cwv_enabled = (bool) get_option( self::OPTION_CWV_ENABLED, false );
+		update_option( self::OPTION_CWV_ENABLED, $cwv_enabled, false );
+		if ( $cwv_enabled && ! $was_cwv_enabled ) {
+			if ( ! wp_next_scheduled( self::CRON_HOOK_CWV ) ) {
+				wp_schedule_event( time() + HOUR_IN_SECONDS, 'weekly', self::CRON_HOOK_CWV );
+			}
+		} elseif ( ! $cwv_enabled && $was_cwv_enabled ) {
+			wp_clear_scheduled_hook( self::CRON_HOOK_CWV );
+		}
+
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'settings_saved', admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) );
 		exit;
 	}
 
@@ -1895,7 +1933,7 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_test_connection' );
+		check_admin_referer( 'ariham_seoagent_test_connection' );
 
 		$gsc_result       = $this->gsc_client->test_connection();
 		$analytics_result = $this->ga4_client->test_connection();
@@ -1903,7 +1941,7 @@ class SEO_Agent_AI_Plugin {
 		if ( ! is_wp_error( $gsc_result ) && ! is_wp_error( $analytics_result ) ) {
 			delete_option( self::OPTION_API_FAILURES );
 			delete_option( self::OPTION_LAST_API_ERROR );
-			delete_transient( 'seo_agent_ai_auth_health' );
+			delete_transient( 'ariham_seoagent_auth_health' );
 		}
 
 		set_transient(
@@ -1931,7 +1969,7 @@ class SEO_Agent_AI_Plugin {
 			5 * MINUTE_IN_SECONDS
 		);
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'connection_tested', admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) );
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'connection_tested', admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) );
 		exit;
 	}
 
@@ -1943,9 +1981,9 @@ class SEO_Agent_AI_Plugin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
-		check_admin_referer( 'seo_agent_ai_google_disconnect' );
+		check_admin_referer( 'ariham_seoagent_google_disconnect' );
 		$this->oauth->disconnect();
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'google_disconnected', admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) );
+		wp_safe_redirect( add_query_arg( 'ariham_seoagent_notice', 'google_disconnected', admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) );
 		exit;
 	}
 
@@ -1975,7 +2013,7 @@ class SEO_Agent_AI_Plugin {
 			$msg = sanitize_text_field( wp_unslash( (string) $error ) );
 			wp_safe_redirect(
 				add_query_arg(
-					'seo_agent_ai_oauth_error',
+					'ariham_seoagent_oauth_error',
 					rawurlencode( $msg ),
 					admin_url( 'admin.php?page=ariham-seoagent-connect' )
 				)
@@ -1991,7 +2029,7 @@ class SEO_Agent_AI_Plugin {
 		if ( is_wp_error( $result ) ) {
 			wp_safe_redirect(
 				add_query_arg(
-					'seo_agent_ai_oauth_error',
+					'ariham_seoagent_oauth_error',
 					rawurlencode( $result->get_error_message() ),
 					admin_url( 'admin.php?page=ariham-seoagent-connect' )
 				)
@@ -1999,7 +2037,7 @@ class SEO_Agent_AI_Plugin {
 		} else {
 			wp_safe_redirect(
 				add_query_arg(
-					'seo_agent_ai_notice',
+					'ariham_seoagent_notice',
 					'google_connected',
 					admin_url( 'admin.php?page=ariham-seoagent-connect' )
 				)
@@ -2017,7 +2055,7 @@ class SEO_Agent_AI_Plugin {
 			wp_send_json_error( 'Unauthorized', 403 );
 			return;
 		}
-		check_ajax_referer( 'seo_agent_ai_property_list' );
+		check_ajax_referer( 'ariham_seoagent_property_list' );
 
 		$sites = $this->gsc_client->list_sites();
 		if ( is_wp_error( $sites ) ) {
@@ -2036,7 +2074,7 @@ class SEO_Agent_AI_Plugin {
 			wp_send_json_error( 'Unauthorized', 403 );
 			return;
 		}
-		check_ajax_referer( 'seo_agent_ai_property_list' );
+		check_ajax_referer( 'ariham_seoagent_property_list' );
 
 		$properties = $this->ga4_client->list_properties();
 		if ( is_wp_error( $properties ) ) {
@@ -2092,7 +2130,7 @@ class SEO_Agent_AI_Plugin {
 		$msg = (string) get_option( self::OPTION_LAST_API_ERROR, '' );
 
 		echo '<div class="notice notice-error"><p>';
-		echo '<strong>' . esc_html__( 'SEO Agent AI:', 'ariham-seoagent' ) . '</strong> ';
+		echo '<strong>' . esc_html__( 'Ariham SEOAgent:', 'ariham-seoagent' ) . '</strong> ';
 		printf(
 			/* translators: %d: number of consecutive failed analysis runs. */
 			esc_html__( 'Search Console / Analytics calls failed on the last %d analysis runs.', 'ariham-seoagent' ),
@@ -2134,7 +2172,7 @@ class SEO_Agent_AI_Plugin {
 		$ga4_safe        = is_wp_error( $ga4_metrics ) ? array() : $ga4_metrics;
 
 		$analysis        = $this->analyzer->analyze( $post, $gsc_safe, $ga4_safe, $seo_audit );
-		$autopilot_conf  = (float) get_option( 'seo_agent_ai_autopilot_min_confidence', 0.7 );
+		$autopilot_conf  = (float) get_option( 'ariham_seoagent_autopilot_min_confidence', 0.7 );
 		$recommendations = $this->recommendation_engine->generate(
 			$post,
 			$analysis,
@@ -2156,7 +2194,7 @@ class SEO_Agent_AI_Plugin {
 				)
 			);
 			$this->data_store->save_recommendations( (int) $post->ID, $recommendations );
-			update_post_meta( (int) $post->ID, '_seo_agent_ai_last_analyzed', current_time( 'mysql' ) );
+			update_post_meta( (int) $post->ID, '_ariham_seoagent_last_analyzed', current_time( 'mysql' ) );
 
 			if ( ! empty( $recommendations ) ) {
 				$this->route_recommendations( (int) $post->ID, $recommendations, $gsc_safe, $analysis, $autopilot );
@@ -2229,7 +2267,7 @@ class SEO_Agent_AI_Plugin {
 		}
 
 		$this->logger->info( sprintf( 'Orphan detection complete. Checked: %d, Orphans found: %d', $checked, $orphans ) );
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_ORPHAN, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_ORPHAN, current_time( 'mysql' ), false );
 	}
 
 	// -------------------------------------------------------------------
@@ -2242,14 +2280,14 @@ class SEO_Agent_AI_Plugin {
 	 * Processes up to 20 images per run to stay within execution time limits.
 	 */
 	public function run_generate_image_alts() {
-		$autopilot = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
+		$autopilot = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
 		if ( ! $autopilot ) {
 			return;
 		}
 
 		$this->logger->info( 'Starting daily image alt text generation pass.' );
 		$result = $this->image_seo->bulk_generate_alt_text( 20 );
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_IMAGE_ALTS, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_IMAGE_ALTS, current_time( 'mysql' ), false );
 		$this->logger->info(
 			sprintf(
 				'Image alt generation complete. processed=%d success=%d failed=%d',
@@ -2269,7 +2307,7 @@ class SEO_Agent_AI_Plugin {
 	 * run in the last 26 hours (i.e. a whole day has been missed).
 	 */
 	public function run_health_check() {
-		$last_raw = get_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_DAILY, '' );
+		$last_raw = get_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_DAILY, '' );
 		if ( $last_raw === '' ) {
 			return;
 		}
@@ -2280,7 +2318,7 @@ class SEO_Agent_AI_Plugin {
 			return;
 		}
 
-		$to = (string) get_option( 'seo_agent_ai_email_address', '' );
+		$to = (string) get_option( 'ariham_seoagent_email_address', '' );
 		if ( $to === '' ) {
 			$to = (string) get_option( 'admin_email', '' );
 		}
@@ -2291,7 +2329,7 @@ class SEO_Agent_AI_Plugin {
 		$site_name = get_bloginfo( 'name' );
 		$subject   = sprintf(
 			/* translators: %s: site name. */
-			__( '[%s] SEO Agent AI — Daily Analysis Missed', 'ariham-seoagent' ),
+			__( '[%s] Ariham SEOAgent — Daily Analysis Missed', 'ariham-seoagent' ),
 			$site_name
 		);
 		$message = sprintf(
@@ -2299,7 +2337,7 @@ class SEO_Agent_AI_Plugin {
 			__( "The daily SEO analysis on %1\$s has not run since %2\$s. This usually means WP-Cron is not firing.\n\nPlease check your hosting cron configuration or visit the Cron Status page in your WordPress admin.\n\n%3\$s", 'ariham-seoagent' ),
 			$site_name,
 			$last_raw,
-			admin_url( 'admin.php?page=seo-agent-cron-status' )
+			admin_url( 'admin.php?page=ariham-seoagent-cron' )
 		);
 
 		wp_mail( sanitize_email( $to ), $subject, $message );
@@ -2317,7 +2355,7 @@ class SEO_Agent_AI_Plugin {
 	public function run_auto_redirect_404s() {
 		$this->logger->info( 'Starting auto-redirect 404 resolution.' );
 		$created = $this->redirect_manager->auto_resolve_404s();
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_AUTO_REDIRECT, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_AUTO_REDIRECT, current_time( 'mysql' ), false );
 		$this->logger->info( sprintf( 'Auto-redirect 404 resolution complete. Redirects created: %d.', $created ) );
 	}
 
@@ -2329,12 +2367,12 @@ class SEO_Agent_AI_Plugin {
 	 * Weekly cron: send a rankings trend email digest when email reports are enabled.
 	 */
 	public function run_weekly_ranking_email() {
-		if ( ! (bool) get_option( 'seo_agent_ai_email_reports', false ) ) {
+		if ( ! (bool) get_option( 'ariham_seoagent_email_reports', false ) ) {
 			return;
 		}
 		$this->logger->info( 'Sending weekly ranking summary email.' );
 		$this->report_engine->send_weekly_ranking_email();
-		update_option( 'seo_agent_ai_last_run_' . self::CRON_HOOK_WEEKLY_EMAIL, current_time( 'mysql' ), false );
+		update_option( 'ariham_seoagent_last_run_' . self::CRON_HOOK_WEEKLY_EMAIL, current_time( 'mysql' ), false );
 	}
 
 	// -------------------------------------------------------------------

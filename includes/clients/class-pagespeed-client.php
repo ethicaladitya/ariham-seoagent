@@ -4,7 +4,7 @@
  *
  * Fetches Core Web Vitals and Lighthouse scores for any URL.
  * The API is free for up to 25,000 requests/day without an API key.
- * With a key (stored as seo_agent_ai_pagespeed_api_key) the quota is higher.
+ * With a key (stored as ariham_seoagent_pagespeed_api_key) the quota is higher.
  *
  * Metrics returned:
  *   lcp_ms        — Largest Contentful Paint in milliseconds
@@ -19,17 +19,17 @@
  *
  * Results are cached as transients (24h by default) per URL+strategy.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_PageSpeed_Client {
+class Ariham_SEOAgent_PageSpeed_Client {
 
 	const API_ENDPOINT    = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
-	const OPTION_API_KEY  = 'seo_agent_ai_pagespeed_api_key';
+	const OPTION_API_KEY  = 'ariham_seoagent_pagespeed_api_key';
 	const CACHE_TTL       = DAY_IN_SECONDS;
 	const REQUEST_TIMEOUT = 30;
 
@@ -54,7 +54,7 @@ class SEO_Agent_AI_PageSpeed_Client {
 		$url      = (string) $url;
 		$strategy = in_array( $strategy, array( 'mobile', 'desktop' ), true ) ? $strategy : 'mobile';
 
-		$cache_key = 'sai_psi_' . md5( $url . $strategy );
+		$cache_key = 'ariham_seoagent_psi_' . md5( $url . $strategy );
 
 		if ( ! $force ) {
 			$cached = get_transient( $cache_key );
@@ -215,16 +215,16 @@ class SEO_Agent_AI_PageSpeed_Client {
 	 * @return string Empty string if no key is configured.
 	 */
 	private function get_api_key() {
-		if ( defined( 'SEO_AGENT_AI_PAGESPEED_API_KEY' ) ) {
-			return (string) SEO_AGENT_AI_PAGESPEED_API_KEY;
+		if ( defined( 'ARIHAM_SEOAGENT_PAGESPEED_API_KEY' ) ) {
+			return (string) ARIHAM_SEOAGENT_PAGESPEED_API_KEY;
 		}
 		$stored = (string) get_option( self::OPTION_API_KEY, '' );
 		if ( '' === $stored ) {
 			return ''; // Will work without a key (rate-limited to 25k/day).
 		}
 		// Decrypt if stored encrypted.
-		if ( class_exists( 'SEO_Agent_AI_Crypto' ) ) {
-			return (string) SEO_Agent_AI_Crypto::decrypt( $stored );
+		if ( class_exists( 'Ariham_SEOAgent_Crypto' ) ) {
+			return (string) Ariham_SEOAgent_Crypto::decrypt( $stored );
 		}
 		return $stored;
 	}

@@ -4,17 +4,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_GSC_Client {
+class Ariham_SEOAgent_GSC_Client {
 
-	const OPTION_ACCESS_TOKEN  = 'seo_agent_ai_google_access_token';
-	const OPTION_GSC_SITE_URL  = 'seo_agent_ai_gsc_site_url';
+	const OPTION_ACCESS_TOKEN  = 'ariham_seoagent_google_access_token';
+	const OPTION_GSC_SITE_URL  = 'ariham_seoagent_gsc_site_url';
 	const PAGE_METRICS_CACHE_TTL = 15 * MINUTE_IN_SECONDS;
-	const PAGE_METRICS_CACHE_PREFIX = 'seo_agent_gsc_page_';
+	const PAGE_METRICS_CACHE_PREFIX = 'ariham_seoagent_gsc_page_';
 
 	private $google_auth;
 
-	public function __construct( ?SEO_Agent_AI_Google_OAuth $google_auth = null ) {
-		$this->google_auth = $google_auth ? $google_auth : new SEO_Agent_AI_Google_OAuth();
+	public function __construct( ?Ariham_SEOAgent_Google_OAuth $google_auth = null ) {
+		$this->google_auth = $google_auth ? $google_auth : new Ariham_SEOAgent_Google_OAuth();
 	}
 
 	// -------------------------------------------------------------------
@@ -36,7 +36,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$current = $this->query_period( $site_url, $access_token, $page_url, 28, 1 );
@@ -78,7 +78,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$result = $this->query_period( $site_url, $access_token, $page_url, $days, 1 );
@@ -98,7 +98,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$start_date = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
@@ -143,7 +143,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$curr_start = gmdate( 'Y-m-d', strtotime( '-' . ( (int) $days ) . ' days' ) );
@@ -211,7 +211,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$start_date = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
@@ -395,7 +395,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_get(
@@ -409,7 +409,7 @@ class SEO_Agent_AI_GSC_Client {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return new WP_Error( 'seo_agent_ai_gsc_connection_failed', $response->get_error_message() );
+			return new WP_Error( 'ariham_seoagent_gsc_connection_failed', $response->get_error_message() );
 		}
 
 		$status = (int) wp_remote_retrieve_response_code( $response );
@@ -418,7 +418,7 @@ class SEO_Agent_AI_GSC_Client {
 
 		if ( $status < 200 || $status >= 300 ) {
 			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC connection error.', 'ariham-seoagent' );
-			return new WP_Error( 'seo_agent_ai_gsc_connection_api_error', $message );
+			return new WP_Error( 'ariham_seoagent_gsc_connection_api_error', $message );
 		}
 
 		$sites = isset( $data['siteEntry'] ) && is_array( $data['siteEntry'] ) ? $data['siteEntry'] : array();
@@ -434,7 +434,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		return new WP_Error(
-			'seo_agent_ai_gsc_property_not_found',
+			'ariham_seoagent_gsc_property_not_found',
 			sprintf(
 				/* translators: %s: configured Search Console property URL. */
 				__( 'Connected to Search Console, but the configured property was not found: %s', 'ariham-seoagent' ),
@@ -451,7 +451,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( empty( $access_token ) ) {
-			return new WP_Error( 'seo_agent_ai_not_connected', __( 'Google account not connected.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_not_connected', __( 'Google account not connected.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_get(
@@ -473,7 +473,7 @@ class SEO_Agent_AI_GSC_Client {
 
 		if ( $code < 200 || $code >= 300 ) {
 			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown error.', 'ariham-seoagent' );
-			return new WP_Error( 'seo_agent_ai_gsc_api_error', $msg );
+			return new WP_Error( 'ariham_seoagent_gsc_api_error', $msg );
 		}
 
 		return isset( $data['siteEntry'] ) && is_array( $data['siteEntry'] ) ? $data['siteEntry'] : array();
@@ -519,7 +519,7 @@ class SEO_Agent_AI_GSC_Client {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return new WP_Error( 'seo_agent_ai_gsc_request_failed', $response->get_error_message() );
+			return new WP_Error( 'ariham_seoagent_gsc_request_failed', $response->get_error_message() );
 		}
 
 		$status = (int) wp_remote_retrieve_response_code( $response );
@@ -528,7 +528,7 @@ class SEO_Agent_AI_GSC_Client {
 
 		if ( $status < 200 || $status >= 300 ) {
 			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC API error.', 'ariham-seoagent' );
-			return new WP_Error( 'seo_agent_ai_gsc_api_error', $message );
+			return new WP_Error( 'ariham_seoagent_gsc_api_error', $message );
 		}
 
 		return $this->normalize_rows( isset( $data['rows'] ) && is_array( $data['rows'] ) ? $data['rows'] : array() );
@@ -550,7 +550,7 @@ class SEO_Agent_AI_GSC_Client {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return new WP_Error( 'seo_agent_ai_gsc_request_failed', $response->get_error_message() );
+			return new WP_Error( 'ariham_seoagent_gsc_request_failed', $response->get_error_message() );
 		}
 
 		$status = (int) wp_remote_retrieve_response_code( $response );
@@ -558,7 +558,7 @@ class SEO_Agent_AI_GSC_Client {
 
 		if ( $status < 200 || $status >= 300 ) {
 			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC API error.', 'ariham-seoagent' );
-			return new WP_Error( 'seo_agent_ai_gsc_api_error', $msg );
+			return new WP_Error( 'ariham_seoagent_gsc_api_error', $msg );
 		}
 
 		$rows   = isset( $data['rows'] ) && is_array( $data['rows'] ) ? $data['rows'] : array();
@@ -671,21 +671,21 @@ class SEO_Agent_AI_GSC_Client {
 	}
 
 	private function get_access_token() {
-		if ( class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active() ) {
-			return SEO_Agent_AI_SiteKit_Bridge::get_access_token();
+		if ( class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active() ) {
+			return Ariham_SEOAgent_SiteKit_Bridge::get_access_token();
 		}
 		return $this->google_auth->get_access_token();
 	}
 
 	private function get_site_url() {
-		if ( class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active() ) {
-			$sk_url = SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url();
+		if ( class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active() ) {
+			$sk_url = Ariham_SEOAgent_SiteKit_Bridge::get_gsc_site_url();
 			if ( $sk_url !== '' ) {
 				return $this->normalize_site_url( $sk_url );
 			}
 		}
 
-		$constant = defined( 'SEO_AGENT_AI_GSC_SITE_URL' ) ? SEO_AGENT_AI_GSC_SITE_URL : '';
+		$constant = defined( 'ARIHAM_SEOAGENT_GSC_SITE_URL' ) ? ARIHAM_SEOAGENT_GSC_SITE_URL : '';
 		if ( is_string( $constant ) && $constant !== '' ) {
 			return $this->normalize_site_url( $constant );
 		}

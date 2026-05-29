@@ -4,12 +4,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class SEO_Agent_AI_Data_Store
+class Ariham_SEOAgent_Data_Store
 {
-    const META_METRICS = '_seo_agent_ai_metrics';
-    const META_RECOMMENDATIONS = '_seo_agent_ai_recommendations';
-    const META_BACKUPS = '_seo_agent_ai_backups';
-    const OPTION_LAST_RUN = 'seo_agent_ai_last_run';
+    const META_METRICS = '_ariham_seoagent_metrics';
+    const META_RECOMMENDATIONS = '_ariham_seoagent_recommendations';
+    const META_BACKUPS = '_ariham_seoagent_backups';
+    const OPTION_LAST_RUN = 'ariham_seoagent_last_run';
 
     public function save_post_metrics($post_id, array $metrics)
     {

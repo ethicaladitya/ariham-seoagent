@@ -4,17 +4,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_SEO_Analyzer {
+class Ariham_SEOAgent_SEO_Analyzer {
 
-	/** @var SEO_Agent_AI_Content_Analyzer|null */
+	/** @var Ariham_SEOAgent_Content_Analyzer|null */
 	private $content_analyzer;
 
-	/** @var SEO_Agent_AI_Keyword_Cluster|null */
+	/** @var Ariham_SEOAgent_Keyword_Cluster|null */
 	private $keyword_cluster;
 
 	public function __construct(
-		?SEO_Agent_AI_Content_Analyzer $content_analyzer = null,
-		?SEO_Agent_AI_Keyword_Cluster $keyword_cluster = null
+		?Ariham_SEOAgent_Content_Analyzer $content_analyzer = null,
+		?Ariham_SEOAgent_Keyword_Cluster $keyword_cluster = null
 	) {
 		$this->content_analyzer = $content_analyzer;
 		$this->keyword_cluster  = $keyword_cluster;
@@ -74,7 +74,7 @@ class SEO_Agent_AI_SEO_Analyzer {
 		// ------------------------------------------------------------------
 
 		$content_data = array();
-		if ( $this->content_analyzer instanceof SEO_Agent_AI_Content_Analyzer ) {
+		if ( $this->content_analyzer instanceof Ariham_SEOAgent_Content_Analyzer ) {
 			$content_data = $this->content_analyzer->analyze( $post, $gsc );
 
 			// Content decay: old content with stale signals.
@@ -102,8 +102,8 @@ class SEO_Agent_AI_SEO_Analyzer {
 		// Internal link signals: orphan detection via DB table
 		// ------------------------------------------------------------------
 
-		if ( class_exists( 'SEO_Agent_AI_DB_Manager' ) ) {
-			$inbound = SEO_Agent_AI_DB_Manager::get_post_links( $post->ID, 'target' );
+		if ( class_exists( 'Ariham_SEOAgent_DB_Manager' ) ) {
+			$inbound = Ariham_SEOAgent_DB_Manager::get_post_links( $post->ID, 'target' );
 			if ( count( $inbound ) === 0 ) {
 				$signals['orphan_page'] = true;
 			}
@@ -173,7 +173,7 @@ class SEO_Agent_AI_SEO_Analyzer {
 		}
 
 		// Cannibalization: detected when cross-page query data is provided.
-		if ( ! empty( $extra['all_page_queries'] ) && $this->keyword_cluster instanceof SEO_Agent_AI_Keyword_Cluster ) {
+		if ( ! empty( $extra['all_page_queries'] ) && $this->keyword_cluster instanceof Ariham_SEOAgent_Keyword_Cluster ) {
 			$cannibal = $this->keyword_cluster->detect_cannibalization( $extra['all_page_queries'] );
 			$page_url = get_permalink( $post );
 			foreach ( $cannibal as $item ) {

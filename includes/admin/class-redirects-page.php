@@ -2,19 +2,19 @@
 /**
  * Redirects & 404s admin page.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Redirects_Page {
+class Ariham_SEOAgent_Redirects_Page {
 
-	/** @var SEO_Agent_AI_Redirect_Manager */
+	/** @var Ariham_SEOAgent_Redirect_Manager */
 	private $redirect_manager;
 
-	public function __construct( SEO_Agent_AI_Redirect_Manager $redirect_manager ) {
+	public function __construct( Ariham_SEOAgent_Redirect_Manager $redirect_manager ) {
 		$this->redirect_manager = $redirect_manager;
 	}
 
@@ -29,7 +29,7 @@ class SEO_Agent_AI_Redirects_Page {
 		$action = isset( $_POST['seo_redirect_action'] ) ? sanitize_key( $_POST['seo_redirect_action'] ) : '';
 
 		if ( 'add' === $action ) {
-			check_admin_referer( 'seo_agent_ai_add_redirect' );
+			check_admin_referer( 'ariham_seoagent_add_redirect' );
 			$source = isset( $_POST['source_url'] ) ? sanitize_text_field( wp_unslash( $_POST['source_url'] ) ) : '';
 			$target = isset( $_POST['target_url'] ) ? esc_url_raw( wp_unslash( $_POST['target_url'] ) ) : '';
 			$type   = isset( $_POST['redirect_type'] ) ? absint( $_POST['redirect_type'] ) : 301;
@@ -39,14 +39,14 @@ class SEO_Agent_AI_Redirects_Page {
 				$this->redirect_manager->add_redirect( $source, $target, $type, $notes );
 			}
 		} elseif ( 'delete' === $action ) {
-			check_admin_referer( 'seo_agent_ai_delete_redirect' );
+			check_admin_referer( 'ariham_seoagent_delete_redirect' );
 			$id = isset( $_POST['redirect_id'] ) ? absint( $_POST['redirect_id'] ) : 0;
 			if ( $id ) {
 				$this->redirect_manager->delete_redirect( $id );
 			}
 		}
 
-		wp_safe_redirect( admin_url( 'admin.php?page=seo-agent-redirects' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ariham-seoagent-redirects' ) );
 		exit;
 	}
 
@@ -63,16 +63,16 @@ class SEO_Agent_AI_Redirects_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Redirects &amp; 404 Monitor', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<nav class="sai-nav">
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-redirects&tab=redirects' ) ); ?>"
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-redirects&tab=redirects' ) ); ?>"
 							class="sai-nav-tab<?php echo 'redirects' === $tab ? ' active' : ''; ?>">
 							<?php esc_html_e( 'Redirects', 'ariham-seoagent' ); ?>
 						</a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-redirects&tab=404s' ) ); ?>"
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-redirects&tab=404s' ) ); ?>"
 							class="sai-nav-tab<?php echo '404s' === $tab ? ' active' : ''; ?>">
 							<?php esc_html_e( '404 Log', 'ariham-seoagent' ); ?>
 						</a>
@@ -107,8 +107,8 @@ class SEO_Agent_AI_Redirects_Page {
 					<div class="sai-card-header"><h2 class="sai-card-title"><?php esc_html_e( 'Add Redirect', 'ariham-seoagent' ); ?></h2></div>
 					<div class="sai-card-body">
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-							<?php wp_nonce_field( 'seo_agent_ai_add_redirect' ); ?>
-							<input type="hidden" name="action" value="seo_agent_ai_manage_redirect">
+							<?php wp_nonce_field( 'ariham_seoagent_add_redirect' ); ?>
+							<input type="hidden" name="action" value="ariham_seoagent_manage_redirect">
 							<input type="hidden" name="seo_redirect_action" value="add">
 							<div class="sai-field">
 								<label class="sai-field-label" for="source_url"><?php esc_html_e( 'Source URL / Path', 'ariham-seoagent' ); ?></label>
@@ -179,8 +179,8 @@ class SEO_Agent_AI_Redirects_Page {
 									</td>
 										<td>
 											<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-												<?php wp_nonce_field( 'seo_agent_ai_delete_redirect' ); ?>
-												<input type="hidden" name="action" value="seo_agent_ai_manage_redirect">
+												<?php wp_nonce_field( 'ariham_seoagent_delete_redirect' ); ?>
+												<input type="hidden" name="action" value="ariham_seoagent_manage_redirect">
 												<input type="hidden" name="seo_redirect_action" value="delete">
 												<input type="hidden" name="redirect_id" value="<?php echo esc_attr( $r['id'] ); ?>">
 												<button type="submit" class="sai-btn sai-btn-danger sai-btn-sm sai-delete-redirect"
@@ -234,7 +234,7 @@ class SEO_Agent_AI_Redirects_Page {
 										<td class="col-center col-num"><?php echo esc_html( number_format_i18n( (int) $e['hit_count'] ) ); ?></td>
 										<td>
 											<?php if ( ! $e['redirect_created'] ) : ?>
-											<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-redirects&tab=redirects&prefill=' . rawurlencode( $e['url'] ) ) ); ?>"
+											<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-redirects&tab=redirects&prefill=' . rawurlencode( $e['url'] ) ) ); ?>"
 												class="sai-btn sai-btn-ghost sai-btn-sm">
 												<span class="btn-label"><?php esc_html_e( '+ Create Redirect', 'ariham-seoagent' ); ?></span>
 											</a>

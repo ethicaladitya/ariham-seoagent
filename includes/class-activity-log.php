@@ -6,9 +6,9 @@
  * signals that led to it, and whether the change was later rolled back.
  * Provides a filterable, paginated read API for the Report admin page.
  *
- * Table: {prefix}seo_agent_ai_activity
+ * Table: {prefix}ariham_seoagent_activity
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-class SEO_Agent_AI_Activity_Log {
+class Ariham_SEOAgent_Activity_Log {
 
-	const DB_VERSION_OPTION = 'seo_agent_ai_activity_db_v';
+	const DB_VERSION_OPTION = 'ariham_seoagent_activity_db_v';
 	const DB_VERSION        = 2;
 
 	// Status values.
@@ -268,7 +268,7 @@ class SEO_Agent_AI_Activity_Log {
 	 */
 	public static function get_table_name() {
 		global $wpdb;
-		return esc_sql( $wpdb->prefix . 'seo_agent_ai_activity' );
+		return esc_sql( $wpdb->prefix . 'ariham_seoagent_activity' );
 	}
 
 	/**

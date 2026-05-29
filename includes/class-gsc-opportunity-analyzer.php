@@ -6,22 +6,22 @@
  * admin dashboard and WP-CLI commands can read one pre-built array
  * instead of making three separate API calls.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_GSC_Opportunity_Analyzer {
+class Ariham_SEOAgent_GSC_Opportunity_Analyzer {
 
-	const CACHE_TRANSIENT = 'seo_agent_ai_site_opportunities';
+	const CACHE_TRANSIENT = 'ariham_seoagent_site_opportunities';
 	const CACHE_TTL       = 6 * HOUR_IN_SECONDS;
 
-	/** @var SEO_Agent_AI_GSC_Client */
+	/** @var Ariham_SEOAgent_GSC_Client */
 	private $gsc_client;
 
-	public function __construct( SEO_Agent_AI_GSC_Client $gsc_client ) {
+	public function __construct( Ariham_SEOAgent_GSC_Client $gsc_client ) {
 		$this->gsc_client = $gsc_client;
 	}
 

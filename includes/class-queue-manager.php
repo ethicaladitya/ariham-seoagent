@@ -10,26 +10,26 @@
  * Queue state is stored in a single WP option as a JSON array
  * so it survives page loads and cron restarts.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Queue_Manager {
+class Ariham_SEOAgent_Queue_Manager {
 
-	const OPTION_KEY       = 'seo_agent_ai_queue';
+	const OPTION_KEY       = 'ariham_seoagent_queue';
 	const BATCH_SIZE       = 10;
 	const MAX_RETRIES      = 3;
 	const GSC_SLEEP_US     = 1000000; // 1 second between GSC calls.
 	const GA4_SLEEP_US     = 500000;  // 0.5 seconds between GA4 calls.
 	const BACKOFF_BASE_SEC = 30;      // Base back-off on 429/503.
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
-	public function __construct( SEO_Agent_AI_Logger $logger ) {
+	public function __construct( Ariham_SEOAgent_Logger $logger ) {
 		$this->logger = $logger;
 	}
 
@@ -85,11 +85,11 @@ class SEO_Agent_AI_Queue_Manager {
 			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'relation' => 'OR',
 				array(
-					'key'     => '_seo_agent_ai_last_analyzed',
+					'key'     => '_ariham_seoagent_last_analyzed',
 					'compare' => 'NOT EXISTS',
 				),
 				array(
-					'key'     => '_seo_agent_ai_last_analyzed',
+					'key'     => '_ariham_seoagent_last_analyzed',
 					'value'   => $cutoff,
 					'compare' => '<',
 					'type'    => 'DATETIME',
@@ -190,7 +190,7 @@ class SEO_Agent_AI_Queue_Manager {
 						$queue['total_errors'] = ( $queue['total_errors'] ?? 0 ) + 1;
 					}
 				} else {
-					update_post_meta( $post_id, '_seo_agent_ai_last_analyzed', current_time( 'mysql' ) );
+					update_post_meta( $post_id, '_ariham_seoagent_last_analyzed', current_time( 'mysql' ) );
 					$processed++;
 					$queue['total_processed'] = ( $queue['total_processed'] ?? 0 ) + 1;
 					$this->logger->debug( "Queue processed post {$post_id}." );
@@ -264,7 +264,7 @@ class SEO_Agent_AI_Queue_Manager {
 	}
 
 	private function is_rate_limit_error( $code, $message ) {
-		if ( in_array( $code, array( 'seo_agent_ai_gsc_api_error', 'seo_agent_ai_ga4_api_error' ), true ) ) {
+		if ( in_array( $code, array( 'ariham_seoagent_gsc_api_error', 'ariham_seoagent_ga4_api_error' ), true ) ) {
 			return ( strpos( $message, '429' ) !== false || strpos( $message, '503' ) !== false
 				|| stripos( $message, 'rate limit' ) !== false || stripos( $message, 'quota' ) !== false );
 		}

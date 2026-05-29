@@ -2,14 +2,14 @@
 /**
  * Per-post SEO metabox — Focus/Score, Meta overrides, Advanced/Robots.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Meta_Box {
+class Ariham_SEOAgent_Meta_Box {
 
 	// -------------------------------------------------------------------
 	// Hooks
@@ -19,7 +19,7 @@ class SEO_Agent_AI_Meta_Box {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_meta_box_assets' ) );
 		add_action( 'add_meta_boxes', array( $this, 'register_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
-		add_action( 'wp_ajax_seo_agent_ai_analyze_single_post', array( $this, 'ajax_analyze_single_post' ) );
+		add_action( 'wp_ajax_ariham_seoagent_analyze_single_post', array( $this, 'ajax_analyze_single_post' ) );
 	}
 
 	// -------------------------------------------------------------------
@@ -36,22 +36,22 @@ class SEO_Agent_AI_Meta_Box {
 		}
 		wp_enqueue_style(
 			'ariham-seoagent-admin',
-			SEO_AGENT_AI_PLUGIN_URL . 'assets/css/admin.css',
+			ARIHAM_SEOAGENT_PLUGIN_URL . 'assets/css/admin.css',
 			array(),
-			SEO_AGENT_AI_VERSION
+			ARIHAM_SEOAGENT_VERSION
 		);
 	}
 
 	public function register_meta_boxes() {
-		$post_types = (array) get_option( 'seo_agent_ai_post_types', array( 'post', 'page' ) );
+		$post_types = (array) get_option( 'ariham_seoagent_post_types', array( 'post', 'page' ) );
 		if ( empty( $post_types ) ) {
 			$post_types = array( 'post', 'page' );
 		}
 
 		foreach ( $post_types as $post_type ) {
 			add_meta_box(
-				'seo_agent_ai_meta_box',
-				__( 'SEO Agent AI', 'ariham-seoagent' ),
+				'ariham_seoagent_meta_box',
+				__( 'Ariham SEOAgent', 'ariham-seoagent' ),
 				array( $this, 'render_meta_box' ),
 				sanitize_key( $post_type ),
 				'normal',
@@ -65,21 +65,21 @@ class SEO_Agent_AI_Meta_Box {
 	// -------------------------------------------------------------------
 
 	public function render_meta_box( WP_Post $post ) {
-		wp_nonce_field( 'seo_agent_ai_meta_box_' . $post->ID, 'seo_agent_ai_meta_box_nonce' );
+		wp_nonce_field( 'ariham_seoagent_meta_box_' . $post->ID, 'ariham_seoagent_meta_box_nonce' );
 
 		// Read stored values.
-		$score         = (int) get_post_meta( $post->ID, '_seo_agent_ai_score', true );
-		$keyword       = (string) get_post_meta( $post->ID, '_seo_agent_ai_focus_keyword', true );
-		$last_analyzed = (string) get_post_meta( $post->ID, '_seo_agent_ai_last_analyzed', true );
-		$custom_title  = (string) get_post_meta( $post->ID, '_seo_agent_ai_custom_title', true );
-		$custom_desc   = (string) get_post_meta( $post->ID, '_seo_agent_ai_custom_description', true );
-		$canonical     = (string) get_post_meta( $post->ID, '_seo_agent_ai_canonical', true );
-		$noindex       = (bool) get_post_meta( $post->ID, '_seo_agent_ai_robots_noindex', true );
-		$nofollow      = (bool) get_post_meta( $post->ID, '_seo_agent_ai_robots_nofollow', true );
-		$noarchive     = (bool) get_post_meta( $post->ID, '_seo_agent_ai_robots_noarchive', true );
-		$nosnippet     = (bool) get_post_meta( $post->ID, '_seo_agent_ai_robots_nosnippet', true );
-		$og_title      = (string) get_post_meta( $post->ID, '_seo_agent_ai_og_title', true );
-		$og_desc       = (string) get_post_meta( $post->ID, '_seo_agent_ai_og_description', true );
+		$score         = (int) get_post_meta( $post->ID, '_ariham_seoagent_score', true );
+		$keyword       = (string) get_post_meta( $post->ID, '_ariham_seoagent_focus_keyword', true );
+		$last_analyzed = (string) get_post_meta( $post->ID, '_ariham_seoagent_last_analyzed', true );
+		$custom_title  = (string) get_post_meta( $post->ID, '_ariham_seoagent_custom_title', true );
+		$custom_desc   = (string) get_post_meta( $post->ID, '_ariham_seoagent_custom_description', true );
+		$canonical     = (string) get_post_meta( $post->ID, '_ariham_seoagent_canonical', true );
+		$noindex       = (bool) get_post_meta( $post->ID, '_ariham_seoagent_robots_noindex', true );
+		$nofollow      = (bool) get_post_meta( $post->ID, '_ariham_seoagent_robots_nofollow', true );
+		$noarchive     = (bool) get_post_meta( $post->ID, '_ariham_seoagent_robots_noarchive', true );
+		$nosnippet     = (bool) get_post_meta( $post->ID, '_ariham_seoagent_robots_nosnippet', true );
+		$og_title      = (string) get_post_meta( $post->ID, '_ariham_seoagent_og_title', true );
+		$og_desc       = (string) get_post_meta( $post->ID, '_ariham_seoagent_og_description', true );
 
 		// Score badge colour.
 		if ( $score >= 70 ) {
@@ -104,8 +104,8 @@ class SEO_Agent_AI_Meta_Box {
 				<span class="sai-score-badge" style="background:<?php echo esc_attr( $badge_color ); ?>"><?php echo esc_html( $score_label ); ?></span>
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_focus_keyword"><?php esc_html_e( 'Focus Keyword', 'ariham-seoagent' ); ?></label>
-				<input type="text" id="seo_agent_ai_focus_keyword" name="seo_agent_ai_focus_keyword" value="<?php echo esc_attr( $keyword ); ?>" />
+				<label for="ariham_seoagent_focus_keyword"><?php esc_html_e( 'Focus Keyword', 'ariham-seoagent' ); ?></label>
+				<input type="text" id="ariham_seoagent_focus_keyword" name="ariham_seoagent_focus_keyword" value="<?php echo esc_attr( $keyword ); ?>" />
 			</div>
 			<?php if ( $last_analyzed ) : ?>
 			<div class="sai-row">
@@ -123,19 +123,19 @@ class SEO_Agent_AI_Meta_Box {
 
 		<div id="sai-tab-meta" class="sai-tab-panel">
 			<div class="sai-row">
-				<label for="seo_agent_ai_custom_title"><?php esc_html_e( 'SEO Title Override', 'ariham-seoagent' ); ?></label>
-				<input type="text" id="seo_agent_ai_custom_title" name="seo_agent_ai_custom_title"
+				<label for="ariham_seoagent_custom_title"><?php esc_html_e( 'SEO Title Override', 'ariham-seoagent' ); ?></label>
+				<input type="text" id="ariham_seoagent_custom_title" name="ariham_seoagent_custom_title"
 					value="<?php echo esc_attr( $custom_title ); ?>"
 					placeholder="<?php echo esc_attr( get_the_title( $post->ID ) ); ?>" />
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_custom_description"><?php esc_html_e( 'Meta Description', 'ariham-seoagent' ); ?></label>
-				<textarea id="seo_agent_ai_custom_description" name="seo_agent_ai_custom_description" rows="3"><?php echo esc_textarea( $custom_desc ); ?></textarea>
+				<label for="ariham_seoagent_custom_description"><?php esc_html_e( 'Meta Description', 'ariham-seoagent' ); ?></label>
+				<textarea id="ariham_seoagent_custom_description" name="ariham_seoagent_custom_description" rows="3"><?php echo esc_textarea( $custom_desc ); ?></textarea>
 				<span class="sai-char-count" id="sai-desc-count"><?php echo esc_html( mb_strlen( $custom_desc ) ); ?> / 160</span>
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_canonical"><?php esc_html_e( 'Canonical URL', 'ariham-seoagent' ); ?></label>
-				<input type="url" id="seo_agent_ai_canonical" name="seo_agent_ai_canonical"
+				<label for="ariham_seoagent_canonical"><?php esc_html_e( 'Canonical URL', 'ariham-seoagent' ); ?></label>
+				<input type="url" id="ariham_seoagent_canonical" name="ariham_seoagent_canonical"
 					value="<?php echo esc_url( $canonical ); ?>"
 					placeholder="<?php echo esc_attr( get_permalink( $post->ID ) ); ?>" />
 			</div>
@@ -144,18 +144,18 @@ class SEO_Agent_AI_Meta_Box {
 		<div id="sai-tab-advanced" class="sai-tab-panel">
 			<div class="sai-row">
 				<label><?php esc_html_e( 'Robots Directives', 'ariham-seoagent' ); ?></label>
-				<label><input type="checkbox" name="seo_agent_ai_robots_noindex"   value="1" <?php checked( $noindex ); ?>> <?php esc_html_e( 'noindex', 'ariham-seoagent' ); ?></label><br>
-				<label><input type="checkbox" name="seo_agent_ai_robots_nofollow"  value="1" <?php checked( $nofollow ); ?>> <?php esc_html_e( 'nofollow', 'ariham-seoagent' ); ?></label><br>
-				<label><input type="checkbox" name="seo_agent_ai_robots_noarchive" value="1" <?php checked( $noarchive ); ?>> <?php esc_html_e( 'noarchive', 'ariham-seoagent' ); ?></label><br>
-				<label><input type="checkbox" name="seo_agent_ai_robots_nosnippet" value="1" <?php checked( $nosnippet ); ?>> <?php esc_html_e( 'nosnippet', 'ariham-seoagent' ); ?></label>
+				<label><input type="checkbox" name="ariham_seoagent_robots_noindex"   value="1" <?php checked( $noindex ); ?>> <?php esc_html_e( 'noindex', 'ariham-seoagent' ); ?></label><br>
+				<label><input type="checkbox" name="ariham_seoagent_robots_nofollow"  value="1" <?php checked( $nofollow ); ?>> <?php esc_html_e( 'nofollow', 'ariham-seoagent' ); ?></label><br>
+				<label><input type="checkbox" name="ariham_seoagent_robots_noarchive" value="1" <?php checked( $noarchive ); ?>> <?php esc_html_e( 'noarchive', 'ariham-seoagent' ); ?></label><br>
+				<label><input type="checkbox" name="ariham_seoagent_robots_nosnippet" value="1" <?php checked( $nosnippet ); ?>> <?php esc_html_e( 'nosnippet', 'ariham-seoagent' ); ?></label>
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_og_title"><?php esc_html_e( 'Social OG Title Override', 'ariham-seoagent' ); ?></label>
-				<input type="text" id="seo_agent_ai_og_title" name="seo_agent_ai_og_title" value="<?php echo esc_attr( $og_title ); ?>" />
+				<label for="ariham_seoagent_og_title"><?php esc_html_e( 'Social OG Title Override', 'ariham-seoagent' ); ?></label>
+				<input type="text" id="ariham_seoagent_og_title" name="ariham_seoagent_og_title" value="<?php echo esc_attr( $og_title ); ?>" />
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_og_description"><?php esc_html_e( 'Social OG Description Override', 'ariham-seoagent' ); ?></label>
-				<textarea id="seo_agent_ai_og_description" name="seo_agent_ai_og_description" rows="2"><?php echo esc_textarea( $og_desc ); ?></textarea>
+				<label for="ariham_seoagent_og_description"><?php esc_html_e( 'Social OG Description Override', 'ariham-seoagent' ); ?></label>
+				<textarea id="ariham_seoagent_og_description" name="ariham_seoagent_og_description" rows="2"><?php echo esc_textarea( $og_desc ); ?></textarea>
 			</div>
 		</div>
 
@@ -171,7 +171,7 @@ class SEO_Agent_AI_Meta_Box {
 				});
 			});
 
-			var descArea = document.getElementById('seo_agent_ai_custom_description');
+			var descArea = document.getElementById('ariham_seoagent_custom_description');
 			var descCount = document.getElementById('sai-desc-count');
 			if(descArea && descCount){
 				descArea.addEventListener('input', function(){
@@ -186,9 +186,9 @@ class SEO_Agent_AI_Meta_Box {
 					status.textContent = '<?php echo esc_js( __( 'Analyzing…', 'ariham-seoagent' ) ); ?>';
 					analyzeBtn.disabled = true;
 					var data = new FormData();
-					data.append('action', 'seo_agent_ai_analyze_single_post');
+					data.append('action', 'ariham_seoagent_analyze_single_post');
 					data.append('post_id', analyzeBtn.dataset.postId);
-					data.append('nonce', '<?php echo esc_js( wp_create_nonce( 'seo_agent_ai_analyze_post' ) ); ?>');
+					data.append('nonce', '<?php echo esc_js( wp_create_nonce( 'ariham_seoagent_analyze_post' ) ); ?>');
 					fetch(ajaxurl, { method:'POST', body:data, credentials:'same-origin' })
 						.then(function(r){ return r.json(); })
 						.then(function(resp){
@@ -220,10 +220,10 @@ class SEO_Agent_AI_Meta_Box {
 		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
-		if ( empty( $_POST['seo_agent_ai_meta_box_nonce'] ) ) {
+		if ( empty( $_POST['ariham_seoagent_meta_box_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['seo_agent_ai_meta_box_nonce'] ) ), 'seo_agent_ai_meta_box_' . $post_id ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ariham_seoagent_meta_box_nonce'] ) ), 'ariham_seoagent_meta_box_' . $post_id ) ) {
 			return;
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -231,15 +231,15 @@ class SEO_Agent_AI_Meta_Box {
 		}
 
 		$text_fields = array(
-			'seo_agent_ai_focus_keyword' => '_seo_agent_ai_focus_keyword',
-			'seo_agent_ai_custom_title'  => '_seo_agent_ai_custom_title',
-			'seo_agent_ai_canonical'     => '_seo_agent_ai_canonical',
-			'seo_agent_ai_og_title'      => '_seo_agent_ai_og_title',
+			'ariham_seoagent_focus_keyword' => '_ariham_seoagent_focus_keyword',
+			'ariham_seoagent_custom_title'  => '_ariham_seoagent_custom_title',
+			'ariham_seoagent_canonical'     => '_ariham_seoagent_canonical',
+			'ariham_seoagent_og_title'      => '_ariham_seoagent_og_title',
 		);
 
 		foreach ( $text_fields as $field => $meta_key ) {
 			if ( isset( $_POST[ $field ] ) ) {
-				$value = $field === 'seo_agent_ai_canonical'
+				$value = $field === 'ariham_seoagent_canonical'
 					? esc_url_raw( wp_unslash( $_POST[ $field ] ) )
 					: sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
 				update_post_meta( $post_id, $meta_key, $value );
@@ -247,8 +247,8 @@ class SEO_Agent_AI_Meta_Box {
 		}
 
 		$textarea_fields = array(
-			'seo_agent_ai_custom_description' => '_seo_agent_ai_custom_description',
-			'seo_agent_ai_og_description'     => '_seo_agent_ai_og_description',
+			'ariham_seoagent_custom_description' => '_ariham_seoagent_custom_description',
+			'ariham_seoagent_og_description'     => '_ariham_seoagent_og_description',
 		);
 
 		foreach ( $textarea_fields as $field => $meta_key ) {
@@ -258,10 +258,10 @@ class SEO_Agent_AI_Meta_Box {
 		}
 
 		$checkbox_fields = array(
-			'seo_agent_ai_robots_noindex'   => '_seo_agent_ai_robots_noindex',
-			'seo_agent_ai_robots_nofollow'  => '_seo_agent_ai_robots_nofollow',
-			'seo_agent_ai_robots_noarchive' => '_seo_agent_ai_robots_noarchive',
-			'seo_agent_ai_robots_nosnippet' => '_seo_agent_ai_robots_nosnippet',
+			'ariham_seoagent_robots_noindex'   => '_ariham_seoagent_robots_noindex',
+			'ariham_seoagent_robots_nofollow'  => '_ariham_seoagent_robots_nofollow',
+			'ariham_seoagent_robots_noarchive' => '_ariham_seoagent_robots_noarchive',
+			'ariham_seoagent_robots_nosnippet' => '_ariham_seoagent_robots_nosnippet',
 		);
 
 		foreach ( $checkbox_fields as $field => $meta_key ) {
@@ -274,7 +274,7 @@ class SEO_Agent_AI_Meta_Box {
 	// -------------------------------------------------------------------
 
 	public function ajax_analyze_single_post() {
-		check_ajax_referer( 'seo_agent_ai_analyze_post', 'nonce' );
+		check_ajax_referer( 'ariham_seoagent_analyze_post', 'nonce' );
 
 		$post_id = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
@@ -286,9 +286,9 @@ class SEO_Agent_AI_Meta_Box {
 			wp_send_json_error( __( 'Post not found.', 'ariham-seoagent' ) );
 		}
 
-		$result = SEO_Agent_AI_Plugin::instance()->analyze_post_for_cli( $post, false, true );
+		$result = Ariham_SEOAgent_Plugin::instance()->analyze_post_for_cli( $post, false, true );
 
-		$score = (int) get_post_meta( $post_id, '_seo_agent_ai_score', true );
+		$score = (int) get_post_meta( $post_id, '_ariham_seoagent_score', true );
 		$recs  = isset( $result['recommendations'] ) ? count( $result['recommendations'] ) : 0;
 
 		$top_issues = array();

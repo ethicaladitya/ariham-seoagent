@@ -18,14 +18,14 @@
  * OAuth proxy (`https://sitekit.withgoogle.com/o/oauth2/token/`) directly,
  * using the site-specific credentials stored in `googlesitekit_credentials`.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_SiteKit_Bridge {
+class Ariham_SEOAgent_SiteKit_Bridge {
 
 	// -----------------------------------------------------------------------
 	// Site Kit option / user-meta keys (stable since Site Kit 1.x)
@@ -137,7 +137,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		$owner_id = self::get_owner_id();
 		if ( $owner_id <= 0 ) {
 			return new WP_Error(
-				'seo_agent_ai_sitekit_no_owner',
+				'ariham_seoagent_sitekit_no_owner',
 				__( 'Site Kit owner user not found.', 'ariham-seoagent' )
 			);
 		}
@@ -157,7 +157,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		$encrypted = get_user_meta( $owner_id, self::META_ACCESS_TOKEN, true );
 		if ( empty( $encrypted ) ) {
 			return new WP_Error(
-				'seo_agent_ai_sitekit_no_token',
+				'ariham_seoagent_sitekit_no_token',
 				__( 'No Site Kit access token found. Please re-connect Site Kit.', 'ariham-seoagent' )
 			);
 		}
@@ -165,7 +165,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		$token = self::sk_decrypt( (string) $encrypted );
 		if ( $token === '' ) {
 			return new WP_Error(
-				'seo_agent_ai_sitekit_decrypt_fail',
+				'ariham_seoagent_sitekit_decrypt_fail',
 				__( 'Could not decrypt Site Kit access token.', 'ariham-seoagent' )
 			);
 		}
@@ -193,7 +193,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		if ( ! defined( 'GOOGLESITEKIT_PLUGIN_MAIN_FILE' )
 			|| ! class_exists( 'Google\Site_Kit\Context' ) ) {
 			return new WP_Error(
-				'seo_agent_ai_sitekit_no_classes',
+				'ariham_seoagent_sitekit_no_classes',
 				__( 'Site Kit classes not available for token refresh.', 'ariham-seoagent' )
 			);
 		}
@@ -221,7 +221,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		$new_token = $oauth_client->get_access_token();
 		if ( empty( $new_token ) ) {
 			return new WP_Error(
-				'seo_agent_ai_sitekit_refresh_empty',
+				'ariham_seoagent_sitekit_refresh_empty',
 				__( 'Site Kit token refresh completed but no access token was returned. Please re-connect Site Kit.', 'ariham-seoagent' )
 			);
 		}

@@ -154,7 +154,7 @@
 
 		function runBatch( offset ) {
 			var fd = new FormData();
-			fd.append( 'action',      'seo_agent_ai_analyze_batch' );
+			fd.append( 'action',      'ariham_seoagent_analyze_batch' );
 			fd.append( '_ajax_nonce', cfg.nonce || '' );
 			fd.append( 'offset',      offset );
 
@@ -213,7 +213,7 @@
 			btnLoading( btn );
 
 			var fd = new FormData();
-			fd.append( 'action',          'seo_agent_ai_decision_action' );
+			fd.append( 'action',          'ariham_seoagent_decision_action' );
 			fd.append( '_ajax_nonce',     cfg.nonce || '' );
 			fd.append( 'decision_id',     decisionId );
 			fd.append( 'decision_action', action );
@@ -287,7 +287,7 @@
 			btnLoading( btn );
 
 			var fd = new FormData();
-			fd.append( 'action',      'seo_agent_ai_bulk_apply_safe' );
+			fd.append( 'action',      'ariham_seoagent_bulk_apply_safe' );
 			fd.append( '_ajax_nonce', cfg.nonceApprove || cfg.nonce || '' );
 
 			fetch( ajaxUrl, { method: 'POST', body: fd } )
@@ -340,7 +340,7 @@
 			btnLoading( btn );
 
 			var fd = new FormData();
-			fd.append( 'action',      'seo_agent_ai_trigger_cron' );
+			fd.append( 'action',      'ariham_seoagent_trigger_cron' );
 			fd.append( '_ajax_nonce', cfg.nonce || '' );
 			fd.append( 'hook',        hook );
 

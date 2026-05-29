@@ -4,21 +4,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Recommendation_Engine {
+class Ariham_SEOAgent_Recommendation_Engine {
 
-	/** @var SEO_Agent_AI_Gemini_Client|null */
+	/** @var Ariham_SEOAgent_Gemini_Client|null */
 	private $gemini;
 
-	/** @var SEO_Agent_AI_OpenAI_Client|null */
+	/** @var Ariham_SEOAgent_OpenAI_Client|null */
 	private $openai;
 
-	/** @var SEO_Agent_AI_Decision_Engine|null */
+	/** @var Ariham_SEOAgent_Decision_Engine|null */
 	private $decision_engine;
 
 	public function __construct(
-		?SEO_Agent_AI_Gemini_Client $gemini = null,
-		?SEO_Agent_AI_OpenAI_Client $openai = null,
-		?SEO_Agent_AI_Decision_Engine $decision_engine = null
+		?Ariham_SEOAgent_Gemini_Client $gemini = null,
+		?Ariham_SEOAgent_OpenAI_Client $openai = null,
+		?Ariham_SEOAgent_Decision_Engine $decision_engine = null
 	) {
 		$this->gemini          = $gemini;
 		$this->openai          = $openai;
@@ -65,11 +65,11 @@ class SEO_Agent_AI_Recommendation_Engine {
 		if ( ! empty( $top_query ) ) {
 			array_unshift( $gsc_query_strings, $top_query );
 		}
-		$search_intent = class_exists( 'SEO_Agent_AI_Search_Intent' )
-			? SEO_Agent_AI_Search_Intent::classify_bulk( $gsc_query_strings )
+		$search_intent = class_exists( 'Ariham_SEOAgent_Search_Intent' )
+			? Ariham_SEOAgent_Search_Intent::classify_bulk( $gsc_query_strings )
 			: 'unknown';
-		$intent_label  = class_exists( 'SEO_Agent_AI_Search_Intent' )
-			? SEO_Agent_AI_Search_Intent::label( $search_intent )
+		$intent_label  = class_exists( 'Ariham_SEOAgent_Search_Intent' )
+			? Ariham_SEOAgent_Search_Intent::label( $search_intent )
 			: __( 'Unknown', 'ariham-seoagent' );
 
 		$recommendations = array();
@@ -554,7 +554,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 		// 16. Core Web Vitals performance fix (new)
 		// ------------------------------------------------------------------
 
-		$psi_cache_key = 'sai_psi_' . md5( get_permalink( $post->ID ) . 'mobile' );
+		$psi_cache_key = 'ariham_seoagent_psi_' . md5( get_permalink( $post->ID ) . 'mobile' );
 		$psi_metrics   = get_transient( $psi_cache_key );
 		if ( is_array( $psi_metrics ) ) {
 			$cwv_lcp  = (int) ( $psi_metrics['lcp_ms'] ?? 0 );
@@ -664,7 +664,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 		// Route through decision engine (if available)
 		// ------------------------------------------------------------------
 
-		if ( $this->decision_engine instanceof SEO_Agent_AI_Decision_Engine ) {
+		if ( $this->decision_engine instanceof Ariham_SEOAgent_Decision_Engine ) {
 			foreach ( $recommendations as &$rec ) {
 				$decision             = $this->decision_engine->process(
 					$post->ID,
@@ -724,7 +724,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 	/**
 	 * Route an AI generation call through the configured provider.
 	 *
-	 * Provider priority (from seo_agent_ai_ai_provider setting):
+	 * Provider priority (from ariham_seoagent_ai_provider setting):
 	 *   gemini  → Gemini only
 	 *   openai  → OpenAI only
 	 *   auto    → try Gemini, fall back to OpenAI, fall back to rule-based
@@ -735,7 +735,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 	 * @return string|null  Generated value, or null to signal fall-through to rule-based.
 	 */
 	private function ai_generate( $method, WP_Post $post, $arg ) {
-		$provider = (string) get_option( 'seo_agent_ai_ai_provider', 'gemini' );
+		$provider = (string) get_option( 'ariham_seoagent_ai_provider', 'gemini' );
 
 		if ( $provider === 'openai' ) {
 			return $this->try_client( $this->openai, $method, $post, $arg );

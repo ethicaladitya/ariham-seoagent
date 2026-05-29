@@ -10,19 +10,19 @@
  * Also processes the OAuth callback (?code=, ?state=) when Google redirects
  * back to this page after the user grants consent.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Connect_Page {
+class Ariham_SEOAgent_Connect_Page {
 
-	/** @var SEO_Agent_AI_Google_OAuth */
+	/** @var Ariham_SEOAgent_Google_OAuth */
 	private $oauth;
 
-	public function __construct( SEO_Agent_AI_Google_OAuth $oauth ) {
+	public function __construct( Ariham_SEOAgent_Google_OAuth $oauth ) {
 		$this->oauth = $oauth;
 	}
 
@@ -40,22 +40,22 @@ class SEO_Agent_AI_Connect_Page {
 		$email         = $this->oauth->get_connected_email();
 		$redirect_uri  = $this->oauth->get_redirect_uri();
 
-		$sitekit_active    = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
+		$sitekit_active    = class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active();
 		$sitekit_installed = defined( 'GOOGLESITEKIT_VERSION' );
 
 		// Only probe OAuth health when Site Kit is not handling auth.
 		$health = ! $sitekit_active ? $this->probe_auth_health() : array( 'ok' => true, 'message' => '' );
 
-		$notice = filter_input( INPUT_GET, 'seo_agent_ai_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$notice = filter_input( INPUT_GET, 'ariham_seoagent_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$notice = is_string( $notice ) ? sanitize_key( wp_unslash( $notice ) ) : '';
 
-		$oauth_error = filter_input( INPUT_GET, 'seo_agent_ai_oauth_error', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$oauth_error = filter_input( INPUT_GET, 'ariham_seoagent_oauth_error', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$oauth_error = is_string( $oauth_error ) ? rawurldecode( sanitize_text_field( wp_unslash( $oauth_error ) ) ) : '';
 		?>
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Connect Google', 'ariham-seoagent' ); ?></h1>
 				</div>
 			</div>
@@ -74,7 +74,7 @@ class SEO_Agent_AI_Connect_Page {
 				<div class="sai-connect-hero">
 					<div class="sai-connect-hero-icon">&#128279;</div>
 					<h2><?php esc_html_e( 'Connect your Google account', 'ariham-seoagent' ); ?></h2>
-					<p><?php esc_html_e( 'SEO Agent AI needs access to Google Search Console and Google Analytics to analyze your content performance. Choose one of the two methods below.', 'ariham-seoagent' ); ?></p>
+					<p><?php esc_html_e( 'Ariham SEOAgent needs access to Google Search Console and Google Analytics to analyze your content performance. Choose one of the two methods below.', 'ariham-seoagent' ); ?></p>
 				</div>
 
 				<?php // ---------------------------------------------------------------
@@ -103,8 +103,8 @@ class SEO_Agent_AI_Connect_Page {
 											printf(
 												/* translators: 1: GSC property URL  2: GA4 property ID */
 												esc_html__( 'Search Console: %1$s — Analytics property: %2$s', 'ariham-seoagent' ),
-												esc_html( SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url() ),
-												esc_html( SEO_Agent_AI_SiteKit_Bridge::get_ga4_property_id() )
+												esc_html( Ariham_SEOAgent_SiteKit_Bridge::get_gsc_site_url() ),
+												esc_html( Ariham_SEOAgent_SiteKit_Bridge::get_ga4_property_id() )
 											);
 											?>
 										</span>
@@ -112,7 +112,7 @@ class SEO_Agent_AI_Connect_Page {
 								</div>
 							</div>
 							<p style="font-size:13px;color:#555;margin:12px 0 0">
-								<?php esc_html_e( 'SEO Agent AI is reading your Search Console and Analytics data directly from Site Kit. All data collection is active.', 'ariham-seoagent' ); ?>
+								<?php esc_html_e( 'Ariham SEOAgent is reading your Search Console and Analytics data directly from Site Kit. All data collection is active.', 'ariham-seoagent' ); ?>
 							</p>
 
 						<?php elseif ( $sitekit_installed ) : ?>
@@ -121,7 +121,7 @@ class SEO_Agent_AI_Connect_Page {
 									<div class="sai-connect-icon-wrap">&#9888;</div>
 									<div class="sai-connect-item-body">
 										<strong><?php esc_html_e( 'Site Kit is installed but not fully connected.', 'ariham-seoagent' ); ?></strong>
-										<span><?php esc_html_e( 'Complete the Site Kit setup wizard so SEO Agent AI can read your data automatically.', 'ariham-seoagent' ); ?></span>
+										<span><?php esc_html_e( 'Complete the Site Kit setup wizard so Ariham SEOAgent can read your data automatically.', 'ariham-seoagent' ); ?></span>
 									</div>
 								</div>
 							</div>
@@ -131,7 +131,7 @@ class SEO_Agent_AI_Connect_Page {
 
 						<?php else : ?>
 							<p style="font-size:13px;color:#555;margin:0 0 12px">
-								<?php esc_html_e( 'Install the free Google Site Kit plugin. Once you connect it, SEO Agent AI automatically reads your Search Console and Analytics data — no API keys or OAuth credentials required.', 'ariham-seoagent' ); ?>
+								<?php esc_html_e( 'Install the free Google Site Kit plugin. Once you connect it, Ariham SEOAgent automatically reads your Search Console and Analytics data — no API keys or OAuth credentials required.', 'ariham-seoagent' ); ?>
 							</p>
 							<a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=google+site+kit&tab=search&type=term' ) ); ?>" class="sai-btn sai-btn-primary" style="display:inline-flex">
 								<span class="btn-label"><?php esc_html_e( 'Install Google Site Kit', 'ariham-seoagent' ); ?> &rarr;</span>
@@ -192,8 +192,8 @@ class SEO_Agent_AI_Connect_Page {
 								</div>
 							</div>
 							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-								<?php wp_nonce_field( 'seo_agent_ai_google_disconnect' ); ?>
-								<input type="hidden" name="action" value="seo_agent_ai_google_disconnect">
+								<?php wp_nonce_field( 'ariham_seoagent_google_disconnect' ); ?>
+								<input type="hidden" name="action" value="ariham_seoagent_google_disconnect">
 								<button type="submit" class="sai-btn sai-btn-danger"
 									onclick="return confirm('<?php esc_attr_e( 'Disconnect your Google account?', 'ariham-seoagent' ); ?>')">
 									<span class="btn-label"><?php esc_html_e( 'Disconnect Google Account', 'ariham-seoagent' ); ?></span>
@@ -291,8 +291,8 @@ class SEO_Agent_AI_Connect_Page {
 							<?php if ( $is_connected ) : ?>
 								<p style="color:#555;font-size:13px"><?php esc_html_e( 'Manual OAuth credentials are also saved. Site Kit takes priority.', 'ariham-seoagent' ); ?></p>
 								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-									<?php wp_nonce_field( 'seo_agent_ai_google_disconnect' ); ?>
-									<input type="hidden" name="action" value="seo_agent_ai_google_disconnect">
+									<?php wp_nonce_field( 'ariham_seoagent_google_disconnect' ); ?>
+									<input type="hidden" name="action" value="ariham_seoagent_google_disconnect">
 									<button type="submit" class="sai-btn sai-btn-ghost"><span class="btn-label"><?php esc_html_e( 'Remove manual OAuth tokens', 'ariham-seoagent' ); ?></span></button>
 								</form>
 							<?php else : ?>
@@ -319,7 +319,7 @@ class SEO_Agent_AI_Connect_Page {
 	 * @return array{ok:bool,message:string}
 	 */
 	private function probe_auth_health() {
-		$cache_key = 'seo_agent_ai_auth_health';
+		$cache_key = 'ariham_seoagent_auth_health';
 		$cached    = get_transient( $cache_key );
 		if ( is_array( $cached ) && isset( $cached['ok'], $cached['message'] ) ) {
 			return $cached;

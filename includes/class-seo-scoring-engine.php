@@ -17,19 +17,19 @@
  *
  * Raw totals are normalised: final = min(100, round(raw * 100 / 110)).
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_SEO_Scoring_Engine {
+class Ariham_SEOAgent_SEO_Scoring_Engine {
 
-	/** @var SEO_Agent_AI_Content_Analyzer */
+	/** @var Ariham_SEOAgent_Content_Analyzer */
 	private $content_analyzer;
 
-	public function __construct( SEO_Agent_AI_Content_Analyzer $content_analyzer ) {
+	public function __construct( Ariham_SEOAgent_Content_Analyzer $content_analyzer ) {
 		$this->content_analyzer = $content_analyzer;
 	}
 
@@ -113,7 +113,7 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 		);
 
 		if ( $save ) {
-			SEO_Agent_AI_DB_Manager::insert_page_insight( $post->ID, $dim_scores + array( 'overall' => $overall ), $signals );
+			Ariham_SEOAgent_DB_Manager::insert_page_insight( $post->ID, $dim_scores + array( 'overall' => $overall ), $signals );
 		}
 
 		return $result;
@@ -126,7 +126,7 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 	 * @return array|null
 	 */
 	public function get_latest( $post_id ) {
-		return SEO_Agent_AI_DB_Manager::get_latest_insight( $post_id );
+		return Ariham_SEOAgent_DB_Manager::get_latest_insight( $post_id );
 	}
 
 	/**
@@ -137,7 +137,7 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 	 * @return array
 	 */
 	public function get_trend( $post_id, $limit = 30 ) {
-		$rows = SEO_Agent_AI_DB_Manager::get_insight_history( $post_id, $limit );
+		$rows = Ariham_SEOAgent_DB_Manager::get_insight_history( $post_id, $limit );
 		return array_map( fn( $r ) => array(
 			'date'    => $r['recorded_at'],
 			'overall' => (int) $r['score_overall'],
@@ -250,7 +250,7 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 		$inlinks = $content['internal_link_count'] ?? 0;
 
 		// Count inbound links from other posts via DB table.
-		$inbound = count( SEO_Agent_AI_DB_Manager::get_post_links( $post_id, 'target' ) );
+		$inbound = count( Ariham_SEOAgent_DB_Manager::get_post_links( $post_id, 'target' ) );
 
 		if ( $inlinks >= 3 ) {
 			$score += 8;
@@ -410,7 +410,7 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 			return array( 5, $s, $i );
 		}
 
-		$cache_key = 'sai_psi_' . md5( $url . 'mobile' );
+		$cache_key = 'ariham_seoagent_psi_' . md5( $url . 'mobile' );
 		$metrics   = get_transient( $cache_key );
 
 		if ( ! is_array( $metrics ) ) {

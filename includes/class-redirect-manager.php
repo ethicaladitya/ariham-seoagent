@@ -2,17 +2,17 @@
 /**
  * Redirect Manager — 301/302 redirects and 404 logging.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Redirect_Manager {
+class Ariham_SEOAgent_Redirect_Manager {
 
-	const TABLE_REDIRECTS   = 'seo_agent_redirects';
-	const TABLE_404_LOG     = 'seo_agent_404_log';
+	const TABLE_REDIRECTS   = 'ariham_seoagent_redirects';
+	const TABLE_404_LOG     = 'ariham_seoagent_404_log';
 	const TABLE_SMARTCRAWL  = 'smartcrawl_redirects';
 	const TABLE_RANKMATH    = 'rank_math_redirections';
 	const TABLE_REDIRECTION = 'redirection_items';
@@ -22,7 +22,7 @@ class SEO_Agent_AI_Redirect_Manager {
 	const BACKEND_REDIRECTION = 'redirection';
 	const BACKEND_OWN         = 'own';
 
-	const REDIRECT_CACHE_KEY = 'seo_agent_ai_redirect_list';
+	const REDIRECT_CACHE_KEY = 'ariham_seoagent_redirect_list';
 	const REDIRECT_CACHE_TTL = 5 * MINUTE_IN_SECONDS;
 
 	/** @var string|null  Detected redirect backend. */

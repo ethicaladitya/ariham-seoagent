@@ -1,10 +1,10 @@
 <?php
 /**
- * WP-CLI command suite for SEO Agent AI.
+ * WP-CLI command suite for Ariham SEOAgent.
  *
- * Register with: WP_CLI::add_command( 'seo-agent', 'SEO_Agent_AI_CLI' )
+ * Register with: WP_CLI::add_command( 'ariham-seoagent', 'Ariham_SEOAgent_CLI' )
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 /**
  * Autonomous SEO agent commands.
  */
-class SEO_Agent_AI_CLI {
+class Ariham_SEOAgent_CLI {
 
 	// -------------------------------------------------------------------
 	// analyze
@@ -40,8 +40,8 @@ class SEO_Agent_AI_CLI {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp seo-agent analyze
-	 *     wp seo-agent analyze --post-id=42 --dry-run --verbose
+	 *     wp ariham-seoagent analyze
+	 *     wp ariham-seoagent analyze --post-id=42 --dry-run --verbose
 	 *
 	 * @subcommand analyze
 	 */
@@ -50,7 +50,7 @@ class SEO_Agent_AI_CLI {
 		$dry_run  = isset( $assoc_args['dry-run'] );
 		$verbose  = isset( $assoc_args['verbose'] );
 
-		$plugin   = SEO_Agent_AI_Plugin::instance();
+		$plugin   = Ariham_SEOAgent_Plugin::instance();
 		$logger   = $plugin->get_logger();
 
 		if ( $dry_run ) {
@@ -138,7 +138,7 @@ class SEO_Agent_AI_CLI {
 		$dry_run  = isset( $assoc_args['dry-run'] );
 		$mode     = isset( $assoc_args['mode'] ) && $assoc_args['mode'] === 'aggressive' ? 'aggressive' : 'safe';
 
-		$plugin = SEO_Agent_AI_Plugin::instance();
+		$plugin = Ariham_SEOAgent_Plugin::instance();
 
 		if ( $dry_run ) {
 			WP_CLI::log( WP_CLI::colorize( '%Y[DRY-RUN]%n No changes will be written.' ) );
@@ -206,7 +206,7 @@ class SEO_Agent_AI_CLI {
 		$date   = isset( $assoc_args['date'] ) ? sanitize_text_field( $assoc_args['date'] ) : gmdate( 'Y-m-d' );
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
 
-		$plugin  = SEO_Agent_AI_Plugin::instance();
+		$plugin  = Ariham_SEOAgent_Plugin::instance();
 		$engine  = $plugin->get_report_engine();
 		$report  = $engine->get( $date );
 
@@ -259,7 +259,7 @@ class SEO_Agent_AI_CLI {
 			return;
 		}
 
-		$plugin = SEO_Agent_AI_Plugin::instance();
+		$plugin = Ariham_SEOAgent_Plugin::instance();
 		$result = $plugin->get_fix_executor()->rollback( $post_id, $dry_run );
 
 		if ( is_wp_error( $result ) ) {
@@ -296,7 +296,7 @@ class SEO_Agent_AI_CLI {
 		$days    = isset( $assoc_args['days'] ) ? (int) $assoc_args['days'] : 28;
 		$verbose = isset( $assoc_args['verbose'] );
 
-		$plugin     = SEO_Agent_AI_Plugin::instance();
+		$plugin     = Ariham_SEOAgent_Plugin::instance();
 		$gsc_client = $plugin->get_gsc_client();
 
 		$posts = get_posts( array(
@@ -315,7 +315,7 @@ class SEO_Agent_AI_CLI {
 
 			if ( ! empty( $history ) ) {
 				foreach ( $history as $row ) {
-					SEO_Agent_AI_DB_Manager::insert_keyword_history( array(
+					Ariham_SEOAgent_DB_Manager::insert_keyword_history( array(
 						'post_id'     => $post->ID,
 						'keyword'     => $row['keyword'],
 						'position'    => $row['position'],
@@ -362,7 +362,7 @@ class SEO_Agent_AI_CLI {
 		$days    = isset( $assoc_args['days'] ) ? (int) $assoc_args['days'] : 28;
 		$verbose = isset( $assoc_args['verbose'] );
 
-		$plugin     = SEO_Agent_AI_Plugin::instance();
+		$plugin     = Ariham_SEOAgent_Plugin::instance();
 		$ga4_client = $plugin->get_ga4_client();
 
 		$posts    = get_posts( array(
@@ -418,7 +418,7 @@ class SEO_Agent_AI_CLI {
 		$post_id = isset( $assoc_args['post-id'] ) ? (int) $assoc_args['post-id'] : 0;
 		$format  = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
 
-		$plugin = SEO_Agent_AI_Plugin::instance();
+		$plugin = Ariham_SEOAgent_Plugin::instance();
 		$engine = $plugin->get_scoring_engine();
 
 		if ( $post_id > 0 ) {
@@ -490,13 +490,13 @@ class SEO_Agent_AI_CLI {
 		$limit  = isset( $assoc_args['limit'] ) ? (int) $assoc_args['limit'] : 20;
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
 
-		$decisions = SEO_Agent_AI_DB_Manager::get_decisions( array(
-			'status' => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+		$decisions = Ariham_SEOAgent_DB_Manager::get_decisions( array(
+			'status' => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 			'limit'  => $limit,
 		) );
 
 		if ( empty( $decisions ) ) {
-			WP_CLI::log( 'No pending opportunities. Run wp seo-agent analyze first.' );
+			WP_CLI::log( 'No pending opportunities. Run wp ariham-seoagent analyze first.' );
 			return;
 		}
 
@@ -530,12 +530,12 @@ class SEO_Agent_AI_CLI {
 	 * @subcommand status
 	 */
 	public function status( $args, $assoc_args ) {
-		$plugin    = SEO_Agent_AI_Plugin::instance();
+		$plugin    = Ariham_SEOAgent_Plugin::instance();
 		$oauth     = $plugin->get_oauth();
 		$logger    = $plugin->get_logger();
 
 		WP_CLI::log( '' );
-		WP_CLI::log( WP_CLI::colorize( '%B=== SEO Agent AI v' . SEO_AGENT_AI_VERSION . ' ===%n' ) );
+		WP_CLI::log( WP_CLI::colorize( '%B=== Ariham SEOAgent v' . ARIHAM_SEOAGENT_VERSION . ' ===%n' ) );
 		WP_CLI::log( '' );
 
 		// Google auth.
@@ -543,14 +543,14 @@ class SEO_Agent_AI_CLI {
 		WP_CLI::log( 'Google Auth:   ' . ( $connected ? WP_CLI::colorize( '%Gconnected%n' ) : WP_CLI::colorize( '%Rnot connected%n' ) ) );
 
 		// AI provider.
-		$provider = (string) get_option( 'seo_agent_ai_ai_provider', 'gemini' );
-		$gemini_ok = class_exists( 'SEO_Agent_AI_Gemini_Client' ) && ( new SEO_Agent_AI_Gemini_Client() )->is_configured();
-		$openai_ok = class_exists( 'SEO_Agent_AI_OpenAI_Client' ) && ( new SEO_Agent_AI_OpenAI_Client() )->is_configured();
+		$provider = (string) get_option( 'ariham_seoagent_ai_provider', 'gemini' );
+		$gemini_ok = class_exists( 'Ariham_SEOAgent_Gemini_Client' ) && ( new Ariham_SEOAgent_Gemini_Client() )->is_configured();
+		$openai_ok = class_exists( 'Ariham_SEOAgent_OpenAI_Client' ) && ( new Ariham_SEOAgent_OpenAI_Client() )->is_configured();
 		WP_CLI::log( 'AI Provider:   ' . $provider . ' | Gemini: ' . ( $gemini_ok ? 'configured' : 'not set' ) . ' | OpenAI: ' . ( $openai_ok ? 'configured' : 'not set' ) );
 
 		// DB tables.
 		global $wpdb;
-		$tables   = array( 'seo_agent_keyword_history', 'seo_agent_page_insights', 'seo_agent_ai_decisions', 'seo_agent_daily_reports', 'seo_agent_internal_links', 'seo_agent_ai_activity' );
+		$tables   = array( 'ariham_seoagent_keyword_history', 'ariham_seoagent_page_insights', 'ariham_seoagent_decisions', 'ariham_seoagent_daily_reports', 'ariham_seoagent_internal_links', 'ariham_seoagent_activity' );
 		$all_ok   = true;
 		foreach ( $tables as $tbl ) {
 			$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->prefix . $tbl ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -561,7 +561,7 @@ class SEO_Agent_AI_CLI {
 		WP_CLI::log( 'DB Tables:     ' . ( $all_ok ? WP_CLI::colorize( '%G6/6 OK%n' ) : WP_CLI::colorize( '%Rmissing tables — run: wp plugin deactivate ariham-seoagent && wp plugin activate ariham-seoagent%n' ) ) );
 
 		// Cron hooks.
-		$cron_hooks = array( 'seo_agent_ai_daily_analysis', 'seo_agent_fetch_gsc_data', 'seo_agent_fetch_ga4_data', 'seo_agent_generate_report', 'seo_agent_score_pages', 'seo_agent_detect_decay', 'seo_agent_run_internal_links', 'seo_agent_purge_old_data' );
+		$cron_hooks = array( 'ariham_seoagent_daily_analysis', 'ariham_seoagent_fetch_gsc_data', 'ariham_seoagent_fetch_ga4_data', 'ariham_seoagent_generate_report', 'ariham_seoagent_score_pages', 'ariham_seoagent_detect_decay', 'ariham_seoagent_run_internal_links', 'ariham_seoagent_purge_old_data' );
 		$cron_ok    = 0;
 		foreach ( $cron_hooks as $hook ) {
 			if ( wp_next_scheduled( $hook ) ) {
@@ -571,11 +571,11 @@ class SEO_Agent_AI_CLI {
 		WP_CLI::log( "Cron Hooks:    {$cron_ok}/" . count( $cron_hooks ) . " scheduled" );
 
 		// Pending approvals.
-		$pending = SEO_Agent_AI_DB_Manager::count_decisions( SEO_Agent_AI_DB_Manager::STATUS_PENDING );
+		$pending = Ariham_SEOAgent_DB_Manager::count_decisions( Ariham_SEOAgent_DB_Manager::STATUS_PENDING );
 		WP_CLI::log( "Pending:       {$pending} decisions awaiting approval" );
 
 		// Queue status.
-		$raw   = get_option( SEO_Agent_AI_Queue_Manager::OPTION_KEY, '' );
+		$raw   = get_option( Ariham_SEOAgent_Queue_Manager::OPTION_KEY, '' );
 		$queue = $raw !== '' ? json_decode( $raw, true ) : array();
 		$q_pending = count( $queue['items'] ?? array() );
 		WP_CLI::log( "Queue:         {$q_pending} posts pending processing" );
@@ -604,7 +604,7 @@ class SEO_Agent_AI_CLI {
 		$level = isset( $assoc_args['level'] ) ? strtoupper( $assoc_args['level'] ) : '';
 		$lines = isset( $assoc_args['lines'] ) ? (int) $assoc_args['lines'] : 50;
 
-		$plugin = SEO_Agent_AI_Plugin::instance();
+		$plugin = Ariham_SEOAgent_Plugin::instance();
 		$logger = $plugin->get_logger();
 
 		$log_lines = $logger->tail( $lines, $level ?: null );

@@ -4,28 +4,28 @@
  *
  * Shows: agent activity (what changed), traffic/ranking trends, score distribution.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Dashboard_Page {
+class Ariham_SEOAgent_Dashboard_Page {
 
-	/** @var SEO_Agent_AI_Decision_Engine */
+	/** @var Ariham_SEOAgent_Decision_Engine */
 	private $decision_engine;
 
-	/** @var SEO_Agent_AI_Report_Engine */
+	/** @var Ariham_SEOAgent_Report_Engine */
 	private $report_engine;
 
-	/** @var SEO_Agent_AI_Activity_Log */
+	/** @var Ariham_SEOAgent_Activity_Log */
 	private $activity_log;
 
 	public function __construct(
-		SEO_Agent_AI_Decision_Engine $decision_engine,
-		SEO_Agent_AI_Report_Engine $report_engine,
-		SEO_Agent_AI_Activity_Log $activity_log
+		Ariham_SEOAgent_Decision_Engine $decision_engine,
+		Ariham_SEOAgent_Report_Engine $report_engine,
+		Ariham_SEOAgent_Activity_Log $activity_log
 	) {
 		$this->decision_engine = $decision_engine;
 		$this->report_engine   = $report_engine;
@@ -45,18 +45,20 @@ class SEO_Agent_AI_Dashboard_Page {
 
 		$recent_changes = $this->activity_log->get_entries( array(), 1, 15 );
 		$total_changes  = $this->activity_log->get_count( array() );
-		$sitekit_active = class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active();
+		$sitekit_active = class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active();
+		$oauth_connected = class_exists( 'Ariham_SEOAgent_Google_OAuth' ) && ( new Ariham_SEOAgent_Google_OAuth() )->is_connected();
 		$gsc_connected  = $sitekit_active
-			|| '' !== (string) get_option( 'seo_agent_ai_gsc_site_url', '' )
-			|| '' !== (string) get_option( 'seo_agent_ai_gsc_site', '' );
+			|| $oauth_connected
+			|| '' !== (string) get_option( 'ariham_seoagent_gsc_site_url', '' )
+			|| '' !== (string) get_option( 'ariham_seoagent_gsc_site', '' );
 		$is_first_run   = 0 === $total_changes && empty( $report ) && ! $gsc_connected;
-		$autopilot      = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
+		$autopilot      = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
 
 		$today_changes = $this->activity_log->get_count(
 			array( 'date_from' => gmdate( 'Y-m-d' ) . ' 00:00:00' )
 		);
 
-		$last_run_raw   = get_option( 'seo_agent_ai_last_run_seo_agent_ai_daily_analysis', '' );
+		$last_run_raw   = get_option( 'ariham_seoagent_last_run_ariham_seoagent_daily_analysis', '' );
 		$last_run_label = '';
 		$agent_overdue  = false;
 		if ( $last_run_raw !== '' ) {
@@ -92,7 +94,7 @@ class SEO_Agent_AI_Dashboard_Page {
 				<div class="sai-header-left">
 					<p class="sai-header-eyebrow">
 						<span class="sai-dot pulsing-green"></span>
-						<?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?>
+						<?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?>
 					</p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Dashboard', 'ariham-seoagent' ); ?></h1>
 				</div>
@@ -162,7 +164,7 @@ class SEO_Agent_AI_Dashboard_Page {
 								printf(
 									/* translators: %s: link to settings page */
 									esc_html__( 'Manual review mode — %s to enable automatic safe fixes.', 'ariham-seoagent' ),
-									'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-settings' ) ) . '">' . esc_html__( 'Go to Settings', 'ariham-seoagent' ) . '</a>'
+									'<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) . '">' . esc_html__( 'Go to Settings', 'ariham-seoagent' ) . '</a>'
 								);
 								?>
 							</div>
@@ -185,7 +187,7 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div class="sai-metric-stripe"></div>
 						<div class="sai-metric-label"><?php esc_html_e( 'Changes Today', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $today_changes ) ); ?></a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-log' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $today_changes ) ); ?></a>
 						</div>
 					</div>
 
@@ -193,7 +195,7 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div class="sai-metric-stripe"></div>
 						<div class="sai-metric-label"><?php esc_html_e( 'Pending Approvals', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-approvals' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $pending_count ) ); ?></a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-approvals' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $pending_count ) ); ?></a>
 						</div>
 					</div>
 
@@ -201,7 +203,7 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div class="sai-metric-stripe"></div>
 						<div class="sai-metric-label"><?php esc_html_e( 'Total Changes', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $total_changes ) ); ?></a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-log' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $total_changes ) ); ?></a>
 						</div>
 					</div>
 
@@ -209,7 +211,7 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div class="sai-metric-stripe"></div>
 						<div class="sai-metric-label"><?php esc_html_e( 'Opportunities', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-opportunities' ) ); ?>" style="color:inherit;text-decoration:none">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-opportunities' ) ); ?>" style="color:inherit;text-decoration:none">
 								<?php
 								$opp_val = $summary['opportunities_detected'] ?? '—';
 								echo is_int( $opp_val ) ? esc_html( number_format_i18n( $opp_val ) ) : esc_html( (string) $opp_val );
@@ -264,7 +266,7 @@ class SEO_Agent_AI_Dashboard_Page {
 						</div>
 						<div class="sai-card-body">
 							<p class="sai-card-desc"><?php esc_html_e( 'Keyword ranking movements detected from Search Console since the last GSC sync.', 'ariham-seoagent' ); ?></p>
-							<?php $this->render_trends( $trends ); ?>
+							<?php $this->render_trends( $trends, $gsc_connected ); ?>
 						</div>
 					</div>
 
@@ -443,7 +445,7 @@ class SEO_Agent_AI_Dashboard_Page {
 		}
 
 		echo '</ul>';
-		echo '<p style="margin-top:12px"><a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ) . '" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'View full activity log →', 'ariham-seoagent' ) . '</span></a></p>';
+		echo '<p style="margin-top:12px"><a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-log' ) ) . '" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'View full activity log →', 'ariham-seoagent' ) . '</span></a></p>';
 	}
 
 	// -------------------------------------------------------------------
@@ -459,7 +461,7 @@ class SEO_Agent_AI_Dashboard_Page {
 	// Traffic & keyword trends
 	// -------------------------------------------------------------------
 
-	private function render_trends( array $trends ) {
+	private function render_trends( array $trends, $gsc_connected = false ) {
 		$rising    = $trends['rising'] ?? array();
 		$declining = $trends['declining'] ?? array();
 
@@ -470,10 +472,17 @@ class SEO_Agent_AI_Dashboard_Page {
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
 				</div>
 				<h3><?php esc_html_e( 'No trend data yet', 'ariham-seoagent' ); ?></h3>
-				<p><?php esc_html_e( 'Connect Google Search Console and wait for the daily GSC sync to populate this panel.', 'ariham-seoagent' ); ?></p>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ); ?>" class="sai-btn sai-btn-primary">
-					<span class="btn-label"><?php esc_html_e( 'Connect Google →', 'ariham-seoagent' ); ?></span>
-				</a>
+				<?php if ( $gsc_connected ) : ?>
+					<p><?php esc_html_e( 'Search Console is connected. Trend data appears after the daily GSC sync runs — you can trigger it now from Cron Status.', 'ariham-seoagent' ); ?></p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-cron' ) ); ?>" class="sai-btn sai-btn-primary">
+						<span class="btn-label"><?php esc_html_e( 'Go to Cron Status →', 'ariham-seoagent' ); ?></span>
+					</a>
+				<?php else : ?>
+					<p><?php esc_html_e( 'Connect Google Search Console and wait for the daily GSC sync to populate this panel.', 'ariham-seoagent' ); ?></p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ); ?>" class="sai-btn sai-btn-primary">
+						<span class="btn-label"><?php esc_html_e( 'Connect Google →', 'ariham-seoagent' ); ?></span>
+					</a>
+				<?php endif; ?>
 			</div>
 			<?php
 			return;
@@ -519,7 +528,7 @@ class SEO_Agent_AI_Dashboard_Page {
 				</div>
 				<h3><?php esc_html_e( 'No score data yet', 'ariham-seoagent' ); ?></h3>
 				<p><?php esc_html_e( 'Wait for the weekly scoring cron or run it manually via Cron Status.', 'ariham-seoagent' ); ?></p>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-cron' ) ); ?>" class="sai-btn sai-btn-ghost">
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-cron' ) ); ?>" class="sai-btn sai-btn-ghost">
 					<span class="btn-label"><?php esc_html_e( 'Go to Cron Status →', 'ariham-seoagent' ); ?></span>
 				</a>
 			</div>

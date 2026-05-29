@@ -2,28 +2,28 @@
 /**
  * Pending AI Decision Approvals admin page.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Pending_Approvals_Page {
+class Ariham_SEOAgent_Pending_Approvals_Page {
 
-	/** @var SEO_Agent_AI_Decision_Engine */
+	/** @var Ariham_SEOAgent_Decision_Engine */
 	private $decision_engine;
 
-	/** @var SEO_Agent_AI_Fix_Executor */
+	/** @var Ariham_SEOAgent_Fix_Executor */
 	private $fix_executor;
 
-	/** @var SEO_Agent_AI_Internal_Link_Engine */
+	/** @var Ariham_SEOAgent_Internal_Link_Engine */
 	private $link_engine;
 
 	public function __construct(
-		SEO_Agent_AI_Decision_Engine $decision_engine,
-		SEO_Agent_AI_Fix_Executor $fix_executor,
-		SEO_Agent_AI_Internal_Link_Engine $link_engine
+		Ariham_SEOAgent_Decision_Engine $decision_engine,
+		Ariham_SEOAgent_Fix_Executor $fix_executor,
+		Ariham_SEOAgent_Internal_Link_Engine $link_engine
 	) {
 		$this->decision_engine = $decision_engine;
 		$this->fix_executor    = $fix_executor;
@@ -38,11 +38,11 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 			wp_die( esc_html__( 'Not allowed.', 'ariham-seoagent' ) );
 		}
 
-		check_admin_referer( 'seo_agent_ai_bulk_apply_safe' );
+		check_admin_referer( 'ariham_seoagent_bulk_apply_safe' );
 
-		$safe_decisions = SEO_Agent_AI_DB_Manager::get_decisions(
+		$safe_decisions = Ariham_SEOAgent_DB_Manager::get_decisions(
 			array(
-				'status'     => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+				'status'     => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 				'risk_level' => 'safe',
 				'limit'      => 200,
 			)
@@ -54,13 +54,13 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 			$this->execute_decision( $dec_id );
 		}
 
-		wp_safe_redirect( admin_url( 'admin.php?page=seo-agent-opportunities&updated=1' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ariham-seoagent-opportunities&updated=1' ) );
 		exit;
 	}
 
 	/**
 	 * Handle approve/reject POST actions.
-	 * Called via admin_post_seo_agent_ai_decision_{action}.
+	 * Called via admin_post_ariham_seoagent_decision_{action}.
 	 */
 	public function handle_action() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
@@ -70,7 +70,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		$action      = sanitize_key( $_POST['seo_action'] ?? '' );
 		$decision_id = absint( wp_unslash( $_POST['decision_id'] ?? 0 ) );
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'seo_agent_ai_decision_' . $decision_id ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'ariham_seoagent_decision_' . $decision_id ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'ariham-seoagent' ) );
 		}
 
@@ -82,7 +82,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		}
 
 		$redirect_to = sanitize_key( $_POST['redirect_to'] ?? '' );
-		$back_page   = ( '' !== $redirect_to ) ? $redirect_to : 'seo-agent-approvals';
+		$back_page   = ( '' !== $redirect_to ) ? $redirect_to : 'ariham-seoagent-approvals';
 		wp_safe_redirect( admin_url( 'admin.php?page=' . $back_page . '&updated=1' ) );
 		exit;
 	}
@@ -93,7 +93,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 	 */
 	private function execute_decision( $decision_id ) {
 		global $wpdb;
-		$table = esc_sql( $wpdb->prefix . 'seo_agent_ai_decisions' );
+		$table = esc_sql( $wpdb->prefix . 'ariham_seoagent_decisions' );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$dec = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $decision_id ), ARRAY_A );
 
@@ -144,7 +144,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 
 			case 'schema_update':
 				// Schema is injected via wp_head when enabled — store a flag so schema engine activates for this post.
-				update_post_meta( $post_id, '_seo_agent_ai_schema_approved', 1 );
+				update_post_meta( $post_id, '_ariham_seoagent_schema_approved', 1 );
 				break;
 		}
 
@@ -161,7 +161,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		$paged     = max( 1, absint( wp_unslash( $_GET['paged'] ?? 1 ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$per_page  = 15;
 
-		$total = SEO_Agent_AI_DB_Manager::count_decisions( SEO_Agent_AI_DB_Manager::STATUS_PENDING );
+		$total = Ariham_SEOAgent_DB_Manager::count_decisions( Ariham_SEOAgent_DB_Manager::STATUS_PENDING );
 
 		?>
 		<div class="wrap sai-page">
@@ -170,7 +170,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 				<div class="sai-header-left">
 					<p class="sai-header-eyebrow">
 						<span class="sai-dot pulsing-green"></span>
-						<?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?>
+						<?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?>
 					</p>
 					<h1 class="sai-header-title">
 						<?php esc_html_e( 'Pending Approvals', 'ariham-seoagent' ); ?>
@@ -182,8 +182,8 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 				<?php if ( $single_id === 0 && $total > 0 ) : ?>
 				<div class="sai-header-actions">
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-						<?php wp_nonce_field( 'seo_agent_ai_bulk_apply_safe', '_wpnonce' ); ?>
-						<input type="hidden" name="action" value="seo_agent_ai_bulk_apply_safe">
+						<?php wp_nonce_field( 'ariham_seoagent_bulk_apply_safe', '_wpnonce' ); ?>
+						<input type="hidden" name="action" value="ariham_seoagent_bulk_apply_safe">
 						<button type="submit" class="sai-btn sai-btn-success sai-bulk-apply-safe"
 							onclick="return confirm('<?php echo esc_js( __( 'Apply all safe decisions now?', 'ariham-seoagent' ) ); ?>')">
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
@@ -218,9 +218,9 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 	// -------------------------------------------------------------------
 
 	private function render_decisions_list( $paged, $per_page, $total ) {
-		$decisions = SEO_Agent_AI_DB_Manager::get_decisions(
+		$decisions = Ariham_SEOAgent_DB_Manager::get_decisions(
 			array(
-				'status' => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+				'status' => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 				'limit'  => $per_page,
 				'offset' => ( $paged - 1 ) * $per_page,
 			)
@@ -282,7 +282,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 
 			echo '<div class="sai-decision-info">';
 			echo '<p class="sai-decision-post">';
-			echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-approvals&decision_id=' . $dec_id ) ) . '">' . esc_html( $title ) . '</a>';
+			echo '<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-approvals&decision_id=' . $dec_id ) ) . '">' . esc_html( $title ) . '</a>';
 			if ( $field !== '' ) {
 				echo ' <span style="color:var(--sai-text-muted);font-size:12px">— ' . esc_html( $field ) . '</span>';
 			}
@@ -303,18 +303,18 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 			echo '<div class="sai-decision-actions">';
 			// Approve form.
 			echo '<form method="post" action="' . esc_url( $admin_post_url ) . '" style="display:inline">';
-			echo '<input type="hidden" name="action" value="seo_agent_ai_decision">';
+			echo '<input type="hidden" name="action" value="ariham_seoagent_decision">';
 			echo '<input type="hidden" name="seo_action" value="approve">';
 			echo '<input type="hidden" name="decision_id" value="' . esc_attr( $dec_id ) . '">';
-			echo wp_nonce_field( 'seo_agent_ai_decision_' . $dec_id, '_wpnonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- nonce field is safe.
+			echo wp_nonce_field( 'ariham_seoagent_decision_' . $dec_id, '_wpnonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- nonce field is safe.
 			echo '<button type="submit" class="sai-btn sai-btn-success sai-btn-sm"><span class="btn-label">' . esc_html__( 'Apply', 'ariham-seoagent' ) . '</span></button>';
 			echo '</form>';
 			// Reject form.
 			echo '<form method="post" action="' . esc_url( $admin_post_url ) . '" style="display:inline">';
-			echo '<input type="hidden" name="action" value="seo_agent_ai_decision">';
+			echo '<input type="hidden" name="action" value="ariham_seoagent_decision">';
 			echo '<input type="hidden" name="seo_action" value="reject">';
 			echo '<input type="hidden" name="decision_id" value="' . esc_attr( $dec_id ) . '">';
-			echo wp_nonce_field( 'seo_agent_ai_decision_' . $dec_id, '_wpnonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- nonce field is safe.
+			echo wp_nonce_field( 'ariham_seoagent_decision_' . $dec_id, '_wpnonce', true, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- nonce field is safe.
 			echo '<button type="submit" class="sai-btn sai-btn-danger sai-btn-sm"><span class="btn-label">' . esc_html__( 'Reject', 'ariham-seoagent' ) . '</span></button>';
 			echo '</form>';
 			echo '</div>';
@@ -378,7 +378,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 
 	private function render_single_decision( $decision_id ) {
 		global $wpdb;
-		$table = esc_sql( $wpdb->prefix . 'seo_agent_ai_decisions' );
+		$table = esc_sql( $wpdb->prefix . 'ariham_seoagent_decisions' );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$dec = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $decision_id ), ARRAY_A );
 
@@ -403,7 +403,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		$risk_badge = $is_safe ? 'b-neutral' : 'b-danger';
 		$risk_label = $is_safe ? __( 'Safe', 'ariham-seoagent' ) : __( 'Risky', 'ariham-seoagent' );
 
-		echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-approvals' ) ) . '" class="sai-btn sai-btn-ghost sai-btn-sm" style="margin-bottom:20px;display:inline-flex">';
+		echo '<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-approvals' ) ) . '" class="sai-btn sai-btn-ghost sai-btn-sm" style="margin-bottom:20px;display:inline-flex">';
 		echo '<span class="btn-label">&#8592; ' . esc_html__( 'Back to list', 'ariham-seoagent' ) . '</span>';
 		echo '</a>';
 
@@ -431,7 +431,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		echo '</div>';
 		echo '</div>';
 
-		if ( $dec['status'] === SEO_Agent_AI_DB_Manager::STATUS_PENDING ) {
+		if ( $dec['status'] === Ariham_SEOAgent_DB_Manager::STATUS_PENDING ) {
 			echo '<div class="sai-decision-actions">';
 			echo $this->action_buttons( $decision_id ); // phpcs:ignore WordPress.Security.EscapeOutput -- action_buttons outputs escaped HTML.
 			echo '</div>';
@@ -493,18 +493,18 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 		$url = admin_url( 'admin-post.php' );
 
 		$approve = '<form method="post" action="' . esc_url( $url ) . '" style="display:inline">'
-			. '<input type="hidden" name="action" value="seo_agent_ai_decision">'
+			. '<input type="hidden" name="action" value="ariham_seoagent_decision">'
 			. '<input type="hidden" name="seo_action" value="approve">'
 			. '<input type="hidden" name="decision_id" value="' . esc_attr( $decision_id ) . '">'
-			. wp_nonce_field( 'seo_agent_ai_decision_' . $decision_id, '_wpnonce', true, false )
+			. wp_nonce_field( 'ariham_seoagent_decision_' . $decision_id, '_wpnonce', true, false )
 			. '<button type="submit" class="sai-btn sai-btn-success sai-btn-sm"><span class="btn-label">' . esc_html__( 'Apply', 'ariham-seoagent' ) . '</span></button>'
 			. '</form>';
 
 		$reject = '<form method="post" action="' . esc_url( $url ) . '" style="display:inline">'
-			. '<input type="hidden" name="action" value="seo_agent_ai_decision">'
+			. '<input type="hidden" name="action" value="ariham_seoagent_decision">'
 			. '<input type="hidden" name="seo_action" value="reject">'
 			. '<input type="hidden" name="decision_id" value="' . esc_attr( $decision_id ) . '">'
-			. wp_nonce_field( 'seo_agent_ai_decision_' . $decision_id, '_wpnonce', true, false )
+			. wp_nonce_field( 'ariham_seoagent_decision_' . $decision_id, '_wpnonce', true, false )
 			. '<button type="submit" class="sai-btn sai-btn-danger sai-btn-sm"><span class="btn-label">' . esc_html__( 'Reject', 'ariham-seoagent' ) . '</span></button>'
 			. '</form>';
 

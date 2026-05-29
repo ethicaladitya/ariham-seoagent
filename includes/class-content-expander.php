@@ -7,24 +7,24 @@
  * is saved as a pending post revision so the site owner can review and
  * publish it with one click. Nothing is published automatically.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Content_Expander {
+class Ariham_SEOAgent_Content_Expander {
 
-	/** @var SEO_Agent_AI_OpenAI_Client */
+	/** @var Ariham_SEOAgent_OpenAI_Client */
 	private $openai;
 
-	/** @var SEO_Agent_AI_Gemini_Client */
+	/** @var Ariham_SEOAgent_Gemini_Client */
 	private $gemini;
 
 	public function __construct(
-		SEO_Agent_AI_OpenAI_Client $openai,
-		SEO_Agent_AI_Gemini_Client $gemini
+		Ariham_SEOAgent_OpenAI_Client $openai,
+		Ariham_SEOAgent_Gemini_Client $gemini
 	) {
 		$this->openai = $openai;
 		$this->gemini = $gemini;
@@ -145,7 +145,7 @@ class SEO_Agent_AI_Content_Expander {
 	 * @return string|WP_Error
 	 */
 	private function ai_complete( $prompt, $max_tokens ) {
-		$provider = (string) get_option( 'seo_agent_ai_ai_provider', 'auto' );
+		$provider = (string) get_option( 'ariham_seoagent_ai_provider', 'auto' );
 
 		if ( 'openai' === $provider || ( 'auto' === $provider && $this->openai->is_configured() ) ) {
 			$result = $this->openai->complete_long( $prompt, $max_tokens );
@@ -175,7 +175,7 @@ class SEO_Agent_AI_Content_Expander {
 	 */
 	private function save_draft( WP_Post $original, $draft ) {
 		// Build the draft content — append after the original.
-		$draft_content = $original->post_content . "\n\n<!-- SEO Agent AI expansion draft -->\n" . wp_kses_post( $draft );
+		$draft_content = $original->post_content . "\n\n<!-- Ariham SEOAgent expansion draft -->\n" . wp_kses_post( $draft );
 
 		$draft_id = wp_insert_post(
 			array(
@@ -195,8 +195,8 @@ class SEO_Agent_AI_Content_Expander {
 		}
 
 		// Tag this draft so the plugin can find/display it.
-		update_post_meta( $draft_id, '_seo_agent_ai_content_draft', $original->ID );
-		update_post_meta( $original->ID, '_seo_agent_ai_pending_draft_id', $draft_id );
+		update_post_meta( $draft_id, '_ariham_seoagent_content_draft', $original->ID );
+		update_post_meta( $original->ID, '_ariham_seoagent_pending_draft_id', $draft_id );
 
 		return true;
 	}

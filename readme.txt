@@ -58,7 +58,7 @@ No data leaves your server until you explicitly connect a Google account. No rem
 
 == Installation ==
 
-1. Upload the `seo-agent-ai` folder to `/wp-content/plugins/`, or install via the WordPress Plugins screen.
+1. Upload the `ariham-seoagent` folder to `/wp-content/plugins/`, or install via the WordPress Plugins screen.
 2. Activate the plugin.
 3. Go to **Ariham SEOAgent → Settings** and enter your Google OAuth Client ID and Client Secret.
    - Create a project at [Google Cloud Console](https://console.cloud.google.com/), enable the Search Console API and Google Analytics Data API, and add your wp-admin Connect Google page URL as an authorised redirect URI.
@@ -116,6 +116,12 @@ After you complete the Google OAuth flow, the plugin communicates with:
 * `analyticsadmin.googleapis.com` — Listing your GA4 properties
 
 [Google Privacy Policy](https://policies.google.com/privacy) | [Google Terms of Service](https://policies.google.com/terms)
+
+**Google PageSpeed Insights (optional, opt-in)**
+
+Disabled by default. When you turn on "Fetch Core Web Vitals" under Ariham SEOAgent → Settings, a weekly background job sends your published post URLs to `www.googleapis.com/pagespeedonline` to retrieve Core Web Vitals and Lighthouse scores. No PageSpeed request is ever made unless you explicitly enable this option.
+
+[Google Privacy Policy](https://policies.google.com/privacy) | [PageSpeed Insights API Terms](https://developers.google.com/speed/docs/insights/v5/about)
 
 **Google Gemini AI (optional)**
 

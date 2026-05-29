@@ -7,14 +7,14 @@
  * unavailable so the plugin keeps working but the value is no longer
  * meaningfully protected — that fallback is documented in the UI.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Crypto {
+class Ariham_SEOAgent_Crypto {
 
 	/**
 	 * Encrypt a value for storage. Returns '' for empty input.

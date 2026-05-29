@@ -2,14 +2,14 @@
 /**
  * Keyword Rankings admin page — position history from keyword_history table.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Rankings_Page {
+class Ariham_SEOAgent_Rankings_Page {
 
 	public function render() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -22,7 +22,7 @@ class SEO_Agent_AI_Rankings_Page {
 		$days         = in_array( $days, array( 7, 14, 30, 60, 90 ), true ) ? $days : 30;
 
 		// phpcs:ignore WordPress.Security.NonceVerification
-		if ( ! empty( $_GET['triggered'] ) && sanitize_key( $_GET['triggered'] ) === 'seo_agent_fetch_gsc_data' ) { // phpcs:ignore WordPress.Security.NonceVerification
+		if ( ! empty( $_GET['triggered'] ) && sanitize_key( $_GET['triggered'] ) === 'ariham_seoagent_fetch_gsc_data' ) { // phpcs:ignore WordPress.Security.NonceVerification
 			echo '<div class="sai-notice n-success"><p>';
 			esc_html_e( 'GSC keyword fetch triggered. Reload in a moment to see results.', 'ariham-seoagent' );
 			echo '</p></div>';
@@ -33,19 +33,19 @@ class SEO_Agent_AI_Rankings_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Keyword Rankings', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<?php if ( $gsc_site !== '' ) : ?>
 						<?php
-						$gsc_hook  = 'seo_agent_fetch_gsc_data';
-						$nonce_val = wp_create_nonce( 'seo_agent_ai_trigger_' . $gsc_hook );
+						$gsc_hook  = 'ariham_seoagent_fetch_gsc_data';
+						$nonce_val = wp_create_nonce( 'ariham_seoagent_trigger_' . $gsc_hook );
 						?>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-							<input type="hidden" name="action" value="seo_agent_ai_trigger_cron">
+							<input type="hidden" name="action" value="ariham_seoagent_trigger_cron">
 							<input type="hidden" name="hook" value="<?php echo esc_attr( $gsc_hook ); ?>">
-							<input type="hidden" name="redirect_page" value="seo-agent-rankings">
+							<input type="hidden" name="redirect_page" value="ariham-seoagent-rankings">
 							<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_val ); ?>">
 							<button type="submit" class="sai-btn sai-btn-ghost">
 								<span class="btn-label"><?php esc_html_e( 'Sync GSC Now', 'ariham-seoagent' ); ?></span>
@@ -82,25 +82,25 @@ class SEO_Agent_AI_Rankings_Page {
 	 * @return string Property URL or empty string when not connected.
 	 */
 	private function resolve_gsc_site() {
-		if ( class_exists( 'SEO_Agent_AI_SiteKit_Bridge' ) && SEO_Agent_AI_SiteKit_Bridge::is_active() ) {
-			$sk_url = SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url();
+		if ( class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active() ) {
+			$sk_url = Ariham_SEOAgent_SiteKit_Bridge::get_gsc_site_url();
 			if ( $sk_url !== '' ) {
 				return $sk_url;
 			}
 		}
 
-		$url = (string) get_option( 'seo_agent_ai_gsc_site_url', '' );
+		$url = (string) get_option( 'ariham_seoagent_gsc_site_url', '' );
 		if ( $url !== '' ) {
 			return $url;
 		}
 
 		// Legacy option written by older settings save handlers.
-		return (string) get_option( 'seo_agent_ai_gsc_site', '' );
+		return (string) get_option( 'ariham_seoagent_gsc_site', '' );
 	}
 
 	private function render_gsc_status_bar() {
 		$gsc_site  = $this->resolve_gsc_site();
-		$last_sync = (string) get_option( 'seo_agent_ai_last_run_seo_agent_fetch_gsc_data', '' );
+		$last_sync = (string) get_option( 'ariham_seoagent_last_run_ariham_seoagent_fetch_gsc_data', '' );
 
 		if ( $gsc_site === '' ) {
 			echo '<div class="sai-notice n-warning" style="margin-bottom:16px">';
@@ -140,7 +140,7 @@ class SEO_Agent_AI_Rankings_Page {
 		) );
 
 		echo '<form method="get" class="sai-filters" style="margin-bottom:16px">';
-		echo '<input type="hidden" name="page" value="seo-agent-rankings">';
+		echo '<input type="hidden" name="page" value="ariham-seoagent-rankings">';
 
 		echo '<div class="sai-search-wrap">';
 		echo '<input type="text" name="keyword" value="' . esc_attr( $search_query ) . '" placeholder="' . esc_attr__( 'Search keyword...', 'ariham-seoagent' ) . '">';
@@ -174,7 +174,7 @@ class SEO_Agent_AI_Rankings_Page {
 
 	private function render_post_rankings( $post_id, $days ) {
 		global $wpdb;
-		$table  = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
+		$table  = esc_sql( $wpdb->prefix . 'ariham_seoagent_keyword_history' );
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -222,7 +222,7 @@ class SEO_Agent_AI_Rankings_Page {
 
 	private function render_keyword_rankings( $keyword, $days ) {
 		global $wpdb;
-		$table  = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
+		$table  = esc_sql( $wpdb->prefix . 'ariham_seoagent_keyword_history' );
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -300,7 +300,7 @@ class SEO_Agent_AI_Rankings_Page {
 
 	private function render_top_movers( $days ) {
 		global $wpdb;
-		$table      = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
+		$table      = esc_sql( $wpdb->prefix . 'ariham_seoagent_keyword_history' );
 		$recent_cut = gmdate( 'Y-m-d', strtotime( '-' . (int) round( $days / 2 ) . ' days' ) );
 		$prior_cut  = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 

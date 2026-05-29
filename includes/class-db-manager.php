@@ -1,9 +1,9 @@
 <?php
 /**
  * Database manager — creates and upgrades all custom tables beyond the
- * original activity-log table (which SEO_Agent_AI_Activity_Log still owns).
+ * original activity-log table (which Ariham_SEOAgent_Activity_Log still owns).
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,17 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
-class SEO_Agent_AI_DB_Manager {
+class Ariham_SEOAgent_DB_Manager {
 
 	const DB_VERSION        = 2;
-	const DB_VERSION_OPTION = 'seo_agent_ai_db_manager_v';
+	const DB_VERSION_OPTION = 'ariham_seoagent_db_manager_v';
 
 	// Table suffixes (no prefix).
-	const TABLE_KEYWORD_HISTORY = 'seo_agent_keyword_history';
-	const TABLE_PAGE_INSIGHTS   = 'seo_agent_page_insights';
-	const TABLE_AI_DECISIONS    = 'seo_agent_ai_decisions';
-	const TABLE_DAILY_REPORTS   = 'seo_agent_daily_reports';
-	const TABLE_INTERNAL_LINKS  = 'seo_agent_internal_links';
+	const TABLE_KEYWORD_HISTORY = 'ariham_seoagent_keyword_history';
+	const TABLE_PAGE_INSIGHTS   = 'ariham_seoagent_page_insights';
+	const TABLE_AI_DECISIONS    = 'ariham_seoagent_decisions';
+	const TABLE_DAILY_REPORTS   = 'ariham_seoagent_daily_reports';
+	const TABLE_INTERNAL_LINKS  = 'ariham_seoagent_internal_links';
 
 	// AI decision statuses.
 	const STATUS_PENDING   = 'pending';
@@ -142,7 +142,7 @@ class SEO_Agent_AI_DB_Manager {
 		);
 
 		// Redirect manager tables.
-		SEO_Agent_AI_Redirect_Manager::create_table();
+		Ariham_SEOAgent_Redirect_Manager::create_table();
 
 		update_option( self::DB_VERSION_OPTION, self::DB_VERSION, false );
 	}
@@ -898,7 +898,7 @@ class SEO_Agent_AI_DB_Manager {
 	 */
 	public static function get_activity_for_range( $date_from, $date_to ) {
 		global $wpdb;
-		$table = SEO_Agent_AI_Activity_Log::get_table_name();
+		$table = Ariham_SEOAgent_Activity_Log::get_table_name();
 		$rows  = $wpdb->get_results(
 			$wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT * FROM {$table} WHERE created_at >= %s AND created_at <= %s ORDER BY created_at DESC LIMIT 500",

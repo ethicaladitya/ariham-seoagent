@@ -2,49 +2,49 @@
 /**
  * Cron Status admin page — health check, last-run times, manual triggers.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Cron_Status_Page {
+class Ariham_SEOAgent_Cron_Status_Page {
 
 	/**
 	 * All managed cron hooks with their schedule and description.
 	 */
 	private static function cron_hooks() {
 		return array(
-			'seo_agent_ai_daily_analysis' => array(
+			'ariham_seoagent_daily_analysis' => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Main daily analysis: fetch GSC/GA4, analyze posts, apply autopilot.', 'ariham-seoagent' ),
 			),
-			'seo_agent_fetch_gsc_data' => array(
+			'ariham_seoagent_fetch_gsc_data' => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Dedicated GSC keyword history fetch → keyword_history table.', 'ariham-seoagent' ),
 			),
-			'seo_agent_fetch_ga4_data' => array(
+			'ariham_seoagent_fetch_ga4_data' => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Dedicated GA4 engagement metrics fetch.', 'ariham-seoagent' ),
 			),
-			'seo_agent_generate_report' => array(
+			'ariham_seoagent_generate_report' => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Generate and store daily SEO report.', 'ariham-seoagent' ),
 			),
-			'seo_agent_score_pages' => array(
+			'ariham_seoagent_score_pages' => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Run SEO scoring engine on all published posts.', 'ariham-seoagent' ),
 			),
-			'seo_agent_detect_decay' => array(
+			'ariham_seoagent_detect_decay' => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Content decay + freshness detection pass.', 'ariham-seoagent' ),
 			),
-			'seo_agent_run_internal_links' => array(
+			'ariham_seoagent_run_internal_links' => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Internal link opportunity detection and insertion.', 'ariham-seoagent' ),
 			),
-			'seo_agent_purge_old_data' => array(
+			'ariham_seoagent_purge_old_data' => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Purge keyword_history and page_insights rows beyond retention window.', 'ariham-seoagent' ),
 			),
@@ -61,7 +61,7 @@ class SEO_Agent_AI_Cron_Status_Page {
 
 		$hook = sanitize_key( $_POST['hook'] ?? '' );
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'seo_agent_ai_trigger_' . $hook ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'ariham_seoagent_trigger_' . $hook ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'ariham-seoagent' ) );
 		}
 
@@ -73,10 +73,10 @@ class SEO_Agent_AI_Cron_Status_Page {
 		// Fire the event now.
 		do_action( $hook ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 
-		$redirect_page = sanitize_key( $_POST['redirect_page'] ?? 'seo-agent-cron' );
-		$allowed_pages = array( 'seo-agent-cron', 'seo-agent-rankings' );
+		$redirect_page = sanitize_key( $_POST['redirect_page'] ?? 'ariham-seoagent-cron' );
+		$allowed_pages = array( 'ariham-seoagent-cron', 'ariham-seoagent-rankings' );
 		if ( ! in_array( $redirect_page, $allowed_pages, true ) ) {
-			$redirect_page = 'seo-agent-cron';
+			$redirect_page = 'ariham-seoagent-cron';
 		}
 
 		wp_safe_redirect( admin_url( 'admin.php?page=' . $redirect_page . '&triggered=' . rawurlencode( $hook ) ) );
@@ -100,17 +100,17 @@ class SEO_Agent_AI_Cron_Status_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Cron Status', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<?php
 					// Trigger-all: loop and emit one button that triggers the main daily analysis.
-					$main_hook  = 'seo_agent_ai_daily_analysis';
-					$main_nonce = wp_create_nonce( 'seo_agent_ai_trigger_' . $main_hook );
+					$main_hook  = 'ariham_seoagent_daily_analysis';
+					$main_nonce = wp_create_nonce( 'ariham_seoagent_trigger_' . $main_hook );
 					?>
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-						<input type="hidden" name="action" value="seo_agent_ai_trigger_cron">
+						<input type="hidden" name="action" value="ariham_seoagent_trigger_cron">
 						<input type="hidden" name="hook" value="<?php echo esc_attr( $main_hook ); ?>">
 						<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $main_nonce ); ?>">
 						<button type="submit" class="sai-btn sai-btn-primary">
@@ -129,7 +129,7 @@ class SEO_Agent_AI_Cron_Status_Page {
 					<?php foreach ( self::cron_hooks() as $hook => $info ) : ?>
 						<?php
 						$next_run  = wp_next_scheduled( $hook );
-						$last_run  = (string) get_option( 'seo_agent_ai_last_run_' . $hook, '' );
+						$last_run  = (string) get_option( 'ariham_seoagent_last_run_' . $hook, '' );
 						$scheduled = $next_run !== false;
 
 						// Determine indicator class.
@@ -143,7 +143,7 @@ class SEO_Agent_AI_Cron_Status_Page {
 
 						$next_str = $scheduled ? $this->human_time( $next_run ) : __( 'Not scheduled', 'ariham-seoagent' );
 						$last_str = $last_run !== '' ? $last_run : __( 'Never', 'ariham-seoagent' );
-						$nonce    = wp_create_nonce( 'seo_agent_ai_trigger_' . $hook );
+						$nonce    = wp_create_nonce( 'ariham_seoagent_trigger_' . $hook );
 						?>
 						<div class="sai-cron-job">
 							<div class="sai-cron-indicator <?php echo esc_attr( $indicator ); ?>"></div>
@@ -159,7 +159,7 @@ class SEO_Agent_AI_Cron_Status_Page {
 								<div style="margin-top:8px;font-size:12px;color:#787c82"><?php echo esc_html( $info['description'] ); ?></div>
 							</div>
 							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:auto">
-								<input type="hidden" name="action" value="seo_agent_ai_trigger_cron">
+								<input type="hidden" name="action" value="ariham_seoagent_trigger_cron">
 								<input type="hidden" name="hook" value="<?php echo esc_attr( $hook ); ?>" data-cron-hook="<?php echo esc_attr( $hook ); ?>">
 								<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce ); ?>">
 								<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm">
@@ -182,7 +182,7 @@ class SEO_Agent_AI_Cron_Status_Page {
 	}
 
 	private function render_queue_status() {
-		$raw   = get_option( SEO_Agent_AI_Queue_Manager::OPTION_KEY, '' );
+		$raw   = get_option( Ariham_SEOAgent_Queue_Manager::OPTION_KEY, '' );
 		$queue = $raw !== '' ? json_decode( $raw, true ) : null;
 
 		if ( ! is_array( $queue ) ) {

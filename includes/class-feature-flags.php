@@ -2,16 +2,16 @@
 /**
  * Feature flags — runtime on/off toggles stored in wp_options.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Feature_Flags {
+class Ariham_SEOAgent_Feature_Flags {
 
-	const OPTION_PREFIX = 'seo_agent_ai_flag_';
+	const OPTION_PREFIX = 'ariham_seoagent_flag_';
 
 	// Default enabled/disabled state for every flag.
 	private static $defaults = array(

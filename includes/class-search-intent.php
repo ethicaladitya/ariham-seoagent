@@ -11,14 +11,14 @@
  *   transactional  — user is ready to act/buy (buy, price, deal, coupon, download, free)
  *   navigational   — user wants a specific site/page (login, official, site:)
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Search_Intent {
+class Ariham_SEOAgent_Search_Intent {
 
 	const INFORMATIONAL = 'informational';
 	const COMMERCIAL    = 'commercial';

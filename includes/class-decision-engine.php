@@ -15,14 +15,14 @@
  *
  * Every decision is recorded, giving full audit trail regardless of tier.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Decision_Engine {
+class Ariham_SEOAgent_Decision_Engine {
 
 	const MEDIUM_CONFIDENCE_THRESHOLD = 0.50;
 
@@ -56,7 +56,7 @@ class SEO_Agent_AI_Decision_Engine {
 
 		// Skip recording if the proposed value is identical to what's already stored.
 		if ( isset( $proposed['meta_title'] ) ) {
-			$stored_title = (string) get_post_meta( $post_id, '_seo_agent_ai_meta_title', true );
+			$stored_title = (string) get_post_meta( $post_id, '_ariham_seoagent_meta_title', true );
 			if ( $stored_title === '' ) {
 				$p            = get_post( $post_id );
 				$stored_title = $p instanceof WP_Post ? $p->post_title : '';
@@ -72,7 +72,7 @@ class SEO_Agent_AI_Decision_Engine {
 			}
 		}
 		if ( isset( $proposed['meta_description'] ) && ! isset( $proposed['meta_title'] ) ) {
-			$stored_desc = (string) get_post_meta( $post_id, '_seo_agent_ai_meta_description', true );
+			$stored_desc = (string) get_post_meta( $post_id, '_ariham_seoagent_meta_description', true );
 			if ( trim( (string) $proposed['meta_description'] ) === trim( $stored_desc ) ) {
 				return array(
 					'tier'        => 'discarded',
@@ -125,9 +125,9 @@ class SEO_Agent_AI_Decision_Engine {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return false;
 		}
-		SEO_Agent_AI_DB_Manager::update_decision_status(
+		Ariham_SEOAgent_DB_Manager::update_decision_status(
 			$decision_id,
-			SEO_Agent_AI_DB_Manager::STATUS_APPROVED,
+			Ariham_SEOAgent_DB_Manager::STATUS_APPROVED,
 			$user_id ?: get_current_user_id()
 		);
 		return true;
@@ -144,9 +144,9 @@ class SEO_Agent_AI_Decision_Engine {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return false;
 		}
-		SEO_Agent_AI_DB_Manager::update_decision_status(
+		Ariham_SEOAgent_DB_Manager::update_decision_status(
 			$decision_id,
-			SEO_Agent_AI_DB_Manager::STATUS_REJECTED,
+			Ariham_SEOAgent_DB_Manager::STATUS_REJECTED,
 			$user_id ?: get_current_user_id()
 		);
 		return true;
@@ -158,18 +158,18 @@ class SEO_Agent_AI_Decision_Engine {
 	 * @param int $decision_id
 	 */
 	public function mark_applied( $decision_id ) {
-		SEO_Agent_AI_DB_Manager::update_decision_status( $decision_id, SEO_Agent_AI_DB_Manager::STATUS_APPLIED );
+		Ariham_SEOAgent_DB_Manager::update_decision_status( $decision_id, Ariham_SEOAgent_DB_Manager::STATUS_APPLIED );
 	}
 
 	/**
 	 * Get pending decisions for admin review.
 	 *
-	 * @param array $args See SEO_Agent_AI_DB_Manager::get_decisions() for args.
+	 * @param array $args See Ariham_SEOAgent_DB_Manager::get_decisions() for args.
 	 * @return array
 	 */
 	public function get_pending( array $args = array() ) {
-		$args['status'] = SEO_Agent_AI_DB_Manager::STATUS_PENDING;
-		return SEO_Agent_AI_DB_Manager::get_decisions( $args );
+		$args['status'] = Ariham_SEOAgent_DB_Manager::STATUS_PENDING;
+		return Ariham_SEOAgent_DB_Manager::get_decisions( $args );
 	}
 
 	/**
@@ -178,7 +178,7 @@ class SEO_Agent_AI_Decision_Engine {
 	 * @return int
 	 */
 	public function count_pending() {
-		return SEO_Agent_AI_DB_Manager::count_decisions( SEO_Agent_AI_DB_Manager::STATUS_PENDING );
+		return Ariham_SEOAgent_DB_Manager::count_decisions( Ariham_SEOAgent_DB_Manager::STATUS_PENDING );
 	}
 
 	// -------------------------------------------------------------------
@@ -197,7 +197,7 @@ class SEO_Agent_AI_Decision_Engine {
 		if ( $confidence >= $autopilot_threshold ) {
 			// When autopilot is fully enabled, apply everything (agent mode).
 			// When autopilot is off, only auto-apply safe recommendations.
-			$autopilot_on = (bool) get_option( 'seo_agent_ai_autopilot_enabled', false );
+			$autopilot_on = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
 			if ( $autopilot_on || $risk === 'safe' ) {
 				return 'auto_apply';
 			}
@@ -227,7 +227,7 @@ class SEO_Agent_AI_Decision_Engine {
 		if ( isset( $proposed['meta_title'] ) ) {
 			$field          = 'meta_title';
 			$proposed_value = (string) $proposed['meta_title'];
-			$current_value  = (string) get_post_meta( $post_id, '_seo_agent_ai_meta_title', true );
+			$current_value  = (string) get_post_meta( $post_id, '_ariham_seoagent_meta_title', true );
 		} elseif ( isset( $proposed['meta_description'] ) ) {
 			$field          = 'meta_description';
 			$proposed_value = (string) $proposed['meta_description'];
@@ -237,12 +237,12 @@ class SEO_Agent_AI_Decision_Engine {
 		}
 
 		$status_map = array(
-			'auto_apply'       => SEO_Agent_AI_DB_Manager::STATUS_PENDING, // Will be updated to 'applied' after apply.
-			'pending_approval' => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
-			'discarded'        => SEO_Agent_AI_DB_Manager::STATUS_DISCARDED,
+			'auto_apply'       => Ariham_SEOAgent_DB_Manager::STATUS_PENDING, // Will be updated to 'applied' after apply.
+			'pending_approval' => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
+			'discarded'        => Ariham_SEOAgent_DB_Manager::STATUS_DISCARDED,
 		);
 
-		$id = SEO_Agent_AI_DB_Manager::insert_decision(
+		$id = Ariham_SEOAgent_DB_Manager::insert_decision(
 			array(
 				'post_id'         => $post_id,
 				'decision_type'   => $type,
@@ -253,7 +253,7 @@ class SEO_Agent_AI_Decision_Engine {
 				'reasoning'       => $recommendation['reason'] ?? '',
 				'expected_impact' => $recommendation['expected_impact'] ?? $this->infer_impact( $tier, $confidence ),
 				'risk_level'      => $recommendation['risk'] ?? 'safe',
-				'status'          => $status_map[ $tier ] ?? SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+				'status'          => $status_map[ $tier ] ?? Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 			)
 		);
 

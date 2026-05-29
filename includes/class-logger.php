@@ -2,20 +2,22 @@
 /**
  * Debug / verbose logger.
  *
- * Writes to a dedicated log file in wp-content/ and optionally mirrors to
- * the native WordPress debug log. Rotation kicks in when the file exceeds 5 MB.
+ * Writes to a dedicated log file inside a plugin-slug folder in the WordPress
+ * uploads directory (never the plugin folder, which is wiped on upgrade) and
+ * optionally mirrors to the native WordPress debug log. The directory is hardened
+ * against public access. Rotation kicks in when the file exceeds 5 MB.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Logger {
+class Ariham_SEOAgent_Logger {
 
-	const OPTION_DEBUG_MODE   = 'seo_agent_ai_debug_mode';
-	const OPTION_VERBOSE_MODE = 'seo_agent_ai_verbose_mode';
+	const OPTION_DEBUG_MODE   = 'ariham_seoagent_debug_mode';
+	const OPTION_VERBOSE_MODE = 'ariham_seoagent_verbose_mode';
 
 	const LEVEL_DEBUG   = 'DEBUG';
 	const LEVEL_INFO    = 'INFO';
@@ -23,6 +25,7 @@ class SEO_Agent_AI_Logger {
 	const LEVEL_ERROR   = 'ERROR';
 
 	const LOG_BASENAME = 'ariham-seoagent-debug.log';
+	const LOG_DIRNAME  = 'ariham-seoagent';
 	const MAX_BYTES    = 5242880; // 5 MB
 
 	/** @var bool */
@@ -39,7 +42,47 @@ class SEO_Agent_AI_Logger {
 	public function __construct( $debug = null, $verbose = null ) {
 		$this->debug    = $debug   !== null ? (bool) $debug   : (bool) get_option( self::OPTION_DEBUG_MODE, false );
 		$this->verbose  = $verbose !== null ? (bool) $verbose : (bool) get_option( self::OPTION_VERBOSE_MODE, false );
-		$this->log_path = WP_CONTENT_DIR . '/' . self::LOG_BASENAME;
+		$this->log_path = self::resolve_log_path();
+	}
+
+	/**
+	 * Build the absolute path to the log file inside the uploads directory.
+	 *
+	 * Stored under uploads/<plugin-slug>/ so it survives plugin upgrades and is
+	 * compatible with multisite. No filesystem writes happen here.
+	 *
+	 * @return string
+	 */
+	private static function resolve_log_path() {
+		$uploads = wp_upload_dir( null, false );
+		$base    = ( is_array( $uploads ) && empty( $uploads['error'] ) && ! empty( $uploads['basedir'] ) )
+			? $uploads['basedir']
+			: WP_CONTENT_DIR . '/uploads';
+		return trailingslashit( $base ) . self::LOG_DIRNAME . '/' . self::LOG_BASENAME;
+	}
+
+	/**
+	 * Ensure the log directory exists and is hardened against public access.
+	 * Cheap to call repeatedly — bails as soon as the guard files are present.
+	 */
+	private function ensure_log_dir() {
+		$dir = dirname( $this->log_path );
+
+		if ( ! is_dir( $dir ) ) {
+			wp_mkdir_p( $dir );
+		}
+
+		$htaccess = $dir . '/.htaccess';
+		if ( ! file_exists( $htaccess ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors
+			@file_put_contents( $htaccess, "Order allow,deny\nDeny from all\n" );
+		}
+
+		$index = $dir . '/index.html';
+		if ( ! file_exists( $index ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors
+			@file_put_contents( $index, '' );
+		}
 	}
 
 	// -------------------------------------------------------------------
@@ -124,6 +167,7 @@ class SEO_Agent_AI_Logger {
 	// -------------------------------------------------------------------
 
 	private function write( $level, $message, array $context = array() ) {
+		$this->ensure_log_dir();
 		$this->maybe_rotate();
 
 		$ts   = gmdate( 'Y-m-d H:i:s' );

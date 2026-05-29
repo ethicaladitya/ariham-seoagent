@@ -6,14 +6,14 @@
  * scores ranking opportunities. No external API calls — uses word-overlap
  * and impressions-weighted scoring.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Keyword_Cluster {
+class Ariham_SEOAgent_Keyword_Cluster {
 
 	// Minimum word overlap ratio to merge two queries into the same cluster.
 	const CLUSTER_SIMILARITY_THRESHOLD = 0.4;

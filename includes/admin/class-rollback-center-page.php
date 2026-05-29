@@ -2,22 +2,22 @@
 /**
  * Rollback Center admin page.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Rollback_Center_Page {
+class Ariham_SEOAgent_Rollback_Center_Page {
 
-	/** @var SEO_Agent_AI_Fix_Executor */
+	/** @var Ariham_SEOAgent_Fix_Executor */
 	private $fix_executor;
 
-	/** @var SEO_Agent_AI_Activity_Log */
+	/** @var Ariham_SEOAgent_Activity_Log */
 	private $activity_log;
 
-	public function __construct( SEO_Agent_AI_Fix_Executor $fix_executor, SEO_Agent_AI_Activity_Log $activity_log ) {
+	public function __construct( Ariham_SEOAgent_Fix_Executor $fix_executor, Ariham_SEOAgent_Activity_Log $activity_log ) {
 		$this->fix_executor = $fix_executor;
 		$this->activity_log = $activity_log;
 	}
@@ -32,16 +32,16 @@ class SEO_Agent_AI_Rollback_Center_Page {
 
 		$post_id = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'seo_agent_ai_rollback_' . $post_id ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'ariham_seoagent_rollback_' . $post_id ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'ariham-seoagent' ) );
 		}
 
 		$result = $this->fix_executor->rollback( $post_id );
 
 		if ( is_wp_error( $result ) ) {
-			$redirect = admin_url( 'admin.php?page=seo-agent-rollback&error=' . rawurlencode( $result->get_error_message() ) );
+			$redirect = admin_url( 'admin.php?page=ariham-seoagent-rollback&error=' . rawurlencode( $result->get_error_message() ) );
 		} else {
-			$redirect = admin_url( 'admin.php?page=seo-agent-rollback&rolled_back=' . $post_id );
+			$redirect = admin_url( 'admin.php?page=ariham-seoagent-rollback&rolled_back=' . $post_id );
 		}
 
 		wp_safe_redirect( $redirect );
@@ -59,7 +59,7 @@ class SEO_Agent_AI_Rollback_Center_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'Ariham SEOAgent', 'ariham-seoagent' ); ?></p>
 					<h1 class="sai-header-title"><?php esc_html_e( 'Rollback Center', 'ariham-seoagent' ); ?></h1>
 				</div>
 			</div>
@@ -80,7 +80,7 @@ class SEO_Agent_AI_Rollback_Center_Page {
 				</div>
 
 				<form method="get" class="sai-filters" style="margin-bottom:16px">
-					<input type="hidden" name="page" value="seo-agent-rollback">
+					<input type="hidden" name="page" value="ariham-seoagent-rollback">
 					<div class="sai-search-wrap">
 						<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search by post title...', 'ariham-seoagent' ); ?>">
 					</div>
@@ -160,9 +160,9 @@ class SEO_Agent_AI_Rollback_Center_Page {
 			echo '</div>'; // .sai-rollback-body
 
 			if ( $has_backup ) {
-				$nonce = wp_create_nonce( 'seo_agent_ai_rollback_' . $post_id );
+				$nonce = wp_create_nonce( 'ariham_seoagent_rollback_' . $post_id );
 				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(\'' . esc_js( __( 'Restore previous meta values for this post?', 'ariham-seoagent' ) ) . '\')">';
-				echo '<input type="hidden" name="action" value="seo_agent_ai_rollback">';
+				echo '<input type="hidden" name="action" value="ariham_seoagent_rollback">';
 				echo '<input type="hidden" name="post_id" value="' . esc_attr( $post_id ) . '">';
 				echo '<input type="hidden" name="_wpnonce" value="' . esc_attr( $nonce ) . '">';
 				echo '<button type="submit" class="sai-btn sai-btn-danger sai-btn-sm sai-rollback-btn"><span class="btn-label">' . esc_html__( 'Rollback', 'ariham-seoagent' ) . '</span></button>';

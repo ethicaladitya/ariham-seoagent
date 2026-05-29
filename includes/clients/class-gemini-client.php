@@ -10,16 +10,16 @@
  * The client is optional — if no API key is saved, all methods return null
  * and the caller falls back to rule-based generation.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Gemini_Client {
+class Ariham_SEOAgent_Gemini_Client {
 
-	const OPTION_API_KEY      = 'seo_agent_ai_gemini_api_key';
+	const OPTION_API_KEY      = 'ariham_seoagent_gemini_api_key';
 	const API_ENDPOINT        = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 	const REQUEST_TIMEOUT     = 20;
 	const MAX_OUTPUT_TOKENS   = 256;
@@ -414,14 +414,14 @@ class SEO_Agent_AI_Gemini_Client {
 	// -----------------------------------------------------------------------
 
 	private function get_api_key() {
-		if ( defined( 'SEO_AGENT_AI_GEMINI_API_KEY' ) ) {
-			$v = constant( 'SEO_AGENT_AI_GEMINI_API_KEY' );
+		if ( defined( 'ARIHAM_SEOAGENT_GEMINI_API_KEY' ) ) {
+			$v = constant( 'ARIHAM_SEOAGENT_GEMINI_API_KEY' );
 			if ( is_string( $v ) && trim( $v ) !== '' ) {
 				return trim( $v );
 			}
 		}
 		$stored = (string) get_option( self::OPTION_API_KEY, '' );
-		return $stored !== '' ? trim( SEO_Agent_AI_Crypto::decrypt( $stored ) ) : '';
+		return $stored !== '' ? trim( Ariham_SEOAgent_Crypto::decrypt( $stored ) ) : '';
 	}
 
 	private function safe_excerpt( WP_Post $post, $max_chars ) {

@@ -5,17 +5,17 @@
  * Detects orphan pages, finds contextual anchor opportunities in other posts,
  * and inserts links safely (max 3 per post per run, no forced insertions).
  *
- * All inserted links are stored in the seo_agent_internal_links table for
+ * All inserted links are stored in the ariham_seoagent_internal_links table for
  * full reversibility. Never modifies posts with status != 'publish'.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Internal_Link_Engine {
+class Ariham_SEOAgent_Internal_Link_Engine {
 
 	/** Maximum links to add to a single source post per run. */
 	const MAX_LINKS_PER_POST = 3;
@@ -23,10 +23,10 @@ class SEO_Agent_AI_Internal_Link_Engine {
 	/** Minimum word length for an anchor phrase match. */
 	const MIN_ANCHOR_WORDS = 2;
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
-	public function __construct( SEO_Agent_AI_Logger $logger ) {
+	public function __construct( Ariham_SEOAgent_Logger $logger ) {
 		$this->logger = $logger;
 	}
 
@@ -50,7 +50,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 
 		$orphans = array();
 		foreach ( $all_posts as $post_id ) {
-			$inbound = SEO_Agent_AI_DB_Manager::get_post_links( $post_id, 'target' );
+			$inbound = Ariham_SEOAgent_DB_Manager::get_post_links( $post_id, 'target' );
 			if ( empty( $inbound ) ) {
 				$post = get_post( $post_id );
 				if ( $post instanceof WP_Post ) {
@@ -103,7 +103,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 			}
 
 			// Skip if source already has MAX_LINKS_PER_POST plugin-added links.
-			$existing_plugin_links = SEO_Agent_AI_DB_Manager::get_post_links( $source_id, 'source' );
+			$existing_plugin_links = Ariham_SEOAgent_DB_Manager::get_post_links( $source_id, 'source' );
 			if ( count( $existing_plugin_links ) >= self::MAX_LINKS_PER_POST ) {
 				continue;
 			}
@@ -144,23 +144,23 @@ class SEO_Agent_AI_Internal_Link_Engine {
 	 */
 	public function insert_link( WP_Post $source_post, WP_Post $target_post, $anchor, $context_snippet, $dry_run = false ) {
 		if ( $source_post->post_status !== 'publish' ) {
-			return new WP_Error( 'seo_agent_ai_il_not_published', __( 'Source post is not published.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_il_not_published', __( 'Source post is not published.', 'ariham-seoagent' ) );
 		}
 
 		// Safety: never link to the same post.
 		if ( $source_post->ID === $target_post->ID ) {
-			return new WP_Error( 'seo_agent_ai_il_self_link', __( 'Cannot link a post to itself.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_il_self_link', __( 'Cannot link a post to itself.', 'ariham-seoagent' ) );
 		}
 
 		// Safety: check per-post plugin link cap.
-		$existing = SEO_Agent_AI_DB_Manager::get_post_links( $source_post->ID, 'source' );
+		$existing = Ariham_SEOAgent_DB_Manager::get_post_links( $source_post->ID, 'source' );
 		if ( count( $existing ) >= self::MAX_LINKS_PER_POST ) {
-			return new WP_Error( 'seo_agent_ai_il_cap_reached', __( 'Maximum plugin links already added to this post.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_il_cap_reached', __( 'Maximum plugin links already added to this post.', 'ariham-seoagent' ) );
 		}
 
 		// Safety: ensure the link does not already exist.
 		if ( $this->link_already_exists( $source_post->ID, $target_post->ID ) ) {
-			return new WP_Error( 'seo_agent_ai_il_duplicate', __( 'A link from this source to this target already exists.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_il_duplicate', __( 'A link from this source to this target already exists.', 'ariham-seoagent' ) );
 		}
 
 		$target_url  = get_permalink( $target_post );
@@ -169,7 +169,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 		// Find and replace the first natural occurrence of the anchor text in content.
 		$new_content = $this->inject_link( $source_post->post_content, $anchor, $target_url );
 		if ( $new_content === null ) {
-			return new WP_Error( 'seo_agent_ai_il_anchor_not_found', __( 'Anchor text not found naturally in post content.', 'ariham-seoagent' ) );
+			return new WP_Error( 'ariham_seoagent_il_anchor_not_found', __( 'Anchor text not found naturally in post content.', 'ariham-seoagent' ) );
 		}
 
 		if ( $dry_run ) {
@@ -184,7 +184,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 		) );
 
 		// Record in DB.
-		SEO_Agent_AI_DB_Manager::insert_internal_link(
+		Ariham_SEOAgent_DB_Manager::insert_internal_link(
 			$source_post->ID,
 			$target_post->ID,
 			$anchor,
@@ -215,7 +215,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 			$processed++;
 
 			// Fetch GSC queries for this post from the keyword_history table (latest snapshot).
-			$gsc_rows = SEO_Agent_AI_DB_Manager::get_keyword_trend( $target->ID, 90 );
+			$gsc_rows = Ariham_SEOAgent_DB_Manager::get_keyword_trend( $target->ID, 90 );
 			$queries  = array_map( fn( $r ) => array( 'query' => $r['keyword'], 'impressions' => $r['impressions'] ), $gsc_rows );
 
 			$candidates = $this->find_link_opportunities( $target, $queries, self::MAX_LINKS_PER_POST );
@@ -274,7 +274,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 			return array( 'inserted' => 0, 'skipped' => 0, 'errors' => 1, 'message' => 'Post not found or not published.' );
 		}
 
-		$gsc_rows = SEO_Agent_AI_DB_Manager::get_keyword_trend( $target_post_id, 90 );
+		$gsc_rows = Ariham_SEOAgent_DB_Manager::get_keyword_trend( $target_post_id, 90 );
 		$queries  = array_map( fn( $r ) => array( 'query' => $r['keyword'], 'impressions' => (int) ( $r['impressions'] ?? 0 ) ), $gsc_rows );
 
 		$candidates = $this->find_link_opportunities( $target, $queries, self::MAX_LINKS_PER_POST );
@@ -505,7 +505,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 	 * Check if a plugin-inserted link from $source_id to $target_id already exists.
 	 */
 	private function link_already_exists( $source_id, $target_id ) {
-		$links = SEO_Agent_AI_DB_Manager::get_post_links( $source_id, 'source' );
+		$links = Ariham_SEOAgent_DB_Manager::get_post_links( $source_id, 'source' );
 		foreach ( $links as $link ) {
 			if ( (int) ( $link['target_post_id'] ?? 0 ) === (int) $target_id ) {
 				return true;

@@ -2,7 +2,7 @@
 /**
  * OpenAI-compatible AI client.
  *
- * Implements the same interface as SEO_Agent_AI_Gemini_Client so either
+ * Implements the same interface as Ariham_SEOAgent_Gemini_Client so either
  * provider can be swapped in the recommendation engine transparently.
  *
  * Supports any endpoint that speaks the OpenAI chat-completions API format:
@@ -17,19 +17,19 @@
  * Azure AI Foundry endpoints: use `api-key` header + append ?api-version=2025-01-01.
  * Detection is automatic; the admin UI presents a neutral "Base URL" field.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_OpenAI_Client {
+class Ariham_SEOAgent_OpenAI_Client {
 
-	const OPTION_API_KEY      = 'seo_agent_ai_openai_api_key';
-	const OPTION_BASE_URL     = 'seo_agent_ai_openai_base_url';
-	const OPTION_MODEL        = 'seo_agent_ai_openai_model';
-	const OPTION_API_VERSION  = 'seo_agent_ai_openai_api_version';
+	const OPTION_API_KEY      = 'ariham_seoagent_openai_api_key';
+	const OPTION_BASE_URL     = 'ariham_seoagent_openai_base_url';
+	const OPTION_MODEL        = 'ariham_seoagent_openai_model';
+	const OPTION_API_VERSION  = 'ariham_seoagent_openai_api_version';
 
 	// Azure legacy GA api-version (2024-02-01 was retired 2025-03-31).
 	const AZURE_LEGACY_API_VERSION  = '2024-10-21';
@@ -76,7 +76,7 @@ class SEO_Agent_AI_OpenAI_Client {
 	public function __construct() {
 		// Do NOT resolve the API key here — Crypto::decrypt() calls wp_salt()
 		// which is not available during early plugin load (the plugin calls
-		// SEO_Agent_AI_Plugin::instance() at global scope). Key is resolved
+		// Ariham_SEOAgent_Plugin::instance() at global scope). Key is resolved
 		// lazily on the first API call via get_api_key().
 		$this->base_url         = rtrim( $this->resolve_base_url(), '/' );
 		$this->model            = $this->resolve_model();
@@ -89,7 +89,7 @@ class SEO_Agent_AI_OpenAI_Client {
 	}
 
 	// -------------------------------------------------------------------
-	// Public interface (mirrors SEO_Agent_AI_Gemini_Client)
+	// Public interface (mirrors Ariham_SEOAgent_Gemini_Client)
 	// -------------------------------------------------------------------
 
 	/**
@@ -443,8 +443,8 @@ class SEO_Agent_AI_OpenAI_Client {
 	 * - Standard/custom   → {base_url}/chat/completions
 	 *
 	 * The Azure legacy api-version can be overridden via the
-	 * seo_agent_ai_openai_api_version option or the
-	 * SEO_AGENT_AI_OPENAI_API_VERSION constant (useful when Azure retires a version).
+	 * ariham_seoagent_openai_api_version option or the
+	 * ARIHAM_SEOAGENT_OPENAI_API_VERSION constant (useful when Azure retires a version).
 	 */
 	private function build_endpoint() {
 		if ( $this->is_azure_foundry ) {
@@ -464,8 +464,8 @@ class SEO_Agent_AI_OpenAI_Client {
 	 * @return string
 	 */
 	private function resolve_azure_api_version() {
-		if ( defined( 'SEO_AGENT_AI_OPENAI_API_VERSION' ) ) {
-			$v = trim( (string) constant( 'SEO_AGENT_AI_OPENAI_API_VERSION' ) );
+		if ( defined( 'ARIHAM_SEOAGENT_OPENAI_API_VERSION' ) ) {
+			$v = trim( (string) constant( 'ARIHAM_SEOAGENT_OPENAI_API_VERSION' ) );
 			if ( $v !== '' ) {
 				return $v;
 			}
@@ -502,27 +502,27 @@ class SEO_Agent_AI_OpenAI_Client {
 	// -------------------------------------------------------------------
 
 	private function resolve_api_key() {
-		if ( defined( 'SEO_AGENT_AI_OPENAI_API_KEY' ) ) {
-			return (string) SEO_AGENT_AI_OPENAI_API_KEY;
+		if ( defined( 'ARIHAM_SEOAGENT_OPENAI_API_KEY' ) ) {
+			return (string) ARIHAM_SEOAGENT_OPENAI_API_KEY;
 		}
 		$stored = (string) get_option( self::OPTION_API_KEY, '' );
 		if ( $stored === '' ) {
 			return '';
 		}
-		return (string) SEO_Agent_AI_Crypto::decrypt( $stored );
+		return (string) Ariham_SEOAgent_Crypto::decrypt( $stored );
 	}
 
 	private function resolve_base_url() {
-		if ( defined( 'SEO_AGENT_AI_OPENAI_BASE_URL' ) ) {
-			return (string) SEO_AGENT_AI_OPENAI_BASE_URL;
+		if ( defined( 'ARIHAM_SEOAGENT_OPENAI_BASE_URL' ) ) {
+			return (string) ARIHAM_SEOAGENT_OPENAI_BASE_URL;
 		}
 		$stored = (string) get_option( self::OPTION_BASE_URL, '' );
 		return $stored !== '' ? $stored : self::DEFAULT_BASE_URL;
 	}
 
 	private function resolve_model() {
-		if ( defined( 'SEO_AGENT_AI_OPENAI_MODEL' ) ) {
-			return (string) SEO_AGENT_AI_OPENAI_MODEL;
+		if ( defined( 'ARIHAM_SEOAGENT_OPENAI_MODEL' ) ) {
+			return (string) ARIHAM_SEOAGENT_OPENAI_MODEL;
 		}
 		$stored = (string) get_option( self::OPTION_MODEL, '' );
 		return $stored !== '' ? $stored : self::DEFAULT_MODEL;

@@ -3,21 +3,21 @@
  * Report Engine.
  *
  * Generates structured daily SEO reports and stores them in the
- * seo_agent_daily_reports table. Optionally emails the admin.
+ * ariham_seoagent_daily_reports table. Optionally emails the admin.
  *
- * @package SEO_Agent_AI
+ * @package Ariham_SEOAgent
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class SEO_Agent_AI_Report_Engine {
+class Ariham_SEOAgent_Report_Engine {
 
-	/** @var SEO_Agent_AI_Logger */
+	/** @var Ariham_SEOAgent_Logger */
 	private $logger;
 
-	public function __construct( SEO_Agent_AI_Logger $logger ) {
+	public function __construct( Ariham_SEOAgent_Logger $logger ) {
 		$this->logger = $logger;
 	}
 
@@ -37,7 +37,7 @@ class SEO_Agent_AI_Report_Engine {
 
 		// Skip if report already exists for this date and not forced.
 		if ( ! $force ) {
-			$existing = SEO_Agent_AI_DB_Manager::get_daily_report( $date );
+			$existing = Ariham_SEOAgent_DB_Manager::get_daily_report( $date );
 			if ( $existing !== null ) {
 				$this->logger->debug( "Daily report for {$date} already exists — skipping." );
 				return is_array( $existing['report_data'] ) ? $existing['report_data'] : json_decode( $existing['report_data'] ?? '{}', true );
@@ -51,7 +51,7 @@ class SEO_Agent_AI_Report_Engine {
 		$opportunities   = $report['summary']['opportunities_detected'] ?? 0;
 		$problems        = $report['summary']['problems_detected'] ?? 0;
 
-		SEO_Agent_AI_DB_Manager::upsert_report(
+		Ariham_SEOAgent_DB_Manager::upsert_report(
 			array(
 				'report_date'            => $date,
 				'report_data'            => wp_json_encode( $report ),
@@ -65,7 +65,7 @@ class SEO_Agent_AI_Report_Engine {
 		$this->logger->info( "Daily report for {$date} generated. {$pages_analyzed} pages, {$opportunities} opportunities." );
 
 		// Optionally email admin.
-		if ( (bool) get_option( 'seo_agent_ai_email_reports', false ) ) {
+		if ( (bool) get_option( 'ariham_seoagent_email_reports', false ) ) {
 			$this->email_report( $report, $date );
 		}
 
@@ -80,7 +80,7 @@ class SEO_Agent_AI_Report_Engine {
 	 */
 	public function get( $date = '' ) {
 		$date = $date !== '' ? $date : gmdate( 'Y-m-d' );
-		$row  = SEO_Agent_AI_DB_Manager::get_daily_report( $date );
+		$row  = Ariham_SEOAgent_DB_Manager::get_daily_report( $date );
 		if ( $row === null ) {
 			return null;
 		}
@@ -94,7 +94,7 @@ class SEO_Agent_AI_Report_Engine {
 	 * @return string[]  Array of 'Y-m-d' date strings.
 	 */
 	public function list_dates( $limit = 30 ) {
-		return SEO_Agent_AI_DB_Manager::get_report_dates( $limit );
+		return Ariham_SEOAgent_DB_Manager::get_report_dates( $limit );
 	}
 
 	// -------------------------------------------------------------------
@@ -107,11 +107,11 @@ class SEO_Agent_AI_Report_Engine {
 		$activity_until = $date . ' 23:59:59';
 
 		// Activity log entries for this date.
-		$activity_rows   = SEO_Agent_AI_DB_Manager::get_activity_for_range( $activity_since, $activity_until );
+		$activity_rows   = Ariham_SEOAgent_DB_Manager::get_activity_for_range( $activity_since, $activity_until );
 		$pages_optimized = count( array_unique( array_column( $activity_rows, 'post_id' ) ) );
 
 		// AI decisions created today.
-		$decisions_today = SEO_Agent_AI_DB_Manager::get_decisions(
+		$decisions_today = Ariham_SEOAgent_DB_Manager::get_decisions(
 			array(
 				'date_from' => $activity_since,
 				'date_to'   => $activity_until,
@@ -119,19 +119,19 @@ class SEO_Agent_AI_Report_Engine {
 		);
 
 		// Pending approvals total.
-		$pending_count = SEO_Agent_AI_DB_Manager::count_decisions( SEO_Agent_AI_DB_Manager::STATUS_PENDING );
+		$pending_count = Ariham_SEOAgent_DB_Manager::count_decisions( Ariham_SEOAgent_DB_Manager::STATUS_PENDING );
 
 		// Latest page insights (all posts with a snapshot).
-		$all_insights   = SEO_Agent_AI_DB_Manager::get_all_latest_insights( 200 );
+		$all_insights   = Ariham_SEOAgent_DB_Manager::get_all_latest_insights( 200 );
 		$pages_analyzed = count( $all_insights );
 
 		// Score distribution.
 		$score_dist = $this->score_distribution( $all_insights );
 
 		// Top opportunities from ai_decisions (pending, ordered by confidence).
-		$top_opportunities = SEO_Agent_AI_DB_Manager::get_decisions(
+		$top_opportunities = Ariham_SEOAgent_DB_Manager::get_decisions(
 			array(
-				'status' => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
+				'status' => Ariham_SEOAgent_DB_Manager::STATUS_PENDING,
 				'limit'  => 10,
 			)
 		);
@@ -201,7 +201,7 @@ class SEO_Agent_AI_Report_Engine {
 	private function compute_trends() {
 		// Get top 10 rising and declining pages based on keyword_history position changes.
 		global $wpdb;
-		$table = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
+		$table = esc_sql( $wpdb->prefix . 'ariham_seoagent_keyword_history' );
 
 		$seven_days_ago    = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
 		$fourteen_days_ago = gmdate( 'Y-m-d', strtotime( '-14 days' ) );
@@ -369,7 +369,7 @@ class SEO_Agent_AI_Report_Engine {
 	 * @return string Email address, or empty string when none is set.
 	 */
 	private function get_report_email() {
-		$custom = (string) get_option( 'seo_agent_ai_email_address', '' );
+		$custom = (string) get_option( 'ariham_seoagent_email_address', '' );
 		if ( $custom !== '' ) {
 			return sanitize_email( $custom );
 		}
@@ -391,7 +391,7 @@ class SEO_Agent_AI_Report_Engine {
 		$score_dist    = $report['score_distribution'] ?? array();
 		$approvals     = (int) ( $summary['pending_approvals'] ?? 0 );
 		$site_name     = esc_html( get_bloginfo( 'name' ) );
-		$approvals_url = esc_url( admin_url( 'admin.php?page=seo-agent-approvals' ) );
+		$approvals_url = esc_url( admin_url( 'admin.php?page=ariham-seoagent-approvals' ) );
 		$dashboard_url = esc_url( admin_url( 'admin.php?page=ariham-seoagent' ) );
 
 		$stats = array(
@@ -508,7 +508,7 @@ class SEO_Agent_AI_Report_Engine {
 
 	<tr><td style="background:#f8f9fa;border-top:1px solid #e5e7eb;border-radius:0 0 8px 8px;padding:16px 32px;text-align:center">
 		<a href="<?php echo esc_url( $dashboard_url ); ?>" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:5px;font-size:13px;font-weight:600"><?php esc_html_e( 'Open Dashboard', 'ariham-seoagent' ); ?></a>
-		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'SEO Agent AI — autonomous SEO for WordPress', 'ariham-seoagent' ); ?></p>
+		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'Ariham SEOAgent — autonomous SEO for WordPress', 'ariham-seoagent' ); ?></p>
 	</td></tr>
 
 </table>
@@ -523,11 +523,11 @@ class SEO_Agent_AI_Report_Engine {
 	private function build_weekly_email_html() {
 		global $wpdb;
 
-		$table         = esc_sql( $wpdb->prefix . 'seo_agent_keyword_history' );
+		$table         = esc_sql( $wpdb->prefix . 'ariham_seoagent_keyword_history' );
 		$site_name     = esc_html( get_bloginfo( 'name' ) );
 		$period_from   = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
 		$period_to     = gmdate( 'Y-m-d' );
-		$dashboard_url = esc_url( admin_url( 'admin.php?page=seo-agent-rankings' ) );
+		$dashboard_url = esc_url( admin_url( 'admin.php?page=ariham-seoagent-rankings' ) );
 
 		// Top movers: biggest position improvement in last 7 days.
 		$top_movers_sql = 'SELECT post_id, keyword,
@@ -538,7 +538,7 @@ class SEO_Agent_AI_Report_Engine {
 		$top_movers = $wpdb->get_results( $wpdb->prepare( $top_movers_sql, $period_from, $period_from, gmdate( 'Y-m-d', strtotime( '-14 days' ) ) ), ARRAY_A );
 
 		// Score distribution snapshot.
-		$all_insights = SEO_Agent_AI_DB_Manager::get_all_latest_insights( 200 );
+		$all_insights = Ariham_SEOAgent_DB_Manager::get_all_latest_insights( 200 );
 		$scores       = array_column( $all_insights, 'score_overall' );
 		$avg_score    = count( $scores ) > 0 ? round( array_sum( $scores ) / count( $scores ) ) : 0;
 		$excellent    = count(
@@ -627,7 +627,7 @@ class SEO_Agent_AI_Report_Engine {
 
 	<tr><td style="background:#f8f9fa;border-top:1px solid #e5e7eb;border-radius:0 0 8px 8px;padding:16px 32px;text-align:center">
 		<a href="<?php echo esc_url( $dashboard_url ); ?>" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:5px;font-size:13px;font-weight:600"><?php esc_html_e( 'View Rankings', 'ariham-seoagent' ); ?></a>
-		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'SEO Agent AI — autonomous SEO for WordPress', 'ariham-seoagent' ); ?></p>
+		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'Ariham SEOAgent — autonomous SEO for WordPress', 'ariham-seoagent' ); ?></p>
 	</td></tr>
 
 </table>
