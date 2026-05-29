@@ -70,7 +70,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 			: 'unknown';
 		$intent_label  = class_exists( 'SEO_Agent_AI_Search_Intent' )
 			? SEO_Agent_AI_Search_Intent::label( $search_intent )
-			: __( 'Unknown', 'seo-agent-ai' );
+			: __( 'Unknown', 'ariham-seoagent' );
 
 		$recommendations = array();
 
@@ -84,10 +84,10 @@ class SEO_Agent_AI_Recommendation_Engine {
 
 			$missing_parts = array();
 			if ( ! $has_title ) {
-				$missing_parts[] = __( 'meta title', 'seo-agent-ai' );
+				$missing_parts[] = __( 'meta title', 'ariham-seoagent' );
 			}
 			if ( ! $has_desc ) {
-				$missing_parts[] = __( 'meta description', 'seo-agent-ai' );
+				$missing_parts[] = __( 'meta description', 'ariham-seoagent' );
 			}
 
 			$recommendations[] = array(
@@ -98,7 +98,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — adds missing fundamental SEO elements.',
 				'reason'          => sprintf(
 					/* translators: %s: comma-separated list of missing SEO meta fields. */
-					__( 'No %s found in any active SEO plugin. These are the most fundamental SEO elements — without them, Google writes its own snippets.', 'seo-agent-ai' ),
+					__( 'No %s found in any active SEO plugin. These are the most fundamental SEO elements — without them, Google writes its own snippets.', 'ariham-seoagent' ),
 					implode( ' / ', $missing_parts )
 				),
 				'proposed'        => array(
@@ -121,13 +121,13 @@ class SEO_Agent_AI_Recommendation_Engine {
 			if ( ! empty( $seo_audit['title_too_long'] ) ) {
 				$title_issue = ' ' . sprintf(
 					/* translators: %d: title length in characters. */
-					__( 'Current title (%d chars) exceeds the 60-char display limit.', 'seo-agent-ai' ),
+					__( 'Current title (%d chars) exceeds the 60-char display limit.', 'ariham-seoagent' ),
 					$title_len
 				);
 			} elseif ( ! empty( $seo_audit['title_too_short'] ) ) {
 				$title_issue = ' ' . sprintf(
 					/* translators: %d: title length in characters. */
-					__( 'Current title (%d chars) is too short.', 'seo-agent-ai' ),
+					__( 'Current title (%d chars) is too short.', 'ariham-seoagent' ),
 					$title_len
 				);
 			}
@@ -136,7 +136,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 			if ( $impressions > 0 ) {
 				$traffic_context = ' ' . sprintf(
 					/* translators: 1: impressions count, 2: average position, 3: CTR percent. */
-					__( 'With %1$s impressions at position %2$.1f, a CTR of %3$.1f%% is below expectation.', 'seo-agent-ai' ),
+					__( 'With %1$s impressions at position %2$.1f, a CTR of %3$.1f%% is below expectation.', 'ariham-seoagent' ),
 					number_format_i18n( $impressions ),
 					$position,
 					$ctr
@@ -149,7 +149,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'priority'        => 'high',
 				'confidence'      => $confidence,
 				'expected_impact' => 'High — improved snippet can lift CTR by 1-3%.',
-				'reason'          => __( 'SEO snippet optimization opportunity.', 'seo-agent-ai' ) . $title_issue . $traffic_context,
+				'reason'          => __( 'SEO snippet optimization opportunity.', 'ariham-seoagent' ) . $title_issue . $traffic_context,
 				'proposed'        => array(
 					'meta_title'       => $this->build_meta_title( $post, $top_query ),
 					'meta_description' => $this->build_meta_description( $post, $top_query ),
@@ -167,15 +167,15 @@ class SEO_Agent_AI_Recommendation_Engine {
 
 			// Tailor the expansion advice based on detected search intent.
 			if ( 'informational' === $search_intent ) {
-				$expansion_hint = __( 'Informational intent detected — expand with step-by-step explanations, definitions, and a FAQ block.', 'seo-agent-ai' );
+				$expansion_hint = __( 'Informational intent detected — expand with step-by-step explanations, definitions, and a FAQ block.', 'ariham-seoagent' );
 			} elseif ( 'commercial' === $search_intent ) {
-				$expansion_hint = __( 'Commercial intent detected — add a comparison table, pros/cons section, and expert verdict to satisfy research-phase users.', 'seo-agent-ai' );
+				$expansion_hint = __( 'Commercial intent detected — add a comparison table, pros/cons section, and expert verdict to satisfy research-phase users.', 'ariham-seoagent' );
 			} elseif ( 'transactional' === $search_intent ) {
-				$expansion_hint = __( 'Transactional intent detected — add clear calls-to-action, pricing details, and trust signals (reviews, guarantees).', 'seo-agent-ai' );
+				$expansion_hint = __( 'Transactional intent detected — add clear calls-to-action, pricing details, and trust signals (reviews, guarantees).', 'ariham-seoagent' );
 			} else {
 				$expansion_hint = sprintf(
 					/* translators: %s: target search query or post title. */
-					__( 'Expand content to at least 600 words. Add an FAQ block for "%s", real examples, and a clear summary.', 'seo-agent-ai' ),
+					__( 'Expand content to at least 600 words. Add an FAQ block for "%s", real examples, and a clear summary.', 'ariham-seoagent' ),
 					$top_query !== '' ? $top_query : $post->post_title
 				);
 			}
@@ -188,7 +188,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Medium — more content enables ranking for long-tail keywords.',
 				'reason'          => sprintf(
 					/* translators: %d: post word count. */
-					__( 'This post has only %d words. Google consistently favours comprehensive content (600+ words).', 'seo-agent-ai' ),
+					__( 'This post has only %d words. Google consistently favours comprehensive content (600+ words).', 'ariham-seoagent' ),
 					$word_count
 				),
 				'meta'            => array(
@@ -217,14 +217,14 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — refreshed content can push rankings from page 2 to top 5.',
 				'reason'          => sprintf(
 					/* translators: 1: average search position, 2: engagement rate percent. */
-					__( 'Page ranks at position %1$.1f but engagement rate is only %2$d%%. Content refresh needed.', 'seo-agent-ai' ),
+					__( 'Page ranks at position %1$.1f but engagement rate is only %2$d%%. Content refresh needed.', 'ariham-seoagent' ),
 					$position,
 					$eng_pct
 				),
 				'proposed'        => array(
 					'summary' => sprintf(
 						/* translators: %s: target search query or post title. */
-						__( 'Audit against top 3 competitors for "%s". Add missing sections, update statistics, improve introduction, add FAQ.', 'seo-agent-ai' ),
+						__( 'Audit against top 3 competitors for "%s". Add missing sections, update statistics, improve introduction, add FAQ.', 'ariham-seoagent' ),
 						$top_query !== '' ? $top_query : $post->post_title
 					),
 				),
@@ -243,25 +243,25 @@ class SEO_Agent_AI_Recommendation_Engine {
 			if ( 'informational' === $search_intent ) {
 				$alignment_hint = sprintf(
 					/* translators: %s: target search query or post title. */
-					__( 'Informational intent detected — revise H1 and introduction to directly answer "%s" within the first 100 words, using clear definitions or step-by-step instructions.', 'seo-agent-ai' ),
+					__( 'Informational intent detected — revise H1 and introduction to directly answer "%s" within the first 100 words, using clear definitions or step-by-step instructions.', 'ariham-seoagent' ),
 					$top_query !== '' ? $top_query : $post->post_title
 				);
 			} elseif ( 'transactional' === $search_intent ) {
 				$alignment_hint = sprintf(
 					/* translators: %s: target search query or post title. */
-					__( 'Transactional intent detected — lead with a clear CTA and pricing/availability for "%s" so users can act immediately rather than bouncing.', 'seo-agent-ai' ),
+					__( 'Transactional intent detected — lead with a clear CTA and pricing/availability for "%s" so users can act immediately rather than bouncing.', 'ariham-seoagent' ),
 					$top_query !== '' ? $top_query : $post->post_title
 				);
 			} elseif ( 'commercial' === $search_intent ) {
 				$alignment_hint = sprintf(
 					/* translators: %s: target search query or post title. */
-					__( 'Commercial intent detected — restructure around comparison and evaluation for "%s": add a verdict section and a clear winner recommendation early in the post.', 'seo-agent-ai' ),
+					__( 'Commercial intent detected — restructure around comparison and evaluation for "%s": add a verdict section and a clear winner recommendation early in the post.', 'ariham-seoagent' ),
 					$top_query !== '' ? $top_query : $post->post_title
 				);
 			} else {
 				$alignment_hint = sprintf(
 					/* translators: %s: target search query or post title. */
-					__( 'Revise H1, introduction, and meta snippet to directly answer "%s" within first visible paragraph.', 'seo-agent-ai' ),
+					__( 'Revise H1, introduction, and meta snippet to directly answer "%s" within first visible paragraph.', 'ariham-seoagent' ),
 					$top_query !== '' ? $top_query : $post->post_title
 				);
 			}
@@ -274,7 +274,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — fixing intent mismatch reduces pogo-sticking and improves rankings.',
 				'reason'          => sprintf(
 					/* translators: 1: average search position, 2: average time on page in seconds, 3: intent label. */
-					__( 'Strong ranking at position %1$.1f, but users spend only %2$ds — %3$s intent mismatch detected. Rewrite introduction to answer primary search intent within first 100 words.', 'seo-agent-ai' ),
+					__( 'Strong ranking at position %1$.1f, but users spend only %2$ds — %3$s intent mismatch detected. Rewrite introduction to answer primary search intent within first 100 words.', 'ariham-seoagent' ),
 					$position,
 					$time_sec,
 					$intent_label
@@ -309,7 +309,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Medium — meta refresh is a quick win while investigating root cause.',
 				'reason'          => sprintf(
 					/* translators: %s: trend descriptor like "-15.2% impressions". */
-					__( 'Performance has dropped %s over 28 days. Refreshing meta is a quick, low-risk first step.', 'seo-agent-ai' ),
+					__( 'Performance has dropped %s over 28 days. Refreshing meta is a quick, low-risk first step.', 'ariham-seoagent' ),
 					$trend_str
 				),
 				'proposed'        => array(
@@ -335,7 +335,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Very High — moving from page 2 to page 1 can increase clicks 3-5x.',
 				'reason'          => sprintf(
 					/* translators: 1: position, 2: impressions. */
-					__( 'Ranking at position %1$.1f with %2$d impressions — this is a page-2 keyword just one push away from first-page visibility.', 'seo-agent-ai' ),
+					__( 'Ranking at position %1$.1f with %2$d impressions — this is a page-2 keyword just one push away from first-page visibility.', 'ariham-seoagent' ),
 					$position,
 					$impressions
 				),
@@ -345,7 +345,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 					'focus_keyword'    => $top_query,
 					'summary'          => sprintf(
 						/* translators: %s: target search query. */
-						__( 'Strengthen the keyword signal for "%s": update title tag, add the keyword to the first paragraph and at least one H2, add internal links pointing to this page.', 'seo-agent-ai' ),
+						__( 'Strengthen the keyword signal for "%s": update title tag, add the keyword to the first paragraph and at least one H2, add internal links pointing to this page.', 'ariham-seoagent' ),
 						$top_query !== '' ? $top_query : $post->post_title
 					),
 				),
@@ -368,7 +368,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — CTR improvement at this position can significantly increase organic traffic.',
 				'reason'          => sprintf(
 					/* translators: 1: actual CTR%, 2: position. */
-					__( 'CTR of %1$.1f%% at position %2$.1f is significantly below the industry average for this position. The snippet is not compelling enough.', 'seo-agent-ai' ),
+					__( 'CTR of %1$.1f%% at position %2$.1f is significantly below the industry average for this position. The snippet is not compelling enough.', 'ariham-seoagent' ),
 					$ctr_pct,
 					$position
 				),
@@ -395,7 +395,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Very High — top-5 position means even a small CTR lift = major traffic gain.',
 				'reason'          => sprintf(
 					/* translators: 1: position, 2: CTR%. */
-					__( 'Top-5 ranking (position %1$.1f) but CTR is only %2$.1f%% — well below what this position should yield. A more compelling title and description can double your clicks without any ranking change.', 'seo-agent-ai' ),
+					__( 'Top-5 ranking (position %1$.1f) but CTR is only %2$.1f%% — well below what this position should yield. A more compelling title and description can double your clicks without any ranking change.', 'ariham-seoagent' ),
 					$position,
 					$ctr_pct
 				),
@@ -419,11 +419,11 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — consolidating cannibalizing pages focuses link equity on the winner.',
 				'reason'          => sprintf(
 					/* translators: %s: post title. */
-					__( 'Multiple pages are competing for the same keywords as "%s". This splits link equity and confuses Google about which page to rank.', 'seo-agent-ai' ),
+					__( 'Multiple pages are competing for the same keywords as "%s". This splits link equity and confuses Google about which page to rank.', 'ariham-seoagent' ),
 					$post->post_title
 				),
 				'proposed'        => array(
-					'summary' => __( 'Audit which page has stronger backlinks and engagement. Set canonical tags on weaker pages, or consolidate content into the stronger page via 301 redirect.', 'seo-agent-ai' ),
+					'summary' => __( 'Audit which page has stronger backlinks and engagement. Set canonical tags on weaker pages, or consolidate content into the stronger page via 301 redirect.', 'ariham-seoagent' ),
 				),
 			);
 		}
@@ -443,13 +443,13 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Medium — fresh content signals can stop ranking decay.',
 				'reason'          => sprintf(
 					/* translators: %d: freshness score. */
-					__( 'Content freshness score is %d/100 — outdated years and statistics detected. Stale content loses rankings as competitors publish fresher information.', 'seo-agent-ai' ),
+					__( 'Content freshness score is %d/100 — outdated years and statistics detected. Stale content loses rankings as competitors publish fresher information.', 'ariham-seoagent' ),
 					$freshness
 				),
 				'proposed'        => array(
 					'meta_title'       => $this->build_meta_title( $post, $top_query ),
 					'meta_description' => $this->build_meta_description( $post, $top_query ),
-					'summary'          => __( 'Update statistics, replace old years with current data, add a "Last updated" date, and refresh the meta description to include the current year.', 'seo-agent-ai' ),
+					'summary'          => __( 'Update statistics, replace old years with current data, add a "Last updated" date, and refresh the meta description to include the current year.', 'ariham-seoagent' ),
 				),
 			);
 		}
@@ -467,11 +467,11 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Medium — internal links pass authority and help Google discover the page.',
 				'reason'          => sprintf(
 					/* translators: %s: post title. */
-					__( '"%s" has no internal links pointing to it. Orphan pages receive no PageRank from internal linking and are harder for Google to discover and value.', 'seo-agent-ai' ),
+					__( '"%s" has no internal links pointing to it. Orphan pages receive no PageRank from internal linking and are harder for Google to discover and value.', 'ariham-seoagent' ),
 					$post->post_title
 				),
 				'proposed'        => array(
-					'summary' => __( 'Find 3-5 related posts and add contextual links to this page using keyword-rich anchor text matching the target query.', 'seo-agent-ai' ),
+					'summary' => __( 'Find 3-5 related posts and add contextual links to this page using keyword-rich anchor text matching the target query.', 'ariham-seoagent' ),
 				),
 			);
 		}
@@ -489,11 +489,11 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Medium — schema markup enables rich results in Google Search.',
 				'reason'          => sprintf(
 					/* translators: %s: post title. */
-					__( '"%s" has no JSON-LD structured data. Schema markup enables rich results like FAQ dropdowns, breadcrumbs, and article metadata that improve CTR.', 'seo-agent-ai' ),
+					__( '"%s" has no JSON-LD structured data. Schema markup enables rich results like FAQ dropdowns, breadcrumbs, and article metadata that improve CTR.', 'ariham-seoagent' ),
 					$post->post_title
 				),
 				'proposed'        => array(
-					'summary' => __( 'Add Article (BlogPosting) schema, BreadcrumbList, and — if the post has an FAQ section — FAQPage schema. The plugin schema engine can auto-inject these via wp_head.', 'seo-agent-ai' ),
+					'summary' => __( 'Add Article (BlogPosting) schema, BreadcrumbList, and — if the post has an FAQ section — FAQPage schema. The plugin schema engine can auto-inject these via wp_head.', 'ariham-seoagent' ),
 				),
 			);
 		}
@@ -514,12 +514,12 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — improved engagement directly signals quality to Google.',
 				'reason'          => sprintf(
 					/* translators: 1: engagement %, 2: time on page seconds. */
-					__( 'Engagement rate of %1$d%% and average time on page of %2$ds are both critically low. Users are not finding value in this content.', 'seo-agent-ai' ),
+					__( 'Engagement rate of %1$d%% and average time on page of %2$ds are both critically low. Users are not finding value in this content.', 'ariham-seoagent' ),
 					$engagement_pct,
 					$time_sec
 				),
 				'proposed'        => array(
-					'summary' => __( 'Rewrite the introduction to deliver immediate value. Add visuals, a TL;DR summary, and improve internal navigation (jump links, table of contents).', 'seo-agent-ai' ),
+					'summary' => __( 'Rewrite the introduction to deliver immediate value. Add visuals, a TL;DR summary, and improve internal navigation (jump links, table of contents).', 'ariham-seoagent' ),
 				),
 			);
 		}
@@ -537,13 +537,13 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'Medium — FAQ sections can earn People Also Ask rich results.',
 				'reason'          => sprintf(
 					/* translators: %s: post title. */
-					__( '"%s" has no FAQ section. Pages ranking for question-based queries often earn People Also Ask (PAA) slots, significantly increasing CTR.', 'seo-agent-ai' ),
+					__( '"%s" has no FAQ section. Pages ranking for question-based queries often earn People Also Ask (PAA) slots, significantly increasing CTR.', 'ariham-seoagent' ),
 					$post->post_title
 				),
 				'proposed'        => array(
 					'summary' => sprintf(
 						/* translators: %s: target search query. */
-						__( 'Add an FAQ section at the bottom of the post answering 4-6 common questions around "%s". Format with H3 headings and concise paragraph answers.', 'seo-agent-ai' ),
+						__( 'Add an FAQ section at the bottom of the post answering 4-6 common questions around "%s". Format with H3 headings and concise paragraph answers.', 'ariham-seoagent' ),
 						$top_query !== '' ? $top_query : $post->post_title
 					),
 				),
@@ -567,13 +567,13 @@ class SEO_Agent_AI_Recommendation_Engine {
 				if ( $cwv_lcp >= 4000 ) {
 					$cwv_reasons[] = sprintf(
 						/* translators: %d: LCP time in milliseconds. */
-						__( 'LCP is poor (%dms — threshold 4,000ms)', 'seo-agent-ai' ),
+						__( 'LCP is poor (%dms — threshold 4,000ms)', 'ariham-seoagent' ),
 						$cwv_lcp
 					);
 				} elseif ( $cwv_lcp >= 2500 ) {
 					$cwv_reasons[] = sprintf(
 						/* translators: %d: LCP time in milliseconds. */
-						__( 'LCP needs improvement (%dms — threshold 2,500ms)', 'seo-agent-ai' ),
+						__( 'LCP needs improvement (%dms — threshold 2,500ms)', 'ariham-seoagent' ),
 						$cwv_lcp
 					);
 				}
@@ -581,13 +581,13 @@ class SEO_Agent_AI_Recommendation_Engine {
 				if ( $cwv_cls >= 0.25 ) {
 					$cwv_reasons[] = sprintf(
 						/* translators: %.2f: CLS score. */
-						__( 'CLS is poor (%.2f — threshold 0.25)', 'seo-agent-ai' ),
+						__( 'CLS is poor (%.2f — threshold 0.25)', 'ariham-seoagent' ),
 						$cwv_cls
 					);
 				} elseif ( $cwv_cls >= 0.1 ) {
 					$cwv_reasons[] = sprintf(
 						/* translators: %.2f: CLS score. */
-						__( 'CLS needs improvement (%.2f — threshold 0.1)', 'seo-agent-ai' ),
+						__( 'CLS needs improvement (%.2f — threshold 0.1)', 'ariham-seoagent' ),
 						$cwv_cls
 					);
 				}
@@ -595,7 +595,7 @@ class SEO_Agent_AI_Recommendation_Engine {
 				if ( $cwv_perf < 50 ) {
 					$cwv_reasons[] = sprintf(
 						/* translators: %d: Lighthouse performance score. */
-						__( 'Lighthouse performance score is low (%d/100)', 'seo-agent-ai' ),
+						__( 'Lighthouse performance score is low (%d/100)', 'ariham-seoagent' ),
 						$cwv_perf
 					);
 				}
@@ -605,13 +605,13 @@ class SEO_Agent_AI_Recommendation_Engine {
 					'risk'            => 'safe',  // No content change — informational flag only.
 					'priority'        => 'high',
 					'confidence'      => 0.95,
-					'expected_impact' => __( 'High — Core Web Vitals are a confirmed Google ranking signal. Fixing poor scores can lift rankings and reduce bounce rate.', 'seo-agent-ai' ),
+					'expected_impact' => __( 'High — Core Web Vitals are a confirmed Google ranking signal. Fixing poor scores can lift rankings and reduce bounce rate.', 'ariham-seoagent' ),
 					'reason'          => implode( '; ', $cwv_reasons ),
 					'proposed'        => array(
 						'lcp_ms'      => $cwv_lcp,
 						'cls'         => $cwv_cls,
 						'performance' => $cwv_perf,
-						'action'      => __( 'Review PageSpeed Insights for this URL and address the flagged issues.', 'seo-agent-ai' ),
+						'action'      => __( 'Review PageSpeed Insights for this URL and address the flagged issues.', 'ariham-seoagent' ),
 					),
 				);
 			}
@@ -633,14 +633,14 @@ class SEO_Agent_AI_Recommendation_Engine {
 				'expected_impact' => 'High — investigating indexing issues can unlock significant ranking recovery.',
 				'reason'          => sprintf(
 					/* translators: 1: impressions, 2: position. */
-					__( '%1$d impressions at position %2$.1f suggests Google is aware of this page but not ranking it well. Possible causes: thin content, duplicate content, or a technical SEO issue.', 'seo-agent-ai' ),
+					__( '%1$d impressions at position %2$.1f suggests Google is aware of this page but not ranking it well. Possible causes: thin content, duplicate content, or a technical SEO issue.', 'ariham-seoagent' ),
 					$impressions,
 					$position
 				),
 				'proposed'        => array(
 					'meta_title'       => $this->build_meta_title( $post, $top_query ),
 					'meta_description' => $this->build_meta_description( $post, $top_query ),
-					'summary'          => __( 'Check Google Search Console Coverage report. Verify canonical tags are correct, check for duplicate content, and ensure the page passes Core Web Vitals.', 'seo-agent-ai' ),
+					'summary'          => __( 'Check Google Search Console Coverage report. Verify canonical tags are correct, check for duplicate content, and ensure the page passes Core Web Vitals.', 'ariham-seoagent' ),
 				),
 			);
 		}

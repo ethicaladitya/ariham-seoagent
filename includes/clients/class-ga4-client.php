@@ -40,7 +40,7 @@ class SEO_Agent_AI_GA4_Client {
 		}
 
 		if ( $property_id === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$page_path = wp_parse_url( $page_url, PHP_URL_PATH );
@@ -84,7 +84,7 @@ class SEO_Agent_AI_GA4_Client {
 		}
 
 		if ( $property_id === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$page_path = wp_parse_url( $page_url, PHP_URL_PATH );
@@ -151,7 +151,7 @@ class SEO_Agent_AI_GA4_Client {
 		}
 
 		if ( $property_id === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$endpoint = 'https://analyticsdata.googleapis.com/v1beta/properties/' . rawurlencode( $property_id ) . ':runReport';
@@ -210,7 +210,7 @@ class SEO_Agent_AI_GA4_Client {
 		}
 
 		if ( $property_id === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'GA4 credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$endpoint = 'https://analyticsdata.googleapis.com/v1beta/properties/' . rawurlencode( $property_id ) . ':runReport';
@@ -342,7 +342,7 @@ class SEO_Agent_AI_GA4_Client {
 		}
 
 		if ( $property_id === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'Google Analytics credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_ga4_not_configured', __( 'Google Analytics credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_post(
@@ -374,14 +374,14 @@ class SEO_Agent_AI_GA4_Client {
 		$data   = json_decode( $body, true );
 
 		if ( $status < 200 || $status >= 300 ) {
-			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown Analytics connection error.', 'seo-agent-ai' );
+			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown Analytics connection error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_ga4_connection_api_error', $message );
 		}
 
 		return array(
 			'service'  => 'analytics',
 			'property' => $property_id,
-			'message'  => __( 'Google Analytics connection succeeded.', 'seo-agent-ai' ),
+			'message'  => __( 'Google Analytics connection succeeded.', 'ariham-seoagent' ),
 		);
 	}
 
@@ -393,7 +393,7 @@ class SEO_Agent_AI_GA4_Client {
 		}
 
 		if ( empty( $access_token ) ) {
-			return new WP_Error( 'seo_agent_ai_not_connected', __( 'Google account not connected.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_not_connected', __( 'Google account not connected.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_get(
@@ -414,9 +414,9 @@ class SEO_Agent_AI_GA4_Client {
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code < 200 || $code >= 300 ) {
-			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown error.', 'seo-agent-ai' );
+			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown error.', 'ariham-seoagent' );
 			if ( $code === 403 || $code === 404 ) {
-				$msg .= ' ' . __( 'Make sure the Google Analytics Admin API is enabled in Google Cloud Console.', 'seo-agent-ai' );
+				$msg .= ' ' . __( 'Make sure the Google Analytics Admin API is enabled in Google Cloud Console.', 'ariham-seoagent' );
 			}
 			return new WP_Error( 'seo_agent_ai_ga4_admin_api_error', $msg );
 		}
@@ -501,7 +501,7 @@ class SEO_Agent_AI_GA4_Client {
 		$data   = json_decode( $body, true );
 
 		if ( $status < 200 || $status >= 300 ) {
-			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GA4 API error.', 'seo-agent-ai' );
+			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GA4 API error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_ga4_api_error', $message );
 		}
 
@@ -537,7 +537,7 @@ class SEO_Agent_AI_GA4_Client {
 		$data   = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $status < 200 || $status >= 300 ) {
-			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GA4 API error.', 'seo-agent-ai' );
+			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GA4 API error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_ga4_api_error', $msg );
 		}
 
@@ -585,14 +585,14 @@ class SEO_Agent_AI_GA4_Client {
 		if ( stripos( $property_id, 'UA-' ) === 0 ) {
 			return new WP_Error(
 				'seo_agent_ai_ua_unsupported',
-				__( 'Universal Analytics properties (UA-...) are retired by Google and cannot be queried for live reporting.', 'seo-agent-ai' )
+				__( 'Universal Analytics properties (UA-...) are retired by Google and cannot be queried for live reporting.', 'ariham-seoagent' )
 			);
 		}
 
 		if ( stripos( $property_id, 'G-' ) === 0 ) {
 			return new WP_Error(
 				'seo_agent_ai_measurement_id_unsupported',
-				__( 'Use a Google Analytics property ID, not a Measurement ID (G-...).', 'seo-agent-ai' )
+				__( 'Use a Google Analytics property ID, not a Measurement ID (G-...).', 'ariham-seoagent' )
 			);
 		}
 
@@ -606,7 +606,7 @@ class SEO_Agent_AI_GA4_Client {
 
 		return new WP_Error(
 			'seo_agent_ai_invalid_property_id',
-			__( 'Google Analytics property ID must be numeric or in the form properties/123456.', 'seo-agent-ai' )
+			__( 'Google Analytics property ID must be numeric or in the form properties/123456.', 'ariham-seoagent' )
 		);
 	}
 }

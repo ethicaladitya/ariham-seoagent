@@ -36,7 +36,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$current = $this->query_period( $site_url, $access_token, $page_url, 28, 1 );
@@ -78,7 +78,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$result = $this->query_period( $site_url, $access_token, $page_url, $days, 1 );
@@ -98,7 +98,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$start_date = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
@@ -143,7 +143,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$curr_start = gmdate( 'Y-m-d', strtotime( '-' . ( (int) $days ) . ' days' ) );
@@ -211,7 +211,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$start_date = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
@@ -395,7 +395,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( $site_url === '' || $access_token === '' ) {
-			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_gsc_not_configured', __( 'Google Search Console credentials are not configured.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_get(
@@ -417,7 +417,7 @@ class SEO_Agent_AI_GSC_Client {
 		$data   = json_decode( $body, true );
 
 		if ( $status < 200 || $status >= 300 ) {
-			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC connection error.', 'seo-agent-ai' );
+			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC connection error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_gsc_connection_api_error', $message );
 		}
 
@@ -428,7 +428,7 @@ class SEO_Agent_AI_GSC_Client {
 				return array(
 					'service'  => 'gsc',
 					'property' => $site_url,
-					'message'  => __( 'Search Console connection succeeded.', 'seo-agent-ai' ),
+					'message'  => __( 'Search Console connection succeeded.', 'ariham-seoagent' ),
 				);
 			}
 		}
@@ -437,7 +437,7 @@ class SEO_Agent_AI_GSC_Client {
 			'seo_agent_ai_gsc_property_not_found',
 			sprintf(
 				/* translators: %s: configured Search Console property URL. */
-				__( 'Connected to Search Console, but the configured property was not found: %s', 'seo-agent-ai' ),
+				__( 'Connected to Search Console, but the configured property was not found: %s', 'ariham-seoagent' ),
 				$site_url
 			)
 		);
@@ -451,7 +451,7 @@ class SEO_Agent_AI_GSC_Client {
 		}
 
 		if ( empty( $access_token ) ) {
-			return new WP_Error( 'seo_agent_ai_not_connected', __( 'Google account not connected.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_not_connected', __( 'Google account not connected.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_get(
@@ -472,7 +472,7 @@ class SEO_Agent_AI_GSC_Client {
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code < 200 || $code >= 300 ) {
-			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown error.', 'seo-agent-ai' );
+			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_gsc_api_error', $msg );
 		}
 
@@ -527,7 +527,7 @@ class SEO_Agent_AI_GSC_Client {
 		$data   = json_decode( $body, true );
 
 		if ( $status < 200 || $status >= 300 ) {
-			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC API error.', 'seo-agent-ai' );
+			$message = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC API error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_gsc_api_error', $message );
 		}
 
@@ -557,7 +557,7 @@ class SEO_Agent_AI_GSC_Client {
 		$data   = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $status < 200 || $status >= 300 ) {
-			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC API error.', 'seo-agent-ai' );
+			$msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : __( 'Unknown GSC API error.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_gsc_api_error', $msg );
 		}
 

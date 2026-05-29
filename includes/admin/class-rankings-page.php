@@ -13,7 +13,7 @@ class SEO_Agent_AI_Rankings_Page {
 
 	public function render() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions.', 'ariham-seoagent' ) );
 		}
 
 		$search_query = isset( $_GET['keyword'] ) ? sanitize_text_field( wp_unslash( $_GET['keyword'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
@@ -24,7 +24,7 @@ class SEO_Agent_AI_Rankings_Page {
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( ! empty( $_GET['triggered'] ) && sanitize_key( $_GET['triggered'] ) === 'seo_agent_fetch_gsc_data' ) { // phpcs:ignore WordPress.Security.NonceVerification
 			echo '<div class="sai-notice n-success"><p>';
-			esc_html_e( 'GSC keyword fetch triggered. Reload in a moment to see results.', 'seo-agent-ai' );
+			esc_html_e( 'GSC keyword fetch triggered. Reload in a moment to see results.', 'ariham-seoagent' );
 			echo '</p></div>';
 		}
 
@@ -33,8 +33,8 @@ class SEO_Agent_AI_Rankings_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
-					<h1 class="sai-header-title"><?php esc_html_e( 'Keyword Rankings', 'seo-agent-ai' ); ?></h1>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Keyword Rankings', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<?php if ( $gsc_site !== '' ) : ?>
@@ -48,7 +48,7 @@ class SEO_Agent_AI_Rankings_Page {
 							<input type="hidden" name="redirect_page" value="seo-agent-rankings">
 							<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_val ); ?>">
 							<button type="submit" class="sai-btn sai-btn-ghost">
-								<span class="btn-label"><?php esc_html_e( 'Sync GSC Now', 'seo-agent-ai' ); ?></span>
+								<span class="btn-label"><?php esc_html_e( 'Sync GSC Now', 'ariham-seoagent' ); ?></span>
 							</button>
 						</form>
 					<?php endif; ?>
@@ -105,10 +105,10 @@ class SEO_Agent_AI_Rankings_Page {
 		if ( $gsc_site === '' ) {
 			echo '<div class="sai-notice n-warning" style="margin-bottom:16px">';
 			echo '<p style="margin:0">';
-			echo '<strong>' . esc_html__( 'Google Search Console not connected.', 'seo-agent-ai' ) . '</strong> ';
-			esc_html_e( 'Keyword ranking data comes from GSC. Connect it first, then fetch data.', 'seo-agent-ai' );
+			echo '<strong>' . esc_html__( 'Google Search Console not connected.', 'ariham-seoagent' ) . '</strong> ';
+			esc_html_e( 'Keyword ranking data comes from GSC. Connect it first, then fetch data.', 'ariham-seoagent' );
 			echo ' <a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '" class="sai-btn sai-btn-sm sai-btn-ghost" style="margin-left:8px">';
-			esc_html_e( 'Connect Google', 'seo-agent-ai' );
+			esc_html_e( 'Connect Google', 'ariham-seoagent' );
 			echo '</a>';
 			echo '</p></div>';
 			return;
@@ -117,15 +117,15 @@ class SEO_Agent_AI_Rankings_Page {
 		$sync_label = $last_sync !== ''
 			? sprintf(
 				/* translators: %s: human-readable time diff */
-				__( 'Last sync: %s ago', 'seo-agent-ai' ),
+				__( 'Last sync: %s ago', 'ariham-seoagent' ),
 				human_time_diff( strtotime( $last_sync ), current_time( 'timestamp' ) ) // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 			)
-			: __( 'Never synced', 'seo-agent-ai' );
+			: __( 'Never synced', 'ariham-seoagent' );
 
 		echo '<div class="sai-card" style="margin-bottom:16px">';
 		echo '<div class="sai-card-body" style="display:flex;align-items:center;gap:12px;padding:10px 16px">';
-		echo '<span class="sai-badge b-success">' . esc_html__( 'Connected', 'seo-agent-ai' ) . '</span>';
-		echo '<span style="color:#50575e;font-size:13px"><strong>' . esc_html__( 'GSC:', 'seo-agent-ai' ) . '</strong> ' . esc_html( $gsc_site ) . '</span>';
+		echo '<span class="sai-badge b-success">' . esc_html__( 'Connected', 'ariham-seoagent' ) . '</span>';
+		echo '<span style="color:#50575e;font-size:13px"><strong>' . esc_html__( 'GSC:', 'ariham-seoagent' ) . '</strong> ' . esc_html( $gsc_site ) . '</span>';
 		echo '<span style="color:#787c82;font-size:12px">' . esc_html( $sync_label ) . '</span>';
 		echo '</div></div>';
 	}
@@ -143,12 +143,12 @@ class SEO_Agent_AI_Rankings_Page {
 		echo '<input type="hidden" name="page" value="seo-agent-rankings">';
 
 		echo '<div class="sai-search-wrap">';
-		echo '<input type="text" name="keyword" value="' . esc_attr( $search_query ) . '" placeholder="' . esc_attr__( 'Search keyword...', 'seo-agent-ai' ) . '">';
+		echo '<input type="text" name="keyword" value="' . esc_attr( $search_query ) . '" placeholder="' . esc_attr__( 'Search keyword...', 'ariham-seoagent' ) . '">';
 		echo '</div>';
 
 		echo '<label>';
 		echo '<select name="post_id">';
-		echo '<option value="">' . esc_html__( 'All posts', 'seo-agent-ai' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'All posts', 'ariham-seoagent' ) . '</option>';
 		foreach ( $posts as $p ) {
 			echo '<option value="' . esc_attr( $p->ID ) . '"' . selected( $post_id, $p->ID, false ) . '>';
 			echo esc_html( $p->post_title );
@@ -162,13 +162,13 @@ class SEO_Agent_AI_Rankings_Page {
 		foreach ( array( 7, 14, 30, 60, 90 ) as $d ) {
 			echo '<option value="' . esc_attr( $d ) . '"' . selected( $days, $d, false ) . '>';
 			/* translators: %d: number of days. */
-			echo esc_html( sprintf( __( 'Last %d days', 'seo-agent-ai' ), $d ) );
+			echo esc_html( sprintf( __( 'Last %d days', 'ariham-seoagent' ), $d ) );
 			echo '</option>';
 		}
 		echo '</select>';
 		echo '</label>';
 
-		echo '<button type="submit" class="sai-btn sai-btn-primary sai-btn-sm"><span class="btn-label">' . esc_html__( 'View', 'seo-agent-ai' ) . '</span></button>';
+		echo '<button type="submit" class="sai-btn sai-btn-primary sai-btn-sm"><span class="btn-label">' . esc_html__( 'View', 'ariham-seoagent' ) . '</span></button>';
 		echo '</form>';
 	}
 
@@ -193,14 +193,14 @@ class SEO_Agent_AI_Rankings_Page {
 
 		echo '<div class="sai-card">';
 		// translators: %s is the post title.
-		echo '<div class="sai-card-header"><h2 class="sai-card-title">' . esc_html( sprintf( __( 'Rankings for: %s', 'seo-agent-ai' ), $title ) ) . '</h2></div>';
+		echo '<div class="sai-card-header"><h2 class="sai-card-title">' . esc_html( sprintf( __( 'Rankings for: %s', 'ariham-seoagent' ), $title ) ) . '</h2></div>';
 		echo '<div class="sai-card-body">';
 
 		if ( empty( $rows ) ) {
 			echo '<div class="sai-empty">';
 			echo '<div class="sai-empty-icon">&#128269;</div>';
-			echo '<h3>' . esc_html__( 'No data yet', 'seo-agent-ai' ) . '</h3>';
-			echo '<p>' . esc_html__( 'No keyword history for this post. Use "Sync GSC Now" to pull data from Google Search Console.', 'seo-agent-ai' ) . '</p>';
+			echo '<h3>' . esc_html__( 'No data yet', 'ariham-seoagent' ) . '</h3>';
+			echo '<p>' . esc_html__( 'No keyword history for this post. Use "Sync GSC Now" to pull data from Google Search Console.', 'ariham-seoagent' ) . '</p>';
 			echo '</div>';
 			echo '</div></div>';
 			return;
@@ -239,14 +239,14 @@ class SEO_Agent_AI_Rankings_Page {
 
 		echo '<div class="sai-card">';
 		// translators: %s is the search keyword.
-		echo '<div class="sai-card-header"><h2 class="sai-card-title">' . esc_html( sprintf( __( 'Rankings for keyword: "%s"', 'seo-agent-ai' ), $keyword ) ) . '</h2></div>';
+		echo '<div class="sai-card-header"><h2 class="sai-card-title">' . esc_html( sprintf( __( 'Rankings for keyword: "%s"', 'ariham-seoagent' ), $keyword ) ) . '</h2></div>';
 		echo '<div class="sai-card-body">';
 
 		if ( empty( $rows ) ) {
 			echo '<div class="sai-empty">';
 			echo '<div class="sai-empty-icon">&#128269;</div>';
-			echo '<h3>' . esc_html__( 'No results', 'seo-agent-ai' ) . '</h3>';
-			echo '<p>' . esc_html__( 'No results found for this keyword.', 'seo-agent-ai' ) . '</p>';
+			echo '<h3>' . esc_html__( 'No results', 'ariham-seoagent' ) . '</h3>';
+			echo '<p>' . esc_html__( 'No results found for this keyword.', 'ariham-seoagent' ) . '</p>';
 			echo '</div>';
 			echo '</div></div>';
 			return;
@@ -255,9 +255,9 @@ class SEO_Agent_AI_Rankings_Page {
 		echo '<div class="sai-table-wrap">';
 		echo '<table class="sai-table">';
 		echo '<thead><tr>';
-		echo '<th>' . esc_html__( 'Post', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center">' . esc_html__( 'Avg Position', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center">' . esc_html__( 'Total Impressions', 'seo-agent-ai' ) . '</th>';
+		echo '<th>' . esc_html__( 'Post', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center">' . esc_html__( 'Avg Position', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center">' . esc_html__( 'Total Impressions', 'ariham-seoagent' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		// Group by post.
@@ -346,14 +346,14 @@ class SEO_Agent_AI_Rankings_Page {
 
 		// Rising card.
 		echo '<div class="sai-card accent-success">';
-		echo '<div class="sai-card-header"><h2 class="sai-card-title">&#8593; ' . esc_html__( 'Rising Keywords', 'seo-agent-ai' ) . '</h2></div>';
+		echo '<div class="sai-card-header"><h2 class="sai-card-title">&#8593; ' . esc_html__( 'Rising Keywords', 'ariham-seoagent' ) . '</h2></div>';
 		echo '<div class="sai-card-body">';
 		$this->render_mover_table( is_array( $rising ) ? $rising : array(), 'rising' );
 		echo '</div></div>';
 
 		// Declining card.
 		echo '<div class="sai-card accent-danger">';
-		echo '<div class="sai-card-header"><h2 class="sai-card-title">&#8595; ' . esc_html__( 'Declining Keywords', 'seo-agent-ai' ) . '</h2></div>';
+		echo '<div class="sai-card-header"><h2 class="sai-card-title">&#8595; ' . esc_html__( 'Declining Keywords', 'ariham-seoagent' ) . '</h2></div>';
 		echo '<div class="sai-card-body">';
 		$this->render_mover_table( is_array( $declining ) ? $declining : array(), 'declining' );
 		echo '</div></div>';
@@ -364,7 +364,7 @@ class SEO_Agent_AI_Rankings_Page {
 	private function render_mover_table( array $rows, $type ) {
 		if ( empty( $rows ) ) {
 			echo '<div class="sai-empty">';
-			echo '<p>' . esc_html__( 'No data yet — keyword history needs at least two GSC syncs to calculate movement.', 'seo-agent-ai' ) . '</p>';
+			echo '<p>' . esc_html__( 'No data yet — keyword history needs at least two GSC syncs to calculate movement.', 'ariham-seoagent' ) . '</p>';
 			echo '</div>';
 			return;
 		}
@@ -372,11 +372,11 @@ class SEO_Agent_AI_Rankings_Page {
 		echo '<div class="sai-table-wrap">';
 		echo '<table class="sai-table">';
 		echo '<thead><tr>';
-		echo '<th>' . esc_html__( 'Keyword', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-trunc">' . esc_html__( 'Post', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center col-num">' . esc_html__( 'Prior', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center col-num">' . esc_html__( 'Recent', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center">' . esc_html__( 'Change', 'seo-agent-ai' ) . '</th>';
+		echo '<th>' . esc_html__( 'Keyword', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-trunc">' . esc_html__( 'Post', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center col-num">' . esc_html__( 'Prior', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center col-num">' . esc_html__( 'Recent', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center">' . esc_html__( 'Change', 'ariham-seoagent' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $rows as $row ) {
@@ -413,10 +413,10 @@ class SEO_Agent_AI_Rankings_Page {
 		echo '<div class="sai-table-wrap">';
 		echo '<table class="sai-table">';
 		echo '<thead><tr>';
-		echo '<th>' . esc_html__( 'Keyword', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center">' . esc_html__( 'Latest Position', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center col-num">' . esc_html__( 'Impressions', 'seo-agent-ai' ) . '</th>';
-		echo '<th class="col-center">' . esc_html__( 'Trend', 'seo-agent-ai' ) . '</th>';
+		echo '<th>' . esc_html__( 'Keyword', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center">' . esc_html__( 'Latest Position', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center col-num">' . esc_html__( 'Impressions', 'ariham-seoagent' ) . '</th>';
+		echo '<th class="col-center">' . esc_html__( 'Trend', 'ariham-seoagent' ) . '</th>';
 		echo '</tr></thead><tbody>';
 
 		foreach ( $by_keyword as $kw => $rows ) {

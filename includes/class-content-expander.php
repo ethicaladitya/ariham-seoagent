@@ -42,7 +42,7 @@ class SEO_Agent_AI_Content_Expander {
 	public function expand( $post_id, $expansion_focus = '', array $gsc_queries = array(), $search_intent = '' ) {
 		$post = get_post( $post_id );
 		if ( ! $post instanceof WP_Post ) {
-			return new WP_Error( 'invalid_post', __( 'Post not found.', 'seo-agent-ai' ) );
+			return new WP_Error( 'invalid_post', __( 'Post not found.', 'ariham-seoagent' ) );
 		}
 
 		$draft = $this->draft_expansion( $post, $expansion_focus, $gsc_queries, $search_intent );
@@ -50,7 +50,7 @@ class SEO_Agent_AI_Content_Expander {
 			return $draft;
 		}
 		if ( empty( $draft ) ) {
-			return new WP_Error( 'empty_draft', __( 'AI returned an empty expansion draft.', 'seo-agent-ai' ) );
+			return new WP_Error( 'empty_draft', __( 'AI returned an empty expansion draft.', 'ariham-seoagent' ) );
 		}
 
 		return $this->save_draft( $post, $draft );
@@ -67,7 +67,7 @@ class SEO_Agent_AI_Content_Expander {
 	public function refresh( $post_id, array $gsc_queries = array(), $search_intent = '' ) {
 		$post = get_post( $post_id );
 		if ( ! $post instanceof WP_Post ) {
-			return new WP_Error( 'invalid_post', __( 'Post not found.', 'seo-agent-ai' ) );
+			return new WP_Error( 'invalid_post', __( 'Post not found.', 'ariham-seoagent' ) );
 		}
 
 		$draft = $this->draft_refresh( $post, $gsc_queries, $search_intent );
@@ -75,7 +75,7 @@ class SEO_Agent_AI_Content_Expander {
 			return $draft;
 		}
 		if ( empty( $draft ) ) {
-			return new WP_Error( 'empty_draft', __( 'AI returned an empty refresh draft.', 'seo-agent-ai' ) );
+			return new WP_Error( 'empty_draft', __( 'AI returned an empty refresh draft.', 'ariham-seoagent' ) );
 		}
 
 		return $this->save_draft( $post, $draft );
@@ -158,7 +158,7 @@ class SEO_Agent_AI_Content_Expander {
 			return $this->gemini->complete( $prompt );
 		}
 
-		return new WP_Error( 'no_ai_configured', __( 'No AI provider configured. Add an OpenAI or Gemini API key in Settings.', 'seo-agent-ai' ) );
+		return new WP_Error( 'no_ai_configured', __( 'No AI provider configured. Add an OpenAI or Gemini API key in Settings.', 'ariham-seoagent' ) );
 	}
 
 	// -------------------------------------------------------------------

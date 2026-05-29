@@ -83,7 +83,7 @@ class SEO_Agent_AI_Google_OAuth {
 		if ( ! $this->is_configured() ) {
 			return new WP_Error(
 				'seo_agent_ai_oauth_not_configured',
-				__( 'Enter your OAuth Client ID and Client Secret before connecting.', 'seo-agent-ai' )
+				__( 'Enter your OAuth Client ID and Client Secret before connecting.', 'ariham-seoagent' )
 			);
 		}
 
@@ -118,7 +118,7 @@ class SEO_Agent_AI_Google_OAuth {
 		if ( $saved_state === false || ! hash_equals( (string) $saved_state, (string) $state ) ) {
 			return new WP_Error(
 				'seo_agent_ai_oauth_state_mismatch',
-				__( 'OAuth state mismatch. Possible CSRF attempt. Please try connecting again.', 'seo-agent-ai' )
+				__( 'OAuth state mismatch. Possible CSRF attempt. Please try connecting again.', 'ariham-seoagent' )
 			);
 		}
 
@@ -145,7 +145,7 @@ class SEO_Agent_AI_Google_OAuth {
 
 		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) ) {
 			$msg = isset( $data['error_description'] ) ? (string) $data['error_description']
-				: __( 'Token exchange failed.', 'seo-agent-ai' );
+				: __( 'Token exchange failed.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_oauth_token_error', $msg );
 		}
 
@@ -182,7 +182,7 @@ class SEO_Agent_AI_Google_OAuth {
 		if ( $refresh_token === '' ) {
 			return new WP_Error(
 				'seo_agent_ai_not_connected',
-				__( 'Google account is not connected. Go to SEO Agent AI → Connect Google to authenticate.', 'seo-agent-ai' )
+				__( 'Google account is not connected. Go to SEO Agent AI → Connect Google to authenticate.', 'ariham-seoagent' )
 			);
 		}
 
@@ -237,7 +237,7 @@ class SEO_Agent_AI_Google_OAuth {
 
 		if ( $status < 200 || $status >= 300 || empty( $data['access_token'] ) ) {
 			$msg = isset( $data['error_description'] ) ? (string) $data['error_description']
-				: __( 'Could not refresh access token.', 'seo-agent-ai' );
+				: __( 'Could not refresh access token.', 'ariham-seoagent' );
 			return new WP_Error( 'seo_agent_ai_oauth_refresh_error', $msg );
 		}
 

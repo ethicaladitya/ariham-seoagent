@@ -34,7 +34,7 @@ class SEO_Agent_AI_Dashboard_Page {
 
 	public function render() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions.', 'ariham-seoagent' ) );
 		}
 
 		$report        = $this->report_engine->get( gmdate( 'Y-m-d' ) );
@@ -64,25 +64,25 @@ class SEO_Agent_AI_Dashboard_Page {
 			if ( $diff < HOUR_IN_SECONDS ) {
 				$last_run_label = sprintf(
 					/* translators: %d: minutes ago. */
-					__( '%d min ago', 'seo-agent-ai' ),
+					__( '%d min ago', 'ariham-seoagent' ),
 					(int) floor( $diff / 60 )
 				);
 			} elseif ( $diff < DAY_IN_SECONDS ) {
 				$last_run_label = sprintf(
 					/* translators: %d: hours ago. */
-					__( '%dh ago', 'seo-agent-ai' ),
+					__( '%dh ago', 'ariham-seoagent' ),
 					(int) floor( $diff / HOUR_IN_SECONDS )
 				);
 			} else {
 				$last_run_label = sprintf(
 					/* translators: %d: days ago. */
-					__( '%dd ago', 'seo-agent-ai' ),
+					__( '%dd ago', 'ariham-seoagent' ),
 					(int) floor( $diff / DAY_IN_SECONDS )
 				);
 				$agent_overdue = $diff > ( 26 * HOUR_IN_SECONDS );
 			}
 		} else {
-			$last_run_label = __( 'Never', 'seo-agent-ai' );
+			$last_run_label = __( 'Never', 'ariham-seoagent' );
 			$agent_overdue  = true;
 		}
 		?>
@@ -92,14 +92,14 @@ class SEO_Agent_AI_Dashboard_Page {
 				<div class="sai-header-left">
 					<p class="sai-header-eyebrow">
 						<span class="sai-dot pulsing-green"></span>
-						<?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?>
+						<?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?>
 					</p>
-					<h1 class="sai-header-title"><?php esc_html_e( 'Dashboard', 'seo-agent-ai' ); ?></h1>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Dashboard', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<button class="sai-btn sai-btn-primary sai-run-scan">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803M15.803 15.803A7.5 7.5 0 1 0 5.196 5.196"/></svg>
-						<span class="btn-label"><?php esc_html_e( 'Run Full Scan', 'seo-agent-ai' ); ?></span>
+						<span class="btn-label"><?php esc_html_e( 'Run Full Scan', 'ariham-seoagent' ); ?></span>
 					</button>
 				</div>
 			</div>
@@ -113,13 +113,13 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div>
 							<div class="sai-ap-label" style="color:#991b1b">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
-								<?php esc_html_e( 'Agent Overdue', 'seo-agent-ai' ); ?>
+								<?php esc_html_e( 'Agent Overdue', 'ariham-seoagent' ); ?>
 							</div>
 							<div class="sai-ap-sub" style="color:#991b1b">
 								<?php
 								printf(
 									/* translators: %s: time since last run. */
-									esc_html__( 'Last run: %s — daily analysis may be stuck. Check Cron Status.', 'seo-agent-ai' ),
+									esc_html__( 'Last run: %s — daily analysis may be stuck. Check Cron Status.', 'ariham-seoagent' ),
 									esc_html( $last_run_label )
 								);
 								?>
@@ -134,13 +134,13 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div>
 							<div class="sai-ap-label">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
-								<?php esc_html_e( 'Autopilot ON', 'seo-agent-ai' ); ?>
+								<?php esc_html_e( 'Autopilot ON', 'ariham-seoagent' ); ?>
 							</div>
 							<div class="sai-ap-sub">
 								<?php
 								printf(
 									/* translators: %s: time of last run. */
-									esc_html__( 'Auto-applying safe changes. Last run: %s', 'seo-agent-ai' ),
+									esc_html__( 'Auto-applying safe changes. Last run: %s', 'ariham-seoagent' ),
 									esc_html( $last_run_label )
 								);
 								?>
@@ -155,14 +155,14 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div>
 							<div class="sai-ap-label">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
-								<?php esc_html_e( 'Autopilot OFF', 'seo-agent-ai' ); ?>
+								<?php esc_html_e( 'Autopilot OFF', 'ariham-seoagent' ); ?>
 							</div>
 							<div class="sai-ap-sub">
 								<?php
 								printf(
 									/* translators: %s: link to settings page */
-									esc_html__( 'Manual review mode — %s to enable automatic safe fixes.', 'seo-agent-ai' ),
-									'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-settings' ) ) . '">' . esc_html__( 'Go to Settings', 'seo-agent-ai' ) . '</a>'
+									esc_html__( 'Manual review mode — %s to enable automatic safe fixes.', 'ariham-seoagent' ),
+									'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-settings' ) ) . '">' . esc_html__( 'Go to Settings', 'ariham-seoagent' ) . '</a>'
 								);
 								?>
 							</div>
@@ -183,7 +183,7 @@ class SEO_Agent_AI_Dashboard_Page {
 				<div class="sai-metrics">
 					<div class="sai-metric m-primary">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Changes Today', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Changes Today', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $today_changes ) ); ?></a>
 						</div>
@@ -191,7 +191,7 @@ class SEO_Agent_AI_Dashboard_Page {
 
 					<div class="sai-metric m-warning">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Pending Approvals', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Pending Approvals', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-approvals' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $pending_count ) ); ?></a>
 						</div>
@@ -199,7 +199,7 @@ class SEO_Agent_AI_Dashboard_Page {
 
 					<div class="sai-metric m-success">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Total Changes', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Total Changes', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ); ?>" style="color:inherit;text-decoration:none"><?php echo esc_html( number_format_i18n( $total_changes ) ); ?></a>
 						</div>
@@ -207,7 +207,7 @@ class SEO_Agent_AI_Dashboard_Page {
 
 					<div class="sai-metric m-neutral">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Opportunities', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Opportunities', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-opportunities' ) ); ?>" style="color:inherit;text-decoration:none">
 								<?php
@@ -220,7 +220,7 @@ class SEO_Agent_AI_Dashboard_Page {
 
 					<div class="sai-metric m-neutral">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Pages Analyzed', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Pages Analyzed', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
 							<?php
 							$pages_val = $summary['pages_analyzed'] ?? '—';
@@ -231,7 +231,7 @@ class SEO_Agent_AI_Dashboard_Page {
 
 					<div class="sai-metric <?php echo ( ( $summary['problems_detected'] ?? 0 ) > 0 ) ? 'm-danger' : 'm-success'; ?>">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Problems Found', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Problems Found', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value">
 							<?php
 							$prob_val = $summary['problems_detected'] ?? '—';
@@ -245,11 +245,11 @@ class SEO_Agent_AI_Dashboard_Page {
 					<div class="sai-card-header">
 						<h2 class="sai-card-title">
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-							<?php esc_html_e( 'Recent Agent Activity', 'seo-agent-ai' ); ?>
+							<?php esc_html_e( 'Recent Agent Activity', 'ariham-seoagent' ); ?>
 						</h2>
 					</div>
 					<div class="sai-card-body">
-						<p class="sai-card-desc"><?php esc_html_e( 'Changes the agent has made — what was modified, what it looked like before, and the confidence level.', 'seo-agent-ai' ); ?></p>
+						<p class="sai-card-desc"><?php esc_html_e( 'Changes the agent has made — what was modified, what it looked like before, and the confidence level.', 'ariham-seoagent' ); ?></p>
 						<?php $this->render_activity_timeline( $recent_changes ); ?>
 					</div>
 				</div>
@@ -259,11 +259,11 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div class="sai-card-header">
 							<h2 class="sai-card-title">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-								<?php esc_html_e( 'Traffic & Keyword Trends', 'seo-agent-ai' ); ?>
+								<?php esc_html_e( 'Traffic & Keyword Trends', 'ariham-seoagent' ); ?>
 							</h2>
 						</div>
 						<div class="sai-card-body">
-							<p class="sai-card-desc"><?php esc_html_e( 'Keyword ranking movements detected from Search Console since the last GSC sync.', 'seo-agent-ai' ); ?></p>
+							<p class="sai-card-desc"><?php esc_html_e( 'Keyword ranking movements detected from Search Console since the last GSC sync.', 'ariham-seoagent' ); ?></p>
 							<?php $this->render_trends( $trends ); ?>
 						</div>
 					</div>
@@ -272,11 +272,11 @@ class SEO_Agent_AI_Dashboard_Page {
 						<div class="sai-card-header">
 							<h2 class="sai-card-title">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-								<?php esc_html_e( 'Score Distribution', 'seo-agent-ai' ); ?>
+								<?php esc_html_e( 'Score Distribution', 'ariham-seoagent' ); ?>
 							</h2>
 						</div>
 						<div class="sai-card-body">
-							<p class="sai-card-desc"><?php esc_html_e( 'How your pages rank across SEO score tiers from the last scoring run.', 'seo-agent-ai' ); ?></p>
+							<p class="sai-card-desc"><?php esc_html_e( 'How your pages rank across SEO score tiers from the last scoring run.', 'ariham-seoagent' ); ?></p>
 							<?php $this->render_score_distribution( $score_dist ); ?>
 						</div>
 					</div>
@@ -299,37 +299,37 @@ class SEO_Agent_AI_Dashboard_Page {
 			<div class="sai-card-header">
 				<h2 class="sai-card-title">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
-					<?php esc_html_e( "Welcome — let's scan your site", 'seo-agent-ai' ); ?>
+					<?php esc_html_e( "Welcome — let's scan your site", 'ariham-seoagent' ); ?>
 				</h2>
 			</div>
 			<div class="sai-card-body">
 				<p class="sai-card-desc">
-					<?php esc_html_e( "SEO Agent hasn't analyzed your site yet. Run a scan to score every page, detect SEO problems, surface keyword opportunities, and generate AI-powered recommendations. Once done, you can review suggestions manually or switch on Autopilot.", 'seo-agent-ai' ); ?>
+					<?php esc_html_e( "SEO Agent hasn't analyzed your site yet. Run a scan to score every page, detect SEO problems, surface keyword opportunities, and generate AI-powered recommendations. Once done, you can review suggestions manually or switch on Autopilot.", 'ariham-seoagent' ); ?>
 				</p>
 				<ol class="sai-onboarding-steps">
 					<li class="sai-onboarding-step <?php echo $google_connected ? 'step-done' : ''; ?>">
 						<?php if ( $google_connected ) : ?>
 							<span class="sai-badge b-success">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-								<?php esc_html_e( 'Google Search Console connected', 'seo-agent-ai' ); ?>
+								<?php esc_html_e( 'Google Search Console connected', 'ariham-seoagent' ); ?>
 							</span>
 						<?php else : ?>
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm">
-								<span class="btn-label"><?php esc_html_e( 'Connect Google Search Console', 'seo-agent-ai' ); ?></span>
+								<span class="btn-label"><?php esc_html_e( 'Connect Google Search Console', 'ariham-seoagent' ); ?></span>
 							</a>
-							<span class="sai-step-hint"><?php esc_html_e( '— optional, unlocks keyword & traffic data', 'seo-agent-ai' ); ?></span>
+							<span class="sai-step-hint"><?php esc_html_e( '— optional, unlocks keyword & traffic data', 'ariham-seoagent' ); ?></span>
 						<?php endif; ?>
 					</li>
 					<li class="sai-onboarding-step step-active">
-						<strong><?php esc_html_e( 'Run your first site scan', 'seo-agent-ai' ); ?></strong>
+						<strong><?php esc_html_e( 'Run your first site scan', 'ariham-seoagent' ); ?></strong>
 					</li>
 					<li class="sai-onboarding-step">
-						<span style="color:var(--sai-text-muted)"><?php esc_html_e( 'Review recommendations or enable Autopilot in Settings', 'seo-agent-ai' ); ?></span>
+						<span style="color:var(--sai-text-muted)"><?php esc_html_e( 'Review recommendations or enable Autopilot in Settings', 'ariham-seoagent' ); ?></span>
 					</li>
 				</ol>
 				<button class="sai-btn sai-btn-primary sai-run-scan" style="margin-top:16px">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803M15.803 15.803A7.5 7.5 0 1 0 5.196 5.196"/></svg>
-					<span class="btn-label"><?php esc_html_e( 'Run Full Scan', 'seo-agent-ai' ); ?></span>
+					<span class="btn-label"><?php esc_html_e( 'Run Full Scan', 'ariham-seoagent' ); ?></span>
 				</button>
 			</div>
 		</div>
@@ -347,11 +347,11 @@ class SEO_Agent_AI_Dashboard_Page {
 				<div class="sai-empty-icon">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
 				</div>
-				<h3><?php esc_html_e( 'No activity yet', 'seo-agent-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Run a scan to let the agent analyze your site and generate recommendations.', 'seo-agent-ai' ); ?></p>
+				<h3><?php esc_html_e( 'No activity yet', 'ariham-seoagent' ); ?></h3>
+				<p><?php esc_html_e( 'Run a scan to let the agent analyze your site and generate recommendations.', 'ariham-seoagent' ); ?></p>
 				<button class="sai-btn sai-btn-primary sai-run-scan">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803M15.803 15.803A7.5 7.5 0 1 0 5.196 5.196"/></svg>
-					<span class="btn-label"><?php esc_html_e( 'Run Full Scan', 'seo-agent-ai' ); ?></span>
+					<span class="btn-label"><?php esc_html_e( 'Run Full Scan', 'ariham-seoagent' ); ?></span>
 				</button>
 			</div>
 			<?php
@@ -359,14 +359,14 @@ class SEO_Agent_AI_Dashboard_Page {
 		}
 
 		$change_labels = array(
-			'meta_title'       => __( 'Meta Title', 'seo-agent-ai' ),
-			'meta_description' => __( 'Meta Description', 'seo-agent-ai' ),
-			'focus_keyword'    => __( 'Focus Keyword', 'seo-agent-ai' ),
-			'alt_text'         => __( 'Image Alt Text', 'seo-agent-ai' ),
-			'heading'          => __( 'H1 Heading', 'seo-agent-ai' ),
-			'faq_schema'       => __( 'FAQ Schema', 'seo-agent-ai' ),
-			'internal_links'   => __( 'Internal Links', 'seo-agent-ai' ),
-			'redirect'         => __( 'Redirect', 'seo-agent-ai' ),
+			'meta_title'       => __( 'Meta Title', 'ariham-seoagent' ),
+			'meta_description' => __( 'Meta Description', 'ariham-seoagent' ),
+			'focus_keyword'    => __( 'Focus Keyword', 'ariham-seoagent' ),
+			'alt_text'         => __( 'Image Alt Text', 'ariham-seoagent' ),
+			'heading'          => __( 'H1 Heading', 'ariham-seoagent' ),
+			'faq_schema'       => __( 'FAQ Schema', 'ariham-seoagent' ),
+			'internal_links'   => __( 'Internal Links', 'ariham-seoagent' ),
+			'redirect'         => __( 'Redirect', 'ariham-seoagent' ),
 		);
 
 		$type_icons = array(
@@ -400,7 +400,7 @@ class SEO_Agent_AI_Dashboard_Page {
 			$status    = (string) $entry['status'];
 			$triggered = (string) $entry['triggered_by'];
 			$when_raw  = (string) $entry['created_at'];
-			$when      = $when_raw ? human_time_diff( strtotime( $when_raw ), current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'seo-agent-ai' ) : '—'; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
+			$when      = $when_raw ? human_time_diff( strtotime( $when_raw ), current_time( 'timestamp' ) ) . ' ' . __( 'ago', 'ariham-seoagent' ) : '—'; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 
 			$badge_class = 'b-neutral';
 			if ( 'applied' === $status ) {
@@ -427,10 +427,10 @@ class SEO_Agent_AI_Dashboard_Page {
 			if ( $before !== '' || $after !== '' ) {
 				echo '<div class="sai-timeline-diff">';
 				if ( $before !== '' ) {
-					echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( mb_strimwidth( $before, 0, 120, '…' ) ) . '</div>';
+					echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'ariham-seoagent' ) . '</span>' . esc_html( mb_strimwidth( $before, 0, 120, '…' ) ) . '</div>';
 				}
 				if ( $after !== '' ) {
-					echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( mb_strimwidth( $after, 0, 120, '…' ) ) . '</div>';
+					echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'ariham-seoagent' ) . '</span>' . esc_html( mb_strimwidth( $after, 0, 120, '…' ) ) . '</div>';
 				}
 				echo '</div>';
 			}
@@ -443,7 +443,7 @@ class SEO_Agent_AI_Dashboard_Page {
 		}
 
 		echo '</ul>';
-		echo '<p style="margin-top:12px"><a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ) . '" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'View full activity log →', 'seo-agent-ai' ) . '</span></a></p>';
+		echo '<p style="margin-top:12px"><a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-activity-log' ) ) . '" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'View full activity log →', 'ariham-seoagent' ) . '</span></a></p>';
 	}
 
 	// -------------------------------------------------------------------
@@ -469,10 +469,10 @@ class SEO_Agent_AI_Dashboard_Page {
 				<div class="sai-empty-icon">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
 				</div>
-				<h3><?php esc_html_e( 'No trend data yet', 'seo-agent-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Connect Google Search Console and wait for the daily GSC sync to populate this panel.', 'seo-agent-ai' ); ?></p>
+				<h3><?php esc_html_e( 'No trend data yet', 'ariham-seoagent' ); ?></h3>
+				<p><?php esc_html_e( 'Connect Google Search Console and wait for the daily GSC sync to populate this panel.', 'ariham-seoagent' ); ?></p>
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ); ?>" class="sai-btn sai-btn-primary">
-					<span class="btn-label"><?php esc_html_e( 'Connect Google →', 'seo-agent-ai' ); ?></span>
+					<span class="btn-label"><?php esc_html_e( 'Connect Google →', 'ariham-seoagent' ); ?></span>
 				</a>
 			</div>
 			<?php
@@ -480,7 +480,7 @@ class SEO_Agent_AI_Dashboard_Page {
 		}
 
 		if ( ! empty( $rising ) ) {
-			echo '<p class="sai-trend-label sai-trend-up">&#8593; ' . esc_html__( 'Improving', 'seo-agent-ai' ) . '</p>';
+			echo '<p class="sai-trend-label sai-trend-up">&#8593; ' . esc_html__( 'Improving', 'ariham-seoagent' ) . '</p>';
 			echo '<ul class="sai-trend-list">';
 			foreach ( array_slice( $rising, 0, 5 ) as $r ) {
 				echo '<li class="sai-trend-item">';
@@ -493,7 +493,7 @@ class SEO_Agent_AI_Dashboard_Page {
 		}
 
 		if ( ! empty( $declining ) ) {
-			echo '<p class="sai-trend-label sai-trend-down" style="margin-top:16px">&#8595; ' . esc_html__( 'Declining', 'seo-agent-ai' ) . '</p>';
+			echo '<p class="sai-trend-label sai-trend-down" style="margin-top:16px">&#8595; ' . esc_html__( 'Declining', 'ariham-seoagent' ) . '</p>';
 			echo '<ul class="sai-trend-list">';
 			foreach ( array_slice( $declining, 0, 5 ) as $r ) {
 				echo '<li class="sai-trend-item">';
@@ -517,10 +517,10 @@ class SEO_Agent_AI_Dashboard_Page {
 				<div class="sai-empty-icon">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="16" height="16" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
 				</div>
-				<h3><?php esc_html_e( 'No score data yet', 'seo-agent-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Wait for the weekly scoring cron or run it manually via Cron Status.', 'seo-agent-ai' ); ?></p>
+				<h3><?php esc_html_e( 'No score data yet', 'ariham-seoagent' ); ?></h3>
+				<p><?php esc_html_e( 'Wait for the weekly scoring cron or run it manually via Cron Status.', 'ariham-seoagent' ); ?></p>
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-cron' ) ); ?>" class="sai-btn sai-btn-ghost">
-					<span class="btn-label"><?php esc_html_e( 'Go to Cron Status →', 'seo-agent-ai' ); ?></span>
+					<span class="btn-label"><?php esc_html_e( 'Go to Cron Status →', 'ariham-seoagent' ); ?></span>
 				</a>
 			</div>
 			<?php
@@ -528,11 +528,11 @@ class SEO_Agent_AI_Dashboard_Page {
 		}
 
 		$labels = array(
-			'excellent' => __( 'Excellent (80-100)', 'seo-agent-ai' ),
-			'good'      => __( 'Good (60-79)', 'seo-agent-ai' ),
-			'average'   => __( 'Average (40-59)', 'seo-agent-ai' ),
-			'poor'      => __( 'Poor (20-39)', 'seo-agent-ai' ),
-			'critical'  => __( 'Critical (0-19)', 'seo-agent-ai' ),
+			'excellent' => __( 'Excellent (80-100)', 'ariham-seoagent' ),
+			'good'      => __( 'Good (60-79)', 'ariham-seoagent' ),
+			'average'   => __( 'Average (40-59)', 'ariham-seoagent' ),
+			'poor'      => __( 'Poor (20-39)', 'ariham-seoagent' ),
+			'critical'  => __( 'Critical (0-19)', 'ariham-seoagent' ),
 		);
 		$colors = array(
 			'excellent' => '#10b981',

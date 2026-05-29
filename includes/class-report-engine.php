@@ -326,7 +326,7 @@ class SEO_Agent_AI_Report_Engine {
 		$blog_name = get_bloginfo( 'name' );
 		$subject   = sprintf(
 			/* translators: 1: site name, 2: date. */
-			__( '[%1$s] SEO Agent Daily Report — %2$s', 'seo-agent-ai' ),
+			__( '[%1$s] SEO Agent Daily Report — %2$s', 'ariham-seoagent' ),
 			$blog_name,
 			$date
 		);
@@ -353,7 +353,7 @@ class SEO_Agent_AI_Report_Engine {
 		$blog_name = get_bloginfo( 'name' );
 		$subject   = sprintf(
 			/* translators: 1: site name. */
-			__( '[%1$s] Weekly SEO Rankings Summary', 'seo-agent-ai' ),
+			__( '[%1$s] Weekly SEO Rankings Summary', 'ariham-seoagent' ),
 			$blog_name
 		);
 
@@ -395,11 +395,11 @@ class SEO_Agent_AI_Report_Engine {
 		$dashboard_url = esc_url( admin_url( 'admin.php?page=seo-agent-ai' ) );
 
 		$stats = array(
-			__( 'Pages Analyzed', 'seo-agent-ai' ) => absint( $summary['pages_analyzed'] ?? 0 ),
-			__( 'Changes Made', 'seo-agent-ai' )   => absint( $summary['changes_made'] ?? 0 ),
-			__( 'Opportunities', 'seo-agent-ai' )  => absint( $summary['opportunities_detected'] ?? 0 ),
-			__( 'Problems Found', 'seo-agent-ai' ) => absint( $summary['problems_detected'] ?? 0 ),
-			__( 'Pending Review', 'seo-agent-ai' ) => $approvals,
+			__( 'Pages Analyzed', 'ariham-seoagent' ) => absint( $summary['pages_analyzed'] ?? 0 ),
+			__( 'Changes Made', 'ariham-seoagent' )   => absint( $summary['changes_made'] ?? 0 ),
+			__( 'Opportunities', 'ariham-seoagent' )  => absint( $summary['opportunities_detected'] ?? 0 ),
+			__( 'Problems Found', 'ariham-seoagent' ) => absint( $summary['problems_detected'] ?? 0 ),
+			__( 'Pending Review', 'ariham-seoagent' ) => $approvals,
 		);
 
 		ob_start();
@@ -414,7 +414,7 @@ class SEO_Agent_AI_Report_Engine {
 
 	<tr><td style="background:#1a1a2e;border-radius:8px 8px 0 0;padding:24px 32px">
 		<p style="margin:0;font-size:12px;color:#8b8fa8;text-transform:uppercase;letter-spacing:1px"><?php echo esc_html( $site_name ); ?></p>
-		<h1 style="margin:4px 0 0;font-size:22px;font-weight:700;color:#ffffff"><?php esc_html_e( 'Daily SEO Report', 'seo-agent-ai' ); ?></h1>
+		<h1 style="margin:4px 0 0;font-size:22px;font-weight:700;color:#ffffff"><?php esc_html_e( 'Daily SEO Report', 'ariham-seoagent' ); ?></h1>
 		<p style="margin:4px 0 0;font-size:13px;color:#8b8fa8"><?php echo esc_html( $date ); ?></p>
 	</td></tr>
 
@@ -433,13 +433,13 @@ class SEO_Agent_AI_Report_Engine {
 
 		<?php if ( $approvals > 0 ) : ?>
 		<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:6px;padding:14px 16px;margin-bottom:20px">
-			<strong style="color:#92400e"><?php echo absint( $approvals ); ?> <?php esc_html_e( 'decisions need your review', 'seo-agent-ai' ); ?></strong>
-			— <a href="<?php echo esc_url( $approvals_url ); ?>" style="color:#1d4ed8"><?php esc_html_e( 'Review now →', 'seo-agent-ai' ); ?></a>
+			<strong style="color:#92400e"><?php echo absint( $approvals ); ?> <?php esc_html_e( 'decisions need your review', 'ariham-seoagent' ); ?></strong>
+			— <a href="<?php echo esc_url( $approvals_url ); ?>" style="color:#1d4ed8"><?php esc_html_e( 'Review now →', 'ariham-seoagent' ); ?></a>
 		</div>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $changes ) ) : ?>
-		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( "Today's Changes", 'seo-agent-ai' ); ?></h2>
+		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( "Today's Changes", 'ariham-seoagent' ); ?></h2>
 		<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;font-size:13px">
 			<?php foreach ( array_slice( $changes, 0, 10 ) as $ch ) : ?>
 			<tr style="border-bottom:1px solid #f3f4f6">
@@ -451,7 +451,7 @@ class SEO_Agent_AI_Report_Engine {
 		<?php endif; ?>
 
 		<?php if ( ! empty( $opps ) ) : ?>
-		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Top Opportunities', 'seo-agent-ai' ); ?></h2>
+		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Top Opportunities', 'ariham-seoagent' ); ?></h2>
 		<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;font-size:13px">
 			<?php foreach ( array_slice( $opps, 0, 5 ) as $op ) : ?>
 			<tr style="border-bottom:1px solid #f3f4f6">
@@ -467,7 +467,7 @@ class SEO_Agent_AI_Report_Engine {
 		<?php endif; ?>
 
 		<?php if ( ! empty( $rising ) ) : ?>
-		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Rising Pages', 'seo-agent-ai' ); ?></h2>
+		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Rising Pages', 'ariham-seoagent' ); ?></h2>
 		<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;font-size:13px">
 			<?php foreach ( array_slice( $rising, 0, 5 ) as $r ) : ?>
 			<tr style="border-bottom:1px solid #f3f4f6">
@@ -480,7 +480,7 @@ class SEO_Agent_AI_Report_Engine {
 		<?php endif; ?>
 
 		<?php if ( ! empty( $declining ) ) : ?>
-		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Declining Pages', 'seo-agent-ai' ); ?></h2>
+		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Declining Pages', 'ariham-seoagent' ); ?></h2>
 		<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;font-size:13px">
 			<?php foreach ( array_slice( $declining, 0, 5 ) as $d ) : ?>
 			<tr style="border-bottom:1px solid #f3f4f6">
@@ -493,12 +493,12 @@ class SEO_Agent_AI_Report_Engine {
 		<?php endif; ?>
 
 		<?php if ( ! empty( $low_score ) ) : ?>
-		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Needs Attention', 'seo-agent-ai' ); ?></h2>
+		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Needs Attention', 'ariham-seoagent' ); ?></h2>
 		<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;font-size:13px">
 			<?php foreach ( array_slice( $low_score, 0, 5 ) as $lp ) : ?>
 			<tr style="border-bottom:1px solid #f3f4f6">
 				<td style="padding:6px 0;color:#374151"><?php echo esc_html( $lp['post_title'] ?? '' ); ?></td>
-				<td style="padding:6px 0;color:#dc2626;font-weight:600;text-align:right"><?php esc_html_e( 'Score', 'seo-agent-ai' ); ?>: <?php echo absint( $lp['score_overall'] ?? 0 ); ?></td>
+				<td style="padding:6px 0;color:#dc2626;font-weight:600;text-align:right"><?php esc_html_e( 'Score', 'ariham-seoagent' ); ?>: <?php echo absint( $lp['score_overall'] ?? 0 ); ?></td>
 			</tr>
 		<?php endforeach; ?>
 		</table>
@@ -507,8 +507,8 @@ class SEO_Agent_AI_Report_Engine {
 	</td></tr>
 
 	<tr><td style="background:#f8f9fa;border-top:1px solid #e5e7eb;border-radius:0 0 8px 8px;padding:16px 32px;text-align:center">
-		<a href="<?php echo esc_url( $dashboard_url ); ?>" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:5px;font-size:13px;font-weight:600"><?php esc_html_e( 'Open Dashboard', 'seo-agent-ai' ); ?></a>
-		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'SEO Agent AI — autonomous SEO for WordPress', 'seo-agent-ai' ); ?></p>
+		<a href="<?php echo esc_url( $dashboard_url ); ?>" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:5px;font-size:13px;font-weight:600"><?php esc_html_e( 'Open Dashboard', 'ariham-seoagent' ); ?></a>
+		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'SEO Agent AI — autonomous SEO for WordPress', 'ariham-seoagent' ); ?></p>
 	</td></tr>
 
 </table>
@@ -570,7 +570,7 @@ class SEO_Agent_AI_Report_Engine {
 
 	<tr><td style="background:#1a1a2e;border-radius:8px 8px 0 0;padding:24px 32px">
 		<p style="margin:0;font-size:12px;color:#8b8fa8;text-transform:uppercase;letter-spacing:1px"><?php echo esc_html( $site_name ); ?></p>
-		<h1 style="margin:4px 0 0;font-size:22px;font-weight:700;color:#ffffff"><?php esc_html_e( 'Weekly Rankings Summary', 'seo-agent-ai' ); ?></h1>
+		<h1 style="margin:4px 0 0;font-size:22px;font-weight:700;color:#ffffff"><?php esc_html_e( 'Weekly Rankings Summary', 'ariham-seoagent' ); ?></h1>
 		<p style="margin:4px 0 0;font-size:13px;color:#8b8fa8"><?php echo esc_html( $period_from . ' → ' . $period_to ); ?></p>
 	</td></tr>
 
@@ -580,27 +580,27 @@ class SEO_Agent_AI_Report_Engine {
 		<tr>
 			<td style="text-align:center;padding:12px 8px;background:#f8f9fa;border-radius:6px">
 				<div style="font-size:28px;font-weight:700;color:#1a1a2e"><?php echo absint( $avg_score ); ?></div>
-				<div style="font-size:11px;color:#6b7280;margin-top:2px"><?php esc_html_e( 'Avg SEO Score', 'seo-agent-ai' ); ?></div>
+				<div style="font-size:11px;color:#6b7280;margin-top:2px"><?php esc_html_e( 'Avg SEO Score', 'ariham-seoagent' ); ?></div>
 			</td>
 			<td style="text-align:center;padding:12px 8px;background:#f0fdf4;border-radius:6px">
 				<div style="font-size:28px;font-weight:700;color:#059669"><?php echo absint( $excellent ); ?></div>
-				<div style="font-size:11px;color:#6b7280;margin-top:2px"><?php esc_html_e( 'Excellent (80+)', 'seo-agent-ai' ); ?></div>
+				<div style="font-size:11px;color:#6b7280;margin-top:2px"><?php esc_html_e( 'Excellent (80+)', 'ariham-seoagent' ); ?></div>
 			</td>
 			<td style="text-align:center;padding:12px 8px;background:#fef2f2;border-radius:6px">
 				<div style="font-size:28px;font-weight:700;color:#dc2626"><?php echo absint( $poor ); ?></div>
-				<div style="font-size:11px;color:#6b7280;margin-top:2px"><?php esc_html_e( 'Poor (<40)', 'seo-agent-ai' ); ?></div>
+				<div style="font-size:11px;color:#6b7280;margin-top:2px"><?php esc_html_e( 'Poor (<40)', 'ariham-seoagent' ); ?></div>
 			</td>
 		</tr>
 		</table>
 
 		<?php if ( ! empty( $top_movers ) ) : ?>
-		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Ranking Changes This Week', 'seo-agent-ai' ); ?></h2>
+		<h2 style="font-size:14px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin:0 0 12px"><?php esc_html_e( 'Ranking Changes This Week', 'ariham-seoagent' ); ?></h2>
 		<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;font-size:13px">
 		<tr style="background:#f8f9fa">
-			<th style="padding:8px;text-align:left;font-weight:600;color:#374151"><?php esc_html_e( 'Page', 'seo-agent-ai' ); ?></th>
-			<th style="padding:8px;text-align:left;font-weight:600;color:#374151"><?php esc_html_e( 'Keyword', 'seo-agent-ai' ); ?></th>
-			<th style="padding:8px;text-align:right;font-weight:600;color:#374151"><?php esc_html_e( 'Change', 'seo-agent-ai' ); ?></th>
-			<th style="padding:8px;text-align:right;font-weight:600;color:#374151"><?php esc_html_e( 'Position', 'seo-agent-ai' ); ?></th>
+			<th style="padding:8px;text-align:left;font-weight:600;color:#374151"><?php esc_html_e( 'Page', 'ariham-seoagent' ); ?></th>
+			<th style="padding:8px;text-align:left;font-weight:600;color:#374151"><?php esc_html_e( 'Keyword', 'ariham-seoagent' ); ?></th>
+			<th style="padding:8px;text-align:right;font-weight:600;color:#374151"><?php esc_html_e( 'Change', 'ariham-seoagent' ); ?></th>
+			<th style="padding:8px;text-align:right;font-weight:600;color:#374151"><?php esc_html_e( 'Position', 'ariham-seoagent' ); ?></th>
 		</tr>
 			<?php
 			foreach ( $top_movers as $m ) :
@@ -620,14 +620,14 @@ class SEO_Agent_AI_Report_Engine {
 			<?php endforeach; ?>
 		</table>
 		<?php else : ?>
-		<p style="color:#6b7280;font-size:13px"><?php esc_html_e( 'Not enough ranking data yet. Rankings will populate as GSC data accumulates.', 'seo-agent-ai' ); ?></p>
+		<p style="color:#6b7280;font-size:13px"><?php esc_html_e( 'Not enough ranking data yet. Rankings will populate as GSC data accumulates.', 'ariham-seoagent' ); ?></p>
 		<?php endif; ?>
 
 	</td></tr>
 
 	<tr><td style="background:#f8f9fa;border-top:1px solid #e5e7eb;border-radius:0 0 8px 8px;padding:16px 32px;text-align:center">
-		<a href="<?php echo esc_url( $dashboard_url ); ?>" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:5px;font-size:13px;font-weight:600"><?php esc_html_e( 'View Rankings', 'seo-agent-ai' ); ?></a>
-		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'SEO Agent AI — autonomous SEO for WordPress', 'seo-agent-ai' ); ?></p>
+		<a href="<?php echo esc_url( $dashboard_url ); ?>" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:5px;font-size:13px;font-weight:600"><?php esc_html_e( 'View Rankings', 'ariham-seoagent' ); ?></a>
+		<p style="margin:12px 0 0;font-size:11px;color:#9ca3af"><?php esc_html_e( 'SEO Agent AI — autonomous SEO for WordPress', 'ariham-seoagent' ); ?></p>
 	</td></tr>
 
 </table>

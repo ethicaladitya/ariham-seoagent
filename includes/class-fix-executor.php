@@ -38,13 +38,13 @@ class SEO_Agent_AI_Fix_Executor {
 	public function apply( $post_id, array $recommendation, $triggered_by = 'manual', array $signal_data = array(), $dry_run = false ) {
 		$post = get_post( $post_id );
 		if ( ! $post instanceof WP_Post || $post->post_status !== 'publish' ) {
-			return new WP_Error( 'seo_agent_ai_invalid_post', __( 'Invalid or non-published post target.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_invalid_post', __( 'Invalid or non-published post target.', 'ariham-seoagent' ) );
 		}
 
 		// Only gate on user capability for manual requests; cron/autopilot runs
 		// as a scheduled background task with no user context.
 		if ( $triggered_by === 'manual' && ! current_user_can( 'edit_post', $post_id ) ) {
-			return new WP_Error( 'seo_agent_ai_forbidden', __( 'You are not allowed to edit this post.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_forbidden', __( 'You are not allowed to edit this post.', 'ariham-seoagent' ) );
 		}
 
 		$type       = isset( $recommendation['type'] ) ? (string) $recommendation['type'] : '';
@@ -55,12 +55,12 @@ class SEO_Agent_AI_Fix_Executor {
 
 		// When autopilot is fully enabled, allow risky recommendations too (agent mode).
 		if ( $risk !== 'safe' && ! (bool) get_option( 'seo_agent_ai_autopilot_enabled', false ) ) {
-			return new WP_Error( 'seo_agent_ai_risky_recommendation', __( 'Only safe recommendations can be auto-applied.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_risky_recommendation', __( 'Only safe recommendations can be auto-applied.', 'ariham-seoagent' ) );
 		}
 
 		$allowed_types = array( 'meta_update', 'monitor_decline', 'schema_update', 'internal_link_needed', 'content_expansion', 'content_refresh_plan', 'alt_text', 'heading_update' );
 		if ( ! in_array( $type, $allowed_types, true ) ) {
-			return new WP_Error( 'seo_agent_ai_unsupported_recommendation', __( 'Recommendation type is not supported for auto-apply.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_unsupported_recommendation', __( 'Recommendation type is not supported for auto-apply.', 'ariham-seoagent' ) );
 		}
 
 		// Types handled externally — just acknowledge and return.
@@ -73,7 +73,7 @@ class SEO_Agent_AI_Fix_Executor {
 			$attachment_id = (int) ( $proposed['attachment_id'] ?? 0 );
 			$new_alt       = sanitize_text_field( $proposed['alt_text'] ?? '' );
 			if ( $attachment_id <= 0 || '' === $new_alt ) {
-				return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No alt text payload found.', 'seo-agent-ai' ) );
+				return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No alt text payload found.', 'ariham-seoagent' ) );
 			}
 			if ( $dry_run ) {
 				return true;
@@ -89,7 +89,7 @@ class SEO_Agent_AI_Fix_Executor {
 		if ( 'heading_update' === $type ) {
 			$new_heading = sanitize_text_field( $proposed['heading'] ?? '' );
 			if ( '' === $new_heading ) {
-				return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No heading payload found.', 'seo-agent-ai' ) );
+				return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No heading payload found.', 'ariham-seoagent' ) );
 			}
 			if ( $dry_run ) {
 				return true;
@@ -129,7 +129,7 @@ class SEO_Agent_AI_Fix_Executor {
 		$new_description = isset( $proposed['meta_description'] ) ? sanitize_textarea_field( $proposed['meta_description'] ) : '';
 
 		if ( $new_title === '' && $new_description === '' ) {
-			return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No safe metadata payload found.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_empty_payload', __( 'No safe metadata payload found.', 'ariham-seoagent' ) );
 		}
 
 		// In dry-run mode: validation passes, but no writes occur.
@@ -185,7 +185,7 @@ class SEO_Agent_AI_Fix_Executor {
 
 		// Nothing actually changed — bail without updating the timestamp.
 		if ( ! $changed && ! isset( $proposed['focus_keyword'] ) ) {
-			return new WP_Error( 'seo_agent_ai_no_change', __( 'Proposed values are identical to current values — no change applied.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_no_change', __( 'Proposed values are identical to current values — no change applied.', 'ariham-seoagent' ) );
 		}
 
 		if ( isset( $proposed['focus_keyword'] ) && $proposed['focus_keyword'] !== '' ) {
@@ -207,7 +207,7 @@ class SEO_Agent_AI_Fix_Executor {
 	public function preview( $post_id, array $recommendation ) {
 		$post = get_post( $post_id );
 		if ( ! $post instanceof WP_Post ) {
-			return new WP_Error( 'seo_agent_ai_invalid_post', __( 'Invalid post.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_invalid_post', __( 'Invalid post.', 'ariham-seoagent' ) );
 		}
 
 		$proposed = isset( $recommendation['proposed'] ) && is_array( $recommendation['proposed'] ) ? $recommendation['proposed'] : array();
@@ -240,7 +240,7 @@ class SEO_Agent_AI_Fix_Executor {
 	public function rollback( $post_id, $dry_run = false ) {
 		$history = get_post_meta( $post_id, SEO_Agent_AI_Data_Store::META_BACKUPS, true );
 		if ( ! is_array( $history ) || empty( $history ) ) {
-			return new WP_Error( 'seo_agent_ai_no_backup', __( 'No backup available for this post.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_no_backup', __( 'No backup available for this post.', 'ariham-seoagent' ) );
 		}
 
 		$latest = end( $history );

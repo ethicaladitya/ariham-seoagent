@@ -117,14 +117,14 @@ class SEO_Agent_AI_OpenAI_Client {
 	 */
 	public function complete( $prompt ) {
 		if ( ! $this->is_configured() ) {
-			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'ariham-seoagent' ) );
 		}
 		$result = $this->chat( (string) $prompt );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 		if ( $result === null ) {
-			return new WP_Error( 'api_error', __( 'OpenAI API returned no result.', 'seo-agent-ai' ) );
+			return new WP_Error( 'api_error', __( 'OpenAI API returned no result.', 'ariham-seoagent' ) );
 		}
 		return $result;
 	}
@@ -138,7 +138,7 @@ class SEO_Agent_AI_OpenAI_Client {
 	 */
 	public function complete_long( $prompt, $max_tokens = 800 ) {
 		if ( ! $this->is_configured() ) {
-			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'ariham-seoagent' ) );
 		}
 		$result = $this->chat( (string) $prompt, (int) $max_tokens );
 		if ( is_wp_error( $result ) ) {
@@ -163,7 +163,7 @@ class SEO_Agent_AI_OpenAI_Client {
 	 */
 	public function complete_with_image( $prompt, $image_url ) {
 		if ( ! $this->is_configured() ) {
-			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'not_configured', __( 'OpenAI API key not configured.', 'ariham-seoagent' ) );
 		}
 
 		$image_url = (string) $image_url;

@@ -93,13 +93,13 @@ class SEO_Agent_AI_PageSpeed_Client {
 			return new WP_Error(
 				'psi_api_error',
 				/* translators: %d: HTTP status code returned by the PageSpeed API. */
-				sprintf( __( 'PageSpeed API returned HTTP %d', 'seo-agent-ai' ), $code )
+				sprintf( __( 'PageSpeed API returned HTTP %d', 'ariham-seoagent' ), $code )
 			);
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( ! is_array( $data ) ) {
-			return new WP_Error( 'psi_parse_error', __( 'Could not parse PageSpeed API response.', 'seo-agent-ai' ) );
+			return new WP_Error( 'psi_parse_error', __( 'Could not parse PageSpeed API response.', 'ariham-seoagent' ) );
 		}
 
 		$metrics = $this->parse_metrics( $data, $strategy );

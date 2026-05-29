@@ -514,13 +514,13 @@ class SEO_Agent_AI_Plugin {
 						/* translators: 1: impressions count, 2: CTR %, 3: avg position. */
 						__(
 							'%1$d impressions but only %2$s%% CTR at position %3$s. Optimising the title tag and meta description to better match search intent could significantly increase clicks.',
-							'seo-agent-ai'
+							'ariham-seoagent'
 						),
 						(int) $impressions,
 						number_format( $ctr * 100, 1 ),
 						number_format( $position, 1 )
 					),
-					'expected_impact' => __( 'High — even a 1% CTR improvement on 50+ impressions yields meaningful traffic gains.', 'seo-agent-ai' ),
+					'expected_impact' => __( 'High — even a 1% CTR improvement on 50+ impressions yields meaningful traffic gains.', 'ariham-seoagent' ),
 					'risk_level'      => 'safe',
 					'status'          => SEO_Agent_AI_DB_Manager::STATUS_PENDING,
 				)
@@ -726,7 +726,7 @@ class SEO_Agent_AI_Plugin {
 					'confidence'      => $confidence,
 					'reasoning'       => sprintf(
 						/* translators: 1: keyword, 2: primary position, 3: competing position. */
-						__( 'Keyword “%1$s” ranks for multiple pages (positions %2$.1f vs %3$.1f). Consider differentiating or consolidating content.', 'seo-agent-ai' ),
+						__( 'Keyword “%1$s” ranks for multiple pages (positions %2$.1f vs %3$.1f). Consider differentiating or consolidating content.', 'ariham-seoagent' ),
 						esc_html( $keyword ),
 						$primary['position'],
 						$competing['position']
@@ -962,7 +962,7 @@ class SEO_Agent_AI_Plugin {
 			$confidence = (float) ( $rec['confidence'] ?? 0.0 );
 			$reasoning  = $rec['reasoning'] ?? sprintf(
 				/* translators: 1: current score, 2: target score, 3: dimension name. */
-				__( 'Score %1$d → target %2$d: improve %3$s dimension.', 'seo-agent-ai' ),
+				__( 'Score %1$d → target %2$d: improve %3$s dimension.', 'ariham-seoagent' ),
 				$overall,
 				$target,
 				$rec['field'] ?? 'unknown'
@@ -975,7 +975,7 @@ class SEO_Agent_AI_Plugin {
 				'current_value'   => $rec['current_value'] ?? '',
 				'confidence'      => $confidence,
 				'reasoning'       => $reasoning,
-				'expected_impact' => $rec['expected_impact'] ?? __( 'Score improvement.', 'seo-agent-ai' ),
+				'expected_impact' => $rec['expected_impact'] ?? __( 'Score improvement.', 'ariham-seoagent' ),
 				'risk_level'      => $rec['risk'] ?? 'risky',
 			);
 
@@ -1008,7 +1008,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_manual_analysis() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_run_analysis' );
 
@@ -1306,7 +1306,7 @@ class SEO_Agent_AI_Plugin {
 		check_ajax_referer( 'seo_agent_ai_analyze_batch' );
 
 		if ( get_transient( self::ANALYSIS_LOCK_KEY ) ) {
-			wp_send_json_error( __( 'Analysis already in progress (scheduled task). Please wait.', 'seo-agent-ai' ) );
+			wp_send_json_error( __( 'Analysis already in progress (scheduled task). Please wait.', 'ariham-seoagent' ) );
 			return;
 		}
 
@@ -1689,7 +1689,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_apply_fix() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_apply_fix' );
 
@@ -1732,7 +1732,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_rollback_backup() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_rollback_backup' );
 
@@ -1754,7 +1754,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_activity_rollback() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_rollback' );
 
@@ -1793,7 +1793,7 @@ class SEO_Agent_AI_Plugin {
 				(string) $entry['value_after'],
 				$before,
 				/* translators: %d: activity log entry id. */
-				sprintf( __( 'Rolled back log entry #%d.', 'seo-agent-ai' ), $log_id ),
+				sprintf( __( 'Rolled back log entry #%d.', 'ariham-seoagent' ), $log_id ),
 				array(),
 				1.0,
 				SEO_Agent_AI_Activity_Log::TRIGGER_ROLLBACK
@@ -1812,7 +1812,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_save_settings() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_save_settings' );
 
@@ -1893,7 +1893,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_test_connection() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_test_connection' );
 
@@ -1916,7 +1916,7 @@ class SEO_Agent_AI_Plugin {
 					)
 					: array(
 						'success' => true,
-						'message' => isset( $gsc_result['message'] ) ? (string) $gsc_result['message'] : __( 'Search Console connected.', 'seo-agent-ai' ),
+						'message' => isset( $gsc_result['message'] ) ? (string) $gsc_result['message'] : __( 'Search Console connected.', 'ariham-seoagent' ),
 					),
 				'analytics' => is_wp_error( $analytics_result )
 					? array(
@@ -1925,7 +1925,7 @@ class SEO_Agent_AI_Plugin {
 					)
 					: array(
 						'success' => true,
-						'message' => isset( $analytics_result['message'] ) ? (string) $analytics_result['message'] : __( 'Analytics connected.', 'seo-agent-ai' ),
+						'message' => isset( $analytics_result['message'] ) ? (string) $analytics_result['message'] : __( 'Analytics connected.', 'ariham-seoagent' ),
 					),
 			),
 			5 * MINUTE_IN_SECONDS
@@ -1941,7 +1941,7 @@ class SEO_Agent_AI_Plugin {
 
 	public function handle_google_disconnect() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Unauthorized.', 'ariham-seoagent' ) );
 		}
 		check_admin_referer( 'seo_agent_ai_google_disconnect' );
 		$this->oauth->disconnect();
@@ -2092,21 +2092,21 @@ class SEO_Agent_AI_Plugin {
 		$msg = (string) get_option( self::OPTION_LAST_API_ERROR, '' );
 
 		echo '<div class="notice notice-error"><p>';
-		echo '<strong>' . esc_html__( 'SEO Agent AI:', 'seo-agent-ai' ) . '</strong> ';
+		echo '<strong>' . esc_html__( 'SEO Agent AI:', 'ariham-seoagent' ) . '</strong> ';
 		printf(
 			/* translators: %d: number of consecutive failed analysis runs. */
-			esc_html__( 'Search Console / Analytics calls failed on the last %d analysis runs.', 'seo-agent-ai' ),
+			esc_html__( 'Search Console / Analytics calls failed on the last %d analysis runs.', 'ariham-seoagent' ),
 			(int) $count
 		);
 		echo ' ';
 		printf(
 			/* translators: 1: opening anchor for Connect page, 2: closing anchor. */
-			esc_html__( 'Reconnect your Google account on the %1$sConnect page%2$s, or check Settings for property selection.', 'seo-agent-ai' ),
+			esc_html__( 'Reconnect your Google account on the %1$sConnect page%2$s, or check Settings for property selection.', 'ariham-seoagent' ),
 			'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">',
 			'</a>'
 		);
 		if ( $msg !== '' ) {
-			echo '<br><em>' . esc_html__( 'Last error:', 'seo-agent-ai' ) . '</em> ' . esc_html( $msg );
+			echo '<br><em>' . esc_html__( 'Last error:', 'ariham-seoagent' ) . '</em> ' . esc_html( $msg );
 		}
 		echo '</p></div>';
 	}
@@ -2220,7 +2220,7 @@ class SEO_Agent_AI_Plugin {
 					'type'       => 'internal_linking',
 					'field'      => 'content',
 					'confidence' => 0.65,
-					'reasoning'  => __( 'This post has no inbound internal links (orphan page). Adding internal links from related posts will help search engines discover and rank it.', 'seo-agent-ai' ),
+					'reasoning'  => __( 'This post has no inbound internal links (orphan page). Adding internal links from related posts will help search engines discover and rank it.', 'ariham-seoagent' ),
 					'risk_level' => 'safe',
 				);
 
@@ -2291,12 +2291,12 @@ class SEO_Agent_AI_Plugin {
 		$site_name = get_bloginfo( 'name' );
 		$subject   = sprintf(
 			/* translators: %s: site name. */
-			__( '[%s] SEO Agent AI — Daily Analysis Missed', 'seo-agent-ai' ),
+			__( '[%s] SEO Agent AI — Daily Analysis Missed', 'ariham-seoagent' ),
 			$site_name
 		);
 		$message = sprintf(
 			/* translators: 1: site name, 2: last run time. */
-			__( "The daily SEO analysis on %1\$s has not run since %2\$s. This usually means WP-Cron is not firing.\n\nPlease check your hosting cron configuration or visit the Cron Status page in your WordPress admin.\n\n%3\$s", 'seo-agent-ai' ),
+			__( "The daily SEO analysis on %1\$s has not run since %2\$s. This usually means WP-Cron is not firing.\n\nPlease check your hosting cron configuration or visit the Cron Status page in your WordPress admin.\n\n%3\$s", 'ariham-seoagent' ),
 			$site_name,
 			$last_raw,
 			admin_url( 'admin.php?page=seo-agent-cron-status' )

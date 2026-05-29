@@ -38,18 +38,18 @@ class SEO_Agent_AI_Activity_Log_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
-					<h1 class="sai-header-title"><?php esc_html_e( 'Audit &amp; Debug Log', 'seo-agent-ai' ); ?></h1>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Audit &amp; Debug Log', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<nav class="sai-nav">
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=activity' ) ); ?>"
 							class="sai-nav-tab<?php echo 'activity' === $tab ? ' active' : ''; ?>">
-							<?php esc_html_e( 'Activity Log', 'seo-agent-ai' ); ?>
+							<?php esc_html_e( 'Activity Log', 'ariham-seoagent' ); ?>
 						</a>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug' ) ); ?>"
 							class="sai-nav-tab<?php echo 'debug' === $tab ? ' active' : ''; ?>">
-							<?php esc_html_e( 'Debug Log', 'seo-agent-ai' ); ?>
+							<?php esc_html_e( 'Debug Log', 'ariham-seoagent' ); ?>
 						</a>
 					</nav>
 				</div>
@@ -96,28 +96,28 @@ class SEO_Agent_AI_Activity_Log_Page {
 
 		echo '<label>';
 		echo '<select name="status">';
-		echo '<option value=""' . selected( $status, '', false ) . '>' . esc_html__( 'All Statuses', 'seo-agent-ai' ) . '</option>';
-		echo '<option value="applied"' . selected( $status, 'applied', false ) . '>' . esc_html__( 'Applied', 'seo-agent-ai' ) . '</option>';
-		echo '<option value="rolled_back"' . selected( $status, 'rolled_back', false ) . '>' . esc_html__( 'Rolled Back', 'seo-agent-ai' ) . '</option>';
-		echo '<option value="skipped"' . selected( $status, 'skipped', false ) . '>' . esc_html__( 'Skipped', 'seo-agent-ai' ) . '</option>';
+		echo '<option value=""' . selected( $status, '', false ) . '>' . esc_html__( 'All Statuses', 'ariham-seoagent' ) . '</option>';
+		echo '<option value="applied"' . selected( $status, 'applied', false ) . '>' . esc_html__( 'Applied', 'ariham-seoagent' ) . '</option>';
+		echo '<option value="rolled_back"' . selected( $status, 'rolled_back', false ) . '>' . esc_html__( 'Rolled Back', 'ariham-seoagent' ) . '</option>';
+		echo '<option value="skipped"' . selected( $status, 'skipped', false ) . '>' . esc_html__( 'Skipped', 'ariham-seoagent' ) . '</option>';
 		echo '</select></label>';
 
 		echo '<label>';
 		echo '<select name="trigger">';
-		echo '<option value=""' . selected( $trigger, '', false ) . '>' . esc_html__( 'All Triggers', 'seo-agent-ai' ) . '</option>';
-		echo '<option value="autopilot"' . selected( $trigger, 'autopilot', false ) . '>' . esc_html__( 'Autopilot', 'seo-agent-ai' ) . '</option>';
-		echo '<option value="manual"' . selected( $trigger, 'manual', false ) . '>' . esc_html__( 'Manual', 'seo-agent-ai' ) . '</option>';
-		echo '<option value="rollback"' . selected( $trigger, 'rollback', false ) . '>' . esc_html__( 'Rollback', 'seo-agent-ai' ) . '</option>';
+		echo '<option value=""' . selected( $trigger, '', false ) . '>' . esc_html__( 'All Triggers', 'ariham-seoagent' ) . '</option>';
+		echo '<option value="autopilot"' . selected( $trigger, 'autopilot', false ) . '>' . esc_html__( 'Autopilot', 'ariham-seoagent' ) . '</option>';
+		echo '<option value="manual"' . selected( $trigger, 'manual', false ) . '>' . esc_html__( 'Manual', 'ariham-seoagent' ) . '</option>';
+		echo '<option value="rollback"' . selected( $trigger, 'rollback', false ) . '>' . esc_html__( 'Rollback', 'ariham-seoagent' ) . '</option>';
 		echo '</select></label>';
 
-		echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'Filter', 'seo-agent-ai' ) . '</span></button>';
+		echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'Filter', 'ariham-seoagent' ) . '</span></button>';
 		echo '</form>';
 
 		if ( empty( $entries ) ) {
 			echo '<div class="sai-empty">';
 			echo '<div class="sai-empty-icon">&#128203;</div>';
-			echo '<h3>' . esc_html__( 'No activity yet', 'seo-agent-ai' ) . '</h3>';
-			echo '<p>' . esc_html__( 'Changes made by SEO Agent AI will appear here.', 'seo-agent-ai' ) . '</p>';
+			echo '<h3>' . esc_html__( 'No activity yet', 'ariham-seoagent' ) . '</h3>';
+			echo '<p>' . esc_html__( 'Changes made by SEO Agent AI will appear here.', 'ariham-seoagent' ) . '</p>';
 			echo '</div>';
 			return;
 		}
@@ -126,7 +126,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 		foreach ( $entries as $e ) {
 			$post_id    = (int) $e['post_id'];
 			$post       = $post_id ? get_post( $post_id ) : null;
-			$post_title = $post instanceof WP_Post ? $post->post_title : ( $post_id ? "(#{$post_id})" : __( 'System', 'seo-agent-ai' ) );
+			$post_title = $post instanceof WP_Post ? $post->post_title : ( $post_id ? "(#{$post_id})" : __( 'System', 'ariham-seoagent' ) );
 			$edit_url   = $post instanceof WP_Post ? get_edit_post_link( $post_id ) : '';
 
 			$change_type = (string) $e['change_type'];
@@ -159,8 +159,8 @@ class SEO_Agent_AI_Activity_Log_Page {
 
 			if ( '' !== $e['value_before'] || '' !== $e['value_after'] ) {
 				echo '<div class="sai-timeline-diff">';
-				echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $e['value_before'], 12, '…' ) ) . '</div>';
-				echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $e['value_after'], 12, '…' ) ) . '</div>';
+				echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'ariham-seoagent' ) . '</span>' . esc_html( wp_trim_words( $e['value_before'], 12, '…' ) ) . '</div>';
+				echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'ariham-seoagent' ) . '</span>' . esc_html( wp_trim_words( $e['value_after'], 12, '…' ) ) . '</div>';
 				echo '</div>';
 			}
 
@@ -197,7 +197,7 @@ class SEO_Agent_AI_Activity_Log_Page {
 			esc_html(
 				sprintf(
 				/* translators: %d: total entries */
-					__( '%d total entries', 'seo-agent-ai' ),
+					__( '%d total entries', 'ariham-seoagent' ),
 					$total
 				)
 			) . '</p>';
@@ -221,26 +221,26 @@ class SEO_Agent_AI_Activity_Log_Page {
 
 		echo '<label>';
 		echo '<select name="level">';
-		echo '<option value=""' . selected( $level, '', false ) . '>' . esc_html__( 'All Levels', 'seo-agent-ai' ) . '</option>';
+		echo '<option value=""' . selected( $level, '', false ) . '>' . esc_html__( 'All Levels', 'ariham-seoagent' ) . '</option>';
 		foreach ( array( 'ERROR', 'WARNING', 'INFO', 'DEBUG' ) as $l ) {
 			echo '<option value="' . esc_attr( strtolower( $l ) ) . '"' . selected( $level, strtolower( $l ), false ) . '>' . esc_html( $l ) . '</option>';
 		}
 		echo '</select></label>';
 
-		echo '<label style="font-size:13px">' . esc_html__( 'Lines:', 'seo-agent-ai' ) . ' ';
+		echo '<label style="font-size:13px">' . esc_html__( 'Lines:', 'ariham-seoagent' ) . ' ';
 		echo '<select name="lines">';
 		foreach ( array( 50, 100, 250, 500 ) as $n ) {
 			echo '<option value="' . esc_attr( $n ) . '"' . selected( $lines, $n, false ) . '>' . esc_html( $n ) . '</option>';
 		}
 		echo '</select></label>';
 
-		echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'Apply', 'seo-agent-ai' ) . '</span></button>';
+		echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label">' . esc_html__( 'Apply', 'ariham-seoagent' ) . '</span></button>';
 		echo '</form>';
 		echo '</div></div>';
 
 		if ( ! file_exists( $log_path ) ) {
 			echo '<div class="sai-notice n-info"><p>' .
-				esc_html__( 'No debug log file yet — it will appear here once SEO Agent AI processes its first cron or analysis.', 'seo-agent-ai' ) .
+				esc_html__( 'No debug log file yet — it will appear here once SEO Agent AI processes its first cron or analysis.', 'ariham-seoagent' ) .
 				'</p></div>';
 			return;
 		}
@@ -249,14 +249,14 @@ class SEO_Agent_AI_Activity_Log_Page {
 			esc_html(
 				sprintf(
 				/* translators: 1: line count, 2: file path */
-					__( 'Showing last %1$d lines from %2$s', 'seo-agent-ai' ),
+					__( 'Showing last %1$d lines from %2$s', 'ariham-seoagent' ),
 					$lines,
 					$log_path
 				)
 			) . '</p>';
 
 		if ( empty( $log_entries ) ) {
-			echo '<div class="sai-empty"><p>' . esc_html__( 'No log entries match the current filter.', 'seo-agent-ai' ) . '</p></div>';
+			echo '<div class="sai-empty"><p>' . esc_html__( 'No log entries match the current filter.', 'ariham-seoagent' ) . '</p></div>';
 			return;
 		}
 
@@ -282,8 +282,8 @@ class SEO_Agent_AI_Activity_Log_Page {
 		echo '</div></div>';
 
 		echo '<p style="margin-top:8px">';
-		echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug&clear=1&_wpnonce=' . wp_create_nonce( 'seo_agent_ai_clear_log' ) ) ) . '" class="sai-btn sai-btn-danger sai-btn-sm" onclick="return confirm(\'' . esc_js( __( 'Clear the debug log file?', 'seo-agent-ai' ) ) . '\')">';
-		echo '<span class="btn-label">' . esc_html__( 'Clear Log', 'seo-agent-ai' ) . '</span>';
+		echo '<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-log&tab=debug&clear=1&_wpnonce=' . wp_create_nonce( 'seo_agent_ai_clear_log' ) ) ) . '" class="sai-btn sai-btn-danger sai-btn-sm" onclick="return confirm(\'' . esc_js( __( 'Clear the debug log file?', 'ariham-seoagent' ) ) . '\')">';
+		echo '<span class="btn-label">' . esc_html__( 'Clear Log', 'ariham-seoagent' ) . '</span>';
 		echo '</a>';
 		echo '</p>';
 

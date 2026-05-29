@@ -47,31 +47,31 @@ class SEO_Agent_AI_Taxonomy_SEO {
 		?>
 		<tr class="form-field">
 			<th scope="row">
-				<label for="seo_agent_ai_term_title"><?php esc_html_e( 'SEO Title', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_term_title"><?php esc_html_e( 'SEO Title', 'ariham-seoagent' ); ?></label>
 			</th>
 			<td>
 				<input type="text" id="seo_agent_ai_term_title" name="seo_agent_ai_term_title"
 					value="<?php echo esc_attr( $seo_title ); ?>" style="width:100%" />
-				<p class="description"><?php esc_html_e( 'Custom title tag for this term archive page. Leave empty to use the default.', 'seo-agent-ai' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Custom title tag for this term archive page. Leave empty to use the default.', 'ariham-seoagent' ); ?></p>
 			</td>
 		</tr>
 		<tr class="form-field">
 			<th scope="row">
-				<label for="seo_agent_ai_term_description"><?php esc_html_e( 'Meta Description', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_term_description"><?php esc_html_e( 'Meta Description', 'ariham-seoagent' ); ?></label>
 			</th>
 			<td>
 				<textarea id="seo_agent_ai_term_description" name="seo_agent_ai_term_description" rows="3" style="width:100%"><?php echo esc_textarea( $seo_desc ); ?></textarea>
-				<p class="description"><?php esc_html_e( 'Custom meta description for this term archive page. Max 160 characters recommended.', 'seo-agent-ai' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Custom meta description for this term archive page. Max 160 characters recommended.', 'ariham-seoagent' ); ?></p>
 			</td>
 		</tr>
 		<tr class="form-field">
 			<th scope="row">
-				<label for="seo_agent_ai_term_noindex"><?php esc_html_e( 'Robots', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_term_noindex"><?php esc_html_e( 'Robots', 'ariham-seoagent' ); ?></label>
 			</th>
 			<td>
 				<label>
 					<input type="checkbox" id="seo_agent_ai_term_noindex" name="seo_agent_ai_term_noindex" value="1" <?php checked( $noindex ); ?>>
-					<?php esc_html_e( 'noindex — prevent search engines from indexing this term archive.', 'seo-agent-ai' ); ?>
+					<?php esc_html_e( 'noindex — prevent search engines from indexing this term archive.', 'ariham-seoagent' ); ?>
 				</label>
 			</td>
 		</tr>

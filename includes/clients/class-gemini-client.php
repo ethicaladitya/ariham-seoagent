@@ -46,14 +46,14 @@ class SEO_Agent_AI_Gemini_Client {
 	 */
 	public function complete( $prompt ) {
 		if ( ! $this->is_configured() ) {
-			return new WP_Error( 'not_configured', __( 'Gemini API key not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'not_configured', __( 'Gemini API key not configured.', 'ariham-seoagent' ) );
 		}
 		$result = $this->generate( (string) $prompt );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 		if ( $result === null ) {
-			return new WP_Error( 'api_error', __( 'Gemini API returned no result.', 'seo-agent-ai' ) );
+			return new WP_Error( 'api_error', __( 'Gemini API returned no result.', 'ariham-seoagent' ) );
 		}
 		return $result;
 	}
@@ -71,7 +71,7 @@ class SEO_Agent_AI_Gemini_Client {
 	 */
 	public function complete_with_image( $prompt, $image_url ) {
 		if ( ! $this->is_configured() ) {
-			return new WP_Error( 'not_configured', __( 'Gemini API key not configured.', 'seo-agent-ai' ) );
+			return new WP_Error( 'not_configured', __( 'Gemini API key not configured.', 'ariham-seoagent' ) );
 		}
 
 		$image_url = (string) $image_url;
@@ -244,7 +244,7 @@ class SEO_Agent_AI_Gemini_Client {
 		);
 
 		if ( $body === false ) {
-			return new WP_Error( 'encode_error', __( 'Failed to encode Gemini request body.', 'seo-agent-ai' ) );
+			return new WP_Error( 'encode_error', __( 'Failed to encode Gemini request body.', 'ariham-seoagent' ) );
 		}
 
 		$response = wp_remote_post(
@@ -281,7 +281,7 @@ class SEO_Agent_AI_Gemini_Client {
 				'safety_filter',
 				sprintf(
 					/* translators: %s: Gemini finish reason code. */
-					__( 'Gemini blocked response (finishReason: %s).', 'seo-agent-ai' ),
+					__( 'Gemini blocked response (finishReason: %s).', 'ariham-seoagent' ),
 					$finish_reason
 				)
 			);

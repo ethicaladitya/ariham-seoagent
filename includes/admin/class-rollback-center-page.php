@@ -27,13 +27,13 @@ class SEO_Agent_AI_Rollback_Center_Page {
 	 */
 	public function handle_rollback() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( esc_html__( 'Not allowed.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Not allowed.', 'ariham-seoagent' ) );
 		}
 
 		$post_id = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ?? '' ) ), 'seo_agent_ai_rollback_' . $post_id ) ) {
-			wp_die( esc_html__( 'Security check failed.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'Security check failed.', 'ariham-seoagent' ) );
 		}
 
 		$result = $this->fix_executor->rollback( $post_id );
@@ -50,7 +50,7 @@ class SEO_Agent_AI_Rollback_Center_Page {
 
 	public function render() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions.', 'seo-agent-ai' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions.', 'ariham-seoagent' ) );
 		}
 
 		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
@@ -59,8 +59,8 @@ class SEO_Agent_AI_Rollback_Center_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
-					<h1 class="sai-header-title"><?php esc_html_e( 'Rollback Center', 'seo-agent-ai' ); ?></h1>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Rollback Center', 'ariham-seoagent' ); ?></h1>
 				</div>
 			</div>
 
@@ -69,22 +69,22 @@ class SEO_Agent_AI_Rollback_Center_Page {
 					<?php $pid = (int) $_GET['rolled_back']; // phpcs:ignore WordPress.Security.NonceVerification ?>
 					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php
 					// translators: %d is the post ID.
-					echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'seo-agent-ai' ), $pid ) ); ?></p></div>
+					echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'ariham-seoagent' ), $pid ) ); ?></p></div>
 				<?php endif; ?>
 				<?php if ( ! empty( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
 					<div class="sai-notice n-error" style="margin-bottom:16px"><p><?php echo esc_html( sanitize_text_field( urldecode( wp_unslash( $_GET['error'] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized ?></p></div>
 				<?php endif; ?>
 
 				<div class="sai-notice n-warning" style="margin-bottom:20px">
-					<p><strong><?php esc_html_e( 'Caution:', 'seo-agent-ai' ); ?></strong> <?php esc_html_e( 'Rolling back will restore a post\'s meta title and description to their last backup snapshot. This action cannot be undone.', 'seo-agent-ai' ); ?></p>
+					<p><strong><?php esc_html_e( 'Caution:', 'ariham-seoagent' ); ?></strong> <?php esc_html_e( 'Rolling back will restore a post\'s meta title and description to their last backup snapshot. This action cannot be undone.', 'ariham-seoagent' ); ?></p>
 				</div>
 
 				<form method="get" class="sai-filters" style="margin-bottom:16px">
 					<input type="hidden" name="page" value="seo-agent-rollback">
 					<div class="sai-search-wrap">
-						<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search by post title...', 'seo-agent-ai' ); ?>">
+						<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search by post title...', 'ariham-seoagent' ); ?>">
 					</div>
-					<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Search', 'seo-agent-ai' ); ?></span></button>
+					<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Search', 'ariham-seoagent' ); ?></span></button>
 				</form>
 
 				<?php $this->render_activity_log( $search, $paged ); ?>
@@ -107,7 +107,7 @@ class SEO_Agent_AI_Rollback_Center_Page {
 				'fields'         => 'ids',
 			) );
 			if ( empty( $matching_posts ) ) {
-				echo '<div class="sai-empty"><p>' . esc_html__( 'No activity log entries found.', 'seo-agent-ai' ) . '</p></div>';
+				echo '<div class="sai-empty"><p>' . esc_html__( 'No activity log entries found.', 'ariham-seoagent' ) . '</p></div>';
 				return;
 			}
 			// Filter to first matching post ID (activity log supports singular post_id only).
@@ -120,8 +120,8 @@ class SEO_Agent_AI_Rollback_Center_Page {
 		if ( empty( $rows ) ) {
 			echo '<div class="sai-empty">';
 			echo '<div class="sai-empty-icon">&#128203;</div>';
-			echo '<h3>' . esc_html__( 'No changes to roll back', 'seo-agent-ai' ) . '</h3>';
-			echo '<p>' . esc_html__( 'No activity log entries found.', 'seo-agent-ai' ) . '</p>';
+			echo '<h3>' . esc_html__( 'No changes to roll back', 'ariham-seoagent' ) . '</h3>';
+			echo '<p>' . esc_html__( 'No activity log entries found.', 'ariham-seoagent' ) . '</p>';
 			echo '</div>';
 			return;
 		}
@@ -153,22 +153,22 @@ class SEO_Agent_AI_Rollback_Center_Page {
 			// Diff.
 			if ( ! empty( $row['value_before'] ) || ! empty( $row['value_after'] ) ) {
 				echo '<div class="sai-timeline-diff">';
-				echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $row['value_before'] ?? '', 10 ) ) . '</div>';
-				echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $row['value_after'] ?? '', 10 ) ) . '</div>';
+				echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'ariham-seoagent' ) . '</span>' . esc_html( wp_trim_words( $row['value_before'] ?? '', 10 ) ) . '</div>';
+				echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'ariham-seoagent' ) . '</span>' . esc_html( wp_trim_words( $row['value_after'] ?? '', 10 ) ) . '</div>';
 				echo '</div>';
 			}
 			echo '</div>'; // .sai-rollback-body
 
 			if ( $has_backup ) {
 				$nonce = wp_create_nonce( 'seo_agent_ai_rollback_' . $post_id );
-				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(\'' . esc_js( __( 'Restore previous meta values for this post?', 'seo-agent-ai' ) ) . '\')">';
+				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" onsubmit="return confirm(\'' . esc_js( __( 'Restore previous meta values for this post?', 'ariham-seoagent' ) ) . '\')">';
 				echo '<input type="hidden" name="action" value="seo_agent_ai_rollback">';
 				echo '<input type="hidden" name="post_id" value="' . esc_attr( $post_id ) . '">';
 				echo '<input type="hidden" name="_wpnonce" value="' . esc_attr( $nonce ) . '">';
-				echo '<button type="submit" class="sai-btn sai-btn-danger sai-btn-sm sai-rollback-btn"><span class="btn-label">' . esc_html__( 'Rollback', 'seo-agent-ai' ) . '</span></button>';
+				echo '<button type="submit" class="sai-btn sai-btn-danger sai-btn-sm sai-rollback-btn"><span class="btn-label">' . esc_html__( 'Rollback', 'ariham-seoagent' ) . '</span></button>';
 				echo '</form>';
 			} else {
-				echo '<span style="font-size:12px;color:#787c82">' . esc_html__( 'No backup', 'seo-agent-ai' ) . '</span>';
+				echo '<span style="font-size:12px;color:#787c82">' . esc_html__( 'No backup', 'ariham-seoagent' ) . '</span>';
 			}
 			echo '</div>'; // .sai-rollback-item
 		}

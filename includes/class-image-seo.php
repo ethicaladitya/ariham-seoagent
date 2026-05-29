@@ -252,7 +252,7 @@ class SEO_Agent_AI_Image_SEO {
 		$post          = get_post( $attachment_id );
 
 		if ( ! $post ) {
-			return new WP_Error( 'not_found', __( 'Attachment not found.', 'seo-agent-ai' ) );
+			return new WP_Error( 'not_found', __( 'Attachment not found.', 'ariham-seoagent' ) );
 		}
 
 		$filepath  = get_attached_file( $attachment_id );
@@ -393,14 +393,14 @@ class SEO_Agent_AI_Image_SEO {
 		check_ajax_referer( 'seo_agent_ai_image_seo', 'nonce' );
 
 		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error( __( 'Unauthorized.', 'seo-agent-ai' ), 403 );
+			wp_send_json_error( __( 'Unauthorized.', 'ariham-seoagent' ), 403 );
 		}
 
 		$attachment_id = absint( wp_unslash( $_POST['attachment_id'] ?? 0 ) );
 		$post_id       = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 
 		if ( ! $attachment_id ) {
-			wp_send_json_error( __( 'Invalid attachment ID.', 'seo-agent-ai' ) );
+			wp_send_json_error( __( 'Invalid attachment ID.', 'ariham-seoagent' ) );
 		}
 
 		$result = $this->generate_alt_text( $attachment_id, $post_id );
@@ -416,7 +416,7 @@ class SEO_Agent_AI_Image_SEO {
 		check_ajax_referer( 'seo_agent_ai_image_seo', 'nonce' );
 
 		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error( __( 'Unauthorized.', 'seo-agent-ai' ), 403 );
+			wp_send_json_error( __( 'Unauthorized.', 'ariham-seoagent' ), 403 );
 		}
 
 		$limit  = absint( wp_unslash( $_POST['limit'] ?? 20 ) );

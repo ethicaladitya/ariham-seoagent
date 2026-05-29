@@ -138,7 +138,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		if ( $owner_id <= 0 ) {
 			return new WP_Error(
 				'seo_agent_ai_sitekit_no_owner',
-				__( 'Site Kit owner user not found.', 'seo-agent-ai' )
+				__( 'Site Kit owner user not found.', 'ariham-seoagent' )
 			);
 		}
 
@@ -158,7 +158,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		if ( empty( $encrypted ) ) {
 			return new WP_Error(
 				'seo_agent_ai_sitekit_no_token',
-				__( 'No Site Kit access token found. Please re-connect Site Kit.', 'seo-agent-ai' )
+				__( 'No Site Kit access token found. Please re-connect Site Kit.', 'ariham-seoagent' )
 			);
 		}
 
@@ -166,7 +166,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		if ( $token === '' ) {
 			return new WP_Error(
 				'seo_agent_ai_sitekit_decrypt_fail',
-				__( 'Could not decrypt Site Kit access token.', 'seo-agent-ai' )
+				__( 'Could not decrypt Site Kit access token.', 'ariham-seoagent' )
 			);
 		}
 
@@ -194,7 +194,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 			|| ! class_exists( 'Google\Site_Kit\Context' ) ) {
 			return new WP_Error(
 				'seo_agent_ai_sitekit_no_classes',
-				__( 'Site Kit classes not available for token refresh.', 'seo-agent-ai' )
+				__( 'Site Kit classes not available for token refresh.', 'ariham-seoagent' )
 			);
 		}
 
@@ -222,7 +222,7 @@ class SEO_Agent_AI_SiteKit_Bridge {
 		if ( empty( $new_token ) ) {
 			return new WP_Error(
 				'seo_agent_ai_sitekit_refresh_empty',
-				__( 'Site Kit token refresh completed but no access token was returned. Please re-connect Site Kit.', 'seo-agent-ai' )
+				__( 'Site Kit token refresh completed but no access token was returned. Please re-connect Site Kit.', 'ariham-seoagent' )
 			);
 		}
 

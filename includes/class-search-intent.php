@@ -222,11 +222,11 @@ class SEO_Agent_AI_Search_Intent {
 	 */
 	public static function label( $intent ) {
 		$labels = array(
-			self::INFORMATIONAL => __( 'Informational', 'seo-agent-ai' ),
-			self::COMMERCIAL    => __( 'Commercial', 'seo-agent-ai' ),
-			self::TRANSACTIONAL => __( 'Transactional', 'seo-agent-ai' ),
-			self::NAVIGATIONAL  => __( 'Navigational', 'seo-agent-ai' ),
-			self::UNKNOWN       => __( 'Unknown', 'seo-agent-ai' ),
+			self::INFORMATIONAL => __( 'Informational', 'ariham-seoagent' ),
+			self::COMMERCIAL    => __( 'Commercial', 'ariham-seoagent' ),
+			self::TRANSACTIONAL => __( 'Transactional', 'ariham-seoagent' ),
+			self::NAVIGATIONAL  => __( 'Navigational', 'ariham-seoagent' ),
+			self::UNKNOWN       => __( 'Unknown', 'ariham-seoagent' ),
 		);
 		return isset( $labels[ $intent ] ) ? $labels[ $intent ] : $labels[ self::UNKNOWN ];
 	}

@@ -101,10 +101,10 @@ class SEO_Agent_AI_Admin_Page {
 	public function register_menu() {
 		// Top-level menu item goes to the new Dashboard.
 		add_menu_page(
-			__( 'SEO Agent AI', 'seo-agent-ai' ),
-			__( 'SEO Agent AI', 'seo-agent-ai' ),
+			__( 'SEO Agent AI', 'ariham-seoagent' ),
+			__( 'SEO Agent AI', 'ariham-seoagent' ),
 			'manage_options',
-			'seo-agent-ai',
+			'ariham-seoagent',
 			array( $this->dashboard_page, 'render' ),
 			'dashicons-chart-area',
 			58
@@ -112,108 +112,108 @@ class SEO_Agent_AI_Admin_Page {
 
 		// First submenu must match the top-level slug to rename it.
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Dashboard', 'seo-agent-ai' ),
-			__( 'Dashboard', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Dashboard', 'ariham-seoagent' ),
+			__( 'Dashboard', 'ariham-seoagent' ),
 			'manage_options',
-			'seo-agent-ai',
+			'ariham-seoagent',
 			array( $this->dashboard_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Connect Google', 'seo-agent-ai' ),
-			__( 'Connect Google', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Connect Google', 'ariham-seoagent' ),
+			__( 'Connect Google', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-ai-connect',
 			array( $this->connect_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Analysis', 'seo-agent-ai' ),
-			__( 'Analysis', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Analysis', 'ariham-seoagent' ),
+			__( 'Analysis', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-ai-report',
 			array( $this->report_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Opportunities', 'seo-agent-ai' ),
-			__( 'Opportunities', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Opportunities', 'ariham-seoagent' ),
+			__( 'Opportunities', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-opportunities',
 			array( $this->opportunities_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Keyword Rankings', 'seo-agent-ai' ),
-			__( 'Rankings', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Keyword Rankings', 'ariham-seoagent' ),
+			__( 'Rankings', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-rankings',
 			array( $this->rankings_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Pending Approvals', 'seo-agent-ai' ),
-			__( 'Approvals', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Pending Approvals', 'ariham-seoagent' ),
+			__( 'Approvals', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-approvals',
 			array( $this->pending_approvals_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Rollback Center', 'seo-agent-ai' ),
-			__( 'Rollback', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Rollback Center', 'ariham-seoagent' ),
+			__( 'Rollback', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-rollback',
 			array( $this->rollback_center_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Image SEO', 'seo-agent-ai' ),
-			__( 'Image SEO', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Image SEO', 'ariham-seoagent' ),
+			__( 'Image SEO', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-image-seo',
 			array( $this->image_seo_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Redirects & 404s', 'seo-agent-ai' ),
-			__( 'Redirects & 404s', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Redirects & 404s', 'ariham-seoagent' ),
+			__( 'Redirects & 404s', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-redirects',
 			array( $this->redirects_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Audit Log', 'seo-agent-ai' ),
-			__( 'Audit Log', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Audit Log', 'ariham-seoagent' ),
+			__( 'Audit Log', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-log',
 			array( $this->activity_log_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Cron Status', 'seo-agent-ai' ),
-			__( 'Cron Status', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Cron Status', 'ariham-seoagent' ),
+			__( 'Cron Status', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-cron',
 			array( $this->cron_status_page, 'render' )
 		);
 
 		add_submenu_page(
-			'seo-agent-ai',
-			__( 'Settings', 'seo-agent-ai' ),
-			__( 'Settings', 'seo-agent-ai' ),
+			'ariham-seoagent',
+			__( 'Settings', 'ariham-seoagent' ),
+			__( 'Settings', 'ariham-seoagent' ),
 			'manage_options',
 			'seo-agent-ai-settings',
 			array( $this, 'render_settings_page' )
@@ -245,14 +245,14 @@ class SEO_Agent_AI_Admin_Page {
 				'nonce'        => wp_create_nonce( 'seo_agent_ai_analyze_batch' ),
 				'nonceApprove' => wp_create_nonce( 'seo_agent_ai_bulk_apply_safe' ),
 				'i18n'         => array(
-					'loading'         => __( 'Working…', 'seo-agent-ai' ),
-					'scanning'        => __( 'Scanning', 'seo-agent-ai' ),
-					'scan_done'       => __( 'Scan complete!', 'seo-agent-ai' ),
-					'scan_error'      => __( 'Scan failed. Please try again.', 'seo-agent-ai' ),
-					'network_error'   => __( 'Network error. Please try again.', 'seo-agent-ai' ),
-					'recommendations' => __( 'recommendation(s) generated.', 'seo-agent-ai' ),
-					'saved'           => __( 'Settings saved!', 'seo-agent-ai' ),
-					'bulk_confirm'    => __( 'Apply all safe pending decisions now? This cannot be undone.', 'seo-agent-ai' ),
+					'loading'         => __( 'Working…', 'ariham-seoagent' ),
+					'scanning'        => __( 'Scanning', 'ariham-seoagent' ),
+					'scan_done'       => __( 'Scan complete!', 'ariham-seoagent' ),
+					'scan_error'      => __( 'Scan failed. Please try again.', 'ariham-seoagent' ),
+					'network_error'   => __( 'Network error. Please try again.', 'ariham-seoagent' ),
+					'recommendations' => __( 'recommendation(s) generated.', 'ariham-seoagent' ),
+					'saved'           => __( 'Settings saved!', 'ariham-seoagent' ),
+					'bulk_confirm'    => __( 'Apply all safe pending decisions now? This cannot be undone.', 'ariham-seoagent' ),
 				),
 			)
 		);
@@ -276,11 +276,11 @@ class SEO_Agent_AI_Admin_Page {
 		?>
 		<div class="wrap seo-agent-wrap">
 			<h1 style="display:flex;align-items:center;gap:12px;">
-				<?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?>
+				<?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?>
 				<?php if ( $autopilot ) : ?>
-					<span class="seo-agent-autopilot-badge on"><span class="dot"></span><?php esc_html_e( 'Autopilot ON', 'seo-agent-ai' ); ?></span>
+					<span class="seo-agent-autopilot-badge on"><span class="dot"></span><?php esc_html_e( 'Autopilot ON', 'ariham-seoagent' ); ?></span>
 				<?php else : ?>
-					<span class="seo-agent-autopilot-badge off"><span class="dot"></span><?php esc_html_e( 'Autopilot OFF', 'seo-agent-ai' ); ?></span>
+					<span class="seo-agent-autopilot-badge off"><span class="dot"></span><?php esc_html_e( 'Autopilot OFF', 'ariham-seoagent' ); ?></span>
 				<?php endif; ?>
 			</h1>
 
@@ -290,8 +290,8 @@ class SEO_Agent_AI_Admin_Page {
 						<?php
 						printf(
 							/* translators: %s: Connect Google page link */
-							esc_html__( 'Google account not connected. %s to enable live data analysis.', 'seo-agent-ai' ),
-							'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'seo-agent-ai' ) . '</a>'
+							esc_html__( 'Google account not connected. %s to enable live data analysis.', 'ariham-seoagent' ),
+							'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'ariham-seoagent' ) . '</a>'
 						);
 						?>
 					</p>
@@ -303,7 +303,7 @@ class SEO_Agent_AI_Admin_Page {
 			<?php if ( ! empty( $last_run ) ) : ?>
 				<div class="seo-agent-card" style="padding:14px 20px;">
 					<p style="margin:0;font-size:13px;color:#3c434a;">
-						<strong><?php esc_html_e( 'Last run:', 'seo-agent-ai' ); ?></strong>
+						<strong><?php esc_html_e( 'Last run:', 'ariham-seoagent' ); ?></strong>
 						<?php
 						echo esc_html(
 							sprintf(
@@ -324,14 +324,14 @@ class SEO_Agent_AI_Admin_Page {
 
 			<div id="seo-analysis-wrap" style="margin-bottom:24px;">
 				<button id="seo-run-analysis" class="button button-primary" style="font-size:14px;height:38px;padding:0 20px;">
-					<?php esc_html_e( 'Run Analysis Now', 'seo-agent-ai' ); ?>
+					<?php esc_html_e( 'Run Analysis Now', 'ariham-seoagent' ); ?>
 				</button>
 				<div id="seo-analysis-progress" style="display:none;max-width:540px;margin-top:16px;">
 					<div class="seo-agent-progress-track">
 						<div id="seo-progress-fill" class="seo-agent-progress-fill" style="width:0%"></div>
 					</div>
 					<p id="seo-progress-status" class="seo-agent-progress-status">
-						<?php esc_html_e( 'Initializing&hellip;', 'seo-agent-ai' ); ?>
+						<?php esc_html_e( 'Initializing&hellip;', 'ariham-seoagent' ); ?>
 					</p>
 				</div>
 			</div>
@@ -341,15 +341,15 @@ class SEO_Agent_AI_Admin_Page {
 				'use strict';
 				var batchNonce = '<?php echo esc_js( wp_create_nonce( 'seo_agent_ai_analyze_batch' ) ); ?>';
 				var strings = {
-					analyzing: '<?php echo esc_js( __( 'Analyzing\u2026', 'seo-agent-ai' ) ); ?>',
-					of:        '<?php echo esc_js( __( 'of', 'seo-agent-ai' ) ); ?>',
-					done:      '<?php echo esc_js( __( 'Analysis complete', 'seo-agent-ai' ) ); ?>',
-					posts:     '<?php echo esc_js( __( 'posts analyzed', 'seo-agent-ai' ) ); ?>',
-					recs:      '<?php echo esc_js( __( 'with recommendations', 'seo-agent-ai' ) ); ?>',
-					errors:    '<?php echo esc_js( __( 'API errors', 'seo-agent-ai' ) ); ?>',
-					loading:   '<?php echo esc_js( __( 'Loading results\u2026', 'seo-agent-ai' ) ); ?>',
-					retry:     '<?php echo esc_js( __( 'Run Analysis Now', 'seo-agent-ai' ) ); ?>',
-					connErr:   '<?php echo esc_js( __( 'Connection error \u2014 please try again.', 'seo-agent-ai' ) ); ?>'
+					analyzing: '<?php echo esc_js( __( 'Analyzing\u2026', 'ariham-seoagent' ) ); ?>',
+					of:        '<?php echo esc_js( __( 'of', 'ariham-seoagent' ) ); ?>',
+					done:      '<?php echo esc_js( __( 'Analysis complete', 'ariham-seoagent' ) ); ?>',
+					posts:     '<?php echo esc_js( __( 'posts analyzed', 'ariham-seoagent' ) ); ?>',
+					recs:      '<?php echo esc_js( __( 'with recommendations', 'ariham-seoagent' ) ); ?>',
+					errors:    '<?php echo esc_js( __( 'API errors', 'ariham-seoagent' ) ); ?>',
+					loading:   '<?php echo esc_js( __( 'Loading results\u2026', 'ariham-seoagent' ) ); ?>',
+					retry:     '<?php echo esc_js( __( 'Run Analysis Now', 'ariham-seoagent' ) ); ?>',
+					connErr:   '<?php echo esc_js( __( 'Connection error \u2014 please try again.', 'ariham-seoagent' ) ); ?>'
 				};
 
 				$('#seo-run-analysis').on('click', function() {
@@ -416,16 +416,16 @@ class SEO_Agent_AI_Admin_Page {
 			<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
 
 			<?php if ( empty( $post_ids ) ) : ?>
-				<p><em><?php esc_html_e( 'No recommendations yet. Run an analysis to populate insights.', 'seo-agent-ai' ); ?></em></p>
+				<p><em><?php esc_html_e( 'No recommendations yet. Run an analysis to populate insights.', 'ariham-seoagent' ); ?></em></p>
 			<?php else : ?>
 				<table class="widefat striped">
 					<thead>
 						<tr>
-							<th><?php esc_html_e( 'Post', 'seo-agent-ai' ); ?></th>
-							<th><?php esc_html_e( 'Severity', 'seo-agent-ai' ); ?></th>
-							<th><?php esc_html_e( 'Signals', 'seo-agent-ai' ); ?></th>
-							<th><?php esc_html_e( 'Recommendations', 'seo-agent-ai' ); ?></th>
-							<th><?php esc_html_e( 'Backups', 'seo-agent-ai' ); ?></th>
+							<th><?php esc_html_e( 'Post', 'ariham-seoagent' ); ?></th>
+							<th><?php esc_html_e( 'Severity', 'ariham-seoagent' ); ?></th>
+							<th><?php esc_html_e( 'Signals', 'ariham-seoagent' ); ?></th>
+							<th><?php esc_html_e( 'Recommendations', 'ariham-seoagent' ); ?></th>
+							<th><?php esc_html_e( 'Backups', 'ariham-seoagent' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -485,7 +485,7 @@ class SEO_Agent_AI_Admin_Page {
 
 		echo '<td>';
 		if ( empty( $recommendations ) ) {
-			echo '<span class="seo-agent-muted">' . esc_html__( 'No actions suggested.', 'seo-agent-ai' ) . '</span>';
+			echo '<span class="seo-agent-muted">' . esc_html__( 'No actions suggested.', 'ariham-seoagent' ) . '</span>';
 		} else {
 			foreach ( $recommendations as $index => $rec ) {
 				$this->render_recommendation( $post_id, $index, $rec, $confidence );
@@ -503,12 +503,12 @@ class SEO_Agent_AI_Admin_Page {
 			echo '<input type="hidden" name="action" value="seo_agent_ai_rollback_backup" />';
 			echo '<input type="hidden" name="post_id" value="' . esc_attr( (string) $post_id ) . '" />';
 			echo '<button type="submit" class="button button-small"'
-				. ' onclick="return confirm(\'' . esc_js( __( 'Restore the most recent backup for this post?', 'seo-agent-ai' ) ) . '\')">'
-				. esc_html__( 'Rollback', 'seo-agent-ai' )
+				. ' onclick="return confirm(\'' . esc_js( __( 'Restore the most recent backup for this post?', 'ariham-seoagent' ) ) . '\')">'
+				. esc_html__( 'Rollback', 'ariham-seoagent' )
 				. '</button>';
 			echo '</form>';
 		} else {
-			echo '<span class="seo-agent-muted">' . esc_html__( 'No backup yet.', 'seo-agent-ai' ) . '</span>';
+			echo '<span class="seo-agent-muted">' . esc_html__( 'No backup yet.', 'ariham-seoagent' ) . '</span>';
 		}
 		echo '</td>';
 
@@ -545,10 +545,10 @@ class SEO_Agent_AI_Admin_Page {
 		if ( ! empty( $proposed['meta_title'] ) || ! empty( $proposed['meta_description'] ) ) {
 			echo '<div class="seo-agent-rec-proposed">';
 			if ( ! empty( $proposed['meta_title'] ) ) {
-				echo '<strong>' . esc_html__( 'Proposed title:', 'seo-agent-ai' ) . '</strong> ' . esc_html( $proposed['meta_title'] ) . '<br/>';
+				echo '<strong>' . esc_html__( 'Proposed title:', 'ariham-seoagent' ) . '</strong> ' . esc_html( $proposed['meta_title'] ) . '<br/>';
 			}
 			if ( ! empty( $proposed['meta_description'] ) ) {
-				echo '<strong>' . esc_html__( 'Proposed description:', 'seo-agent-ai' ) . '</strong> ' . esc_html( $proposed['meta_description'] );
+				echo '<strong>' . esc_html__( 'Proposed description:', 'ariham-seoagent' ) . '</strong> ' . esc_html( $proposed['meta_description'] );
 			}
 			echo '</div>';
 		}
@@ -563,7 +563,7 @@ class SEO_Agent_AI_Admin_Page {
 			echo '<input type="hidden" name="action" value="seo_agent_ai_apply_fix" />';
 			echo '<input type="hidden" name="post_id" value="' . esc_attr( (string) $post_id ) . '" />';
 			echo '<input type="hidden" name="rec_index" value="' . esc_attr( (string) $index ) . '" />';
-			echo '<button type="submit" class="button button-secondary">' . esc_html__( 'Approve &amp; Apply', 'seo-agent-ai' ) . '</button>';
+			echo '<button type="submit" class="button button-secondary">' . esc_html__( 'Approve &amp; Apply', 'ariham-seoagent' ) . '</button>';
 			echo '</form>';
 		}
 
@@ -611,14 +611,14 @@ class SEO_Agent_AI_Admin_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
-					<h1 class="sai-header-title"><?php esc_html_e( 'Settings', 'seo-agent-ai' ); ?></h1>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Settings', 'ariham-seoagent' ); ?></h1>
 				</div>
 				<div class="sai-header-actions">
 					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
 						<?php wp_nonce_field( 'seo_agent_ai_test_connection' ); ?>
 						<input type="hidden" name="action" value="seo_agent_ai_test_connection">
-						<button type="submit" class="sai-btn sai-btn-ghost"><span class="btn-label"><?php esc_html_e( 'Test Connection', 'seo-agent-ai' ); ?></span></button>
+						<button type="submit" class="sai-btn sai-btn-ghost"><span class="btn-label"><?php esc_html_e( 'Test Connection', 'ariham-seoagent' ); ?></span></button>
 					</form>
 				</div>
 			</div>
@@ -637,7 +637,7 @@ class SEO_Agent_AI_Admin_Page {
 					<?php // Google Data Sources ?>
 					<?php // ------------------------------------------------------------------ ?>
 					<div class="sai-settings-section">
-						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Google Data Sources', 'seo-agent-ai' ); ?></h2>
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Google Data Sources', 'ariham-seoagent' ); ?></h2>
 
 						<?php if ( $sitekit_active ) : ?>
 						<div class="sai-card accent-success" style="margin-bottom:16px">
@@ -646,18 +646,18 @@ class SEO_Agent_AI_Admin_Page {
 									<div class="sai-connect-status-item csi-ok">
 										<div class="sai-connect-icon-wrap">&#10003;</div>
 										<div class="sai-connect-item-body">
-											<strong><?php esc_html_e( 'Connected via Google Site Kit', 'seo-agent-ai' ); ?></strong>
-											<span><?php esc_html_e( 'Search Console and Analytics data are being pulled automatically.', 'seo-agent-ai' ); ?></span>
+											<strong><?php esc_html_e( 'Connected via Google Site Kit', 'ariham-seoagent' ); ?></strong>
+											<span><?php esc_html_e( 'Search Console and Analytics data are being pulled automatically.', 'ariham-seoagent' ); ?></span>
 										</div>
 									</div>
 								</div>
 								<div class="sai-field" style="margin-top:12px">
-									<span class="sai-field-label"><?php esc_html_e( 'Search Console', 'seo-agent-ai' ); ?></span>
+									<span class="sai-field-label"><?php esc_html_e( 'Search Console', 'ariham-seoagent' ); ?></span>
 									<div class="sai-field-control"><code><?php echo esc_html( SEO_Agent_AI_SiteKit_Bridge::get_gsc_site_url() ); ?></code></div>
 								</div>
 								<?php if ( SEO_Agent_AI_SiteKit_Bridge::is_ga4_active() ) : ?>
 								<div class="sai-field">
-									<span class="sai-field-label"><?php esc_html_e( 'Analytics (GA4)', 'seo-agent-ai' ); ?></span>
+									<span class="sai-field-label"><?php esc_html_e( 'Analytics (GA4)', 'ariham-seoagent' ); ?></span>
 									<div class="sai-field-control"><code><?php echo esc_html( 'Property ' . SEO_Agent_AI_SiteKit_Bridge::get_ga4_property_id() ); ?></code></div>
 								</div>
 								<?php endif; ?>
@@ -667,28 +667,28 @@ class SEO_Agent_AI_Admin_Page {
 						<?php else : ?>
 
 						<div class="sai-card" style="margin-bottom:16px">
-							<div class="sai-card-header"><h3 class="sai-card-title"><?php esc_html_e( 'Google OAuth Credentials', 'seo-agent-ai' ); ?></h3></div>
+							<div class="sai-card-header"><h3 class="sai-card-title"><?php esc_html_e( 'Google OAuth Credentials', 'ariham-seoagent' ); ?></h3></div>
 							<div class="sai-card-body">
 								<div class="sai-notice n-info" style="margin-bottom:14px">
 									<p>
-										<?php esc_html_e( 'Tip: Install the free Google Site Kit plugin to connect automatically — no credentials needed.', 'seo-agent-ai' ); ?>
+										<?php esc_html_e( 'Tip: Install the free Google Site Kit plugin to connect automatically — no credentials needed.', 'ariham-seoagent' ); ?>
 										<a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=google+site+kit&tab=search&type=term' ) ); ?>" style="margin-left:6px">
-											<?php esc_html_e( 'Install Site Kit', 'seo-agent-ai' ); ?> &rarr;
+											<?php esc_html_e( 'Install Site Kit', 'ariham-seoagent' ); ?> &rarr;
 										</a>
 									</p>
 								</div>
 								<div class="sai-field">
-									<label class="sai-field-label" for="google_client_id"><?php esc_html_e( 'Client ID', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="google_client_id"><?php esc_html_e( 'Client ID', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<input type="text" id="google_client_id" name="google_client_id" value="<?php echo esc_attr( $client_id ); ?>" class="regular-text">
 									</div>
 								</div>
 								<div class="sai-field">
-									<label class="sai-field-label" for="google_client_secret"><?php esc_html_e( 'Client Secret', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="google_client_secret"><?php esc_html_e( 'Client Secret', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<div class="sai-key-input-wrap">
 											<input type="password" id="google_client_secret" name="google_client_secret" value="<?php echo esc_attr( $client_secret ); ?>" class="regular-text" autocomplete="off">
-											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'seo-agent-ai' ); ?>">&#128065;</button>
+											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'ariham-seoagent' ); ?>">&#128065;</button>
 										</div>
 									</div>
 								</div>
@@ -696,7 +696,7 @@ class SEO_Agent_AI_Admin_Page {
 						</div>
 
 						<div class="sai-card" style="margin-bottom:16px">
-							<div class="sai-card-header"><h3 class="sai-card-title"><?php esc_html_e( 'Search Console &amp; Analytics Properties', 'seo-agent-ai' ); ?></h3></div>
+							<div class="sai-card-header"><h3 class="sai-card-title"><?php esc_html_e( 'Search Console &amp; Analytics Properties', 'ariham-seoagent' ); ?></h3></div>
 							<div class="sai-card-body">
 								<?php if ( ! $is_connected ) : ?>
 								<div class="sai-notice n-warning" style="margin-bottom:14px">
@@ -704,25 +704,25 @@ class SEO_Agent_AI_Admin_Page {
 										<?php
 										printf(
 											/* translators: %s: HTML link to the Connect Google page. */
-											esc_html__( 'Connect your Google account to load available properties automatically. %s', 'seo-agent-ai' ),
-											'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'seo-agent-ai' ) . '</a>'
+											esc_html__( 'Connect your Google account to load available properties automatically. %s', 'ariham-seoagent' ),
+											'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'ariham-seoagent' ) . '</a>'
 										);
 										?>
 									</p>
 								</div>
 								<?php endif; ?>
 								<div class="sai-field">
-									<label class="sai-field-label" for="gsc_site_url"><?php esc_html_e( 'Search Console Property', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="gsc_site_url"><?php esc_html_e( 'Search Console Property', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control" id="seo-gsc-property-wrap">
 										<input type="text" id="gsc_site_url" name="gsc_site_url" value="<?php echo esc_attr( $gsc_site_url ); ?>" class="regular-text">
-										<p class="description"><?php esc_html_e( 'Full URL, sc-domain:example.com, or bare domain.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Full URL, sc-domain:example.com, or bare domain.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 								<div class="sai-field">
-									<label class="sai-field-label" for="ga4_property_id"><?php esc_html_e( 'Analytics Property ID', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="ga4_property_id"><?php esc_html_e( 'Analytics Property ID', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control" id="seo-ga4-property-wrap">
 										<input type="text" id="ga4_property_id" name="ga4_property_id" value="<?php echo esc_attr( $ga4_property_id ); ?>" class="regular-text">
-										<p class="description"><?php esc_html_e( 'Numeric GA4 property ID.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Numeric GA4 property ID.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 							</div>
@@ -735,7 +735,7 @@ class SEO_Agent_AI_Admin_Page {
 					<?php // SEO Plugin Integration ?>
 					<?php // ------------------------------------------------------------------ ?>
 					<div class="sai-settings-section">
-						<h2 class="sai-settings-section-title"><?php esc_html_e( 'SEO Plugin Integration', 'seo-agent-ai' ); ?></h2>
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'SEO Plugin Integration', 'ariham-seoagent' ); ?></h2>
 						<div class="sai-card" style="margin-bottom:16px">
 							<div class="sai-card-body">
 								<?php
@@ -743,7 +743,7 @@ class SEO_Agent_AI_Admin_Page {
 								if ( ! empty( $detected_plugins ) ) :
 									?>
 								<p class="description" style="margin-bottom:12px">
-									<?php esc_html_e( 'SEO Agent AI is automatically syncing changes with the following active plugins.', 'seo-agent-ai' ); ?>
+									<?php esc_html_e( 'SEO Agent AI is automatically syncing changes with the following active plugins.', 'ariham-seoagent' ); ?>
 								</p>
 								<div style="display:flex;flex-wrap:wrap;gap:8px">
 									<?php foreach ( $detected_plugins as $slug ) : ?>
@@ -752,7 +752,7 @@ class SEO_Agent_AI_Admin_Page {
 								</div>
 								<?php else : ?>
 								<div class="sai-notice n-info">
-									<p><?php esc_html_e( 'No supported SEO plugin detected. Install Yoast SEO, RankMath SEO, or SmartCrawl to automatically sync generated metadata.', 'seo-agent-ai' ); ?></p>
+									<p><?php esc_html_e( 'No supported SEO plugin detected. Install Yoast SEO, RankMath SEO, or SmartCrawl to automatically sync generated metadata.', 'ariham-seoagent' ); ?></p>
 								</div>
 								<?php endif; ?>
 							</div>
@@ -763,54 +763,54 @@ class SEO_Agent_AI_Admin_Page {
 					<?php // AI Provider ?>
 					<?php // ------------------------------------------------------------------ ?>
 					<div class="sai-settings-section">
-						<h2 class="sai-settings-section-title"><?php esc_html_e( 'AI Provider', 'seo-agent-ai' ); ?></h2>
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'AI Provider', 'ariham-seoagent' ); ?></h2>
 						<div class="sai-card" style="margin-bottom:16px">
 							<div class="sai-card-body">
 								<div class="sai-field">
-									<span class="sai-field-label"><?php esc_html_e( 'Provider', 'seo-agent-ai' ); ?></span>
+									<span class="sai-field-label"><?php esc_html_e( 'Provider', 'ariham-seoagent' ); ?></span>
 									<div class="sai-field-control">
 										<fieldset>
 											<label style="display:block;margin-bottom:8px">
 												<input type="radio" name="ai_provider" value="gemini" <?php checked( $ai_provider, 'gemini' ); ?>>
-												<?php esc_html_e( 'Gemini (Google AI)', 'seo-agent-ai' ); ?>
+												<?php esc_html_e( 'Gemini (Google AI)', 'ariham-seoagent' ); ?>
 											</label>
 											<label style="display:block;margin-bottom:8px">
 												<input type="radio" name="ai_provider" value="openai" <?php checked( $ai_provider, 'openai' ); ?>>
-												<?php esc_html_e( 'OpenAI-compatible (default or custom endpoint)', 'seo-agent-ai' ); ?>
+												<?php esc_html_e( 'OpenAI-compatible (default or custom endpoint)', 'ariham-seoagent' ); ?>
 											</label>
 											<label style="display:block">
 												<input type="radio" name="ai_provider" value="auto" <?php checked( $ai_provider, 'auto' ); ?>>
-												<?php esc_html_e( 'Auto (try Gemini first, fall back to OpenAI, then rule-based)', 'seo-agent-ai' ); ?>
+												<?php esc_html_e( 'Auto (try Gemini first, fall back to OpenAI, then rule-based)', 'ariham-seoagent' ); ?>
 											</label>
 										</fieldset>
 									</div>
 								</div>
 								<div class="sai-field" style="margin-top:16px">
-									<label class="sai-field-label" for="gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<div class="sai-key-input-wrap">
 											<input type="password" id="gemini_api_key" name="gemini_api_key" value="" class="regular-text" autocomplete="new-password"
-												placeholder="<?php echo $gemini_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'seo-agent-ai' ) : esc_attr__( 'Enter Gemini API key', 'seo-agent-ai' ); ?>">
-											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'seo-agent-ai' ); ?>">&#128065;</button>
+												placeholder="<?php echo $gemini_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'ariham-seoagent' ) : esc_attr__( 'Enter Gemini API key', 'ariham-seoagent' ); ?>">
+											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'ariham-seoagent' ); ?>">&#128065;</button>
 										</div>
 										<?php if ( $gemini_has_key ) : ?>
-											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
+											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'ariham-seoagent' ); ?></span>
 										<?php endif; ?>
-										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 								<div class="sai-field">
-									<label class="sai-field-label" for="openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<div class="sai-key-input-wrap">
 											<input type="password" id="openai_api_key" name="openai_api_key" value="" class="regular-text" autocomplete="new-password"
-												placeholder="<?php echo $openai_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'seo-agent-ai' ) : esc_attr__( 'Enter API key', 'seo-agent-ai' ); ?>">
-											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'seo-agent-ai' ); ?>">&#128065;</button>
+												placeholder="<?php echo $openai_has_key ? esc_attr__( 'Key saved — enter a new one to replace it', 'ariham-seoagent' ) : esc_attr__( 'Enter API key', 'ariham-seoagent' ); ?>">
+											<button type="button" class="sai-key-reveal" aria-label="<?php esc_attr_e( 'Show/hide', 'ariham-seoagent' ); ?>">&#128065;</button>
 										</div>
 										<?php if ( $openai_has_key ) : ?>
-											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'seo-agent-ai' ); ?></span>
+											<span class="sai-badge b-success" style="margin-top:6px;display:inline-block"><?php esc_html_e( 'Key saved', 'ariham-seoagent' ); ?></span>
 										<?php endif; ?>
-										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Stored encrypted. Leave blank to keep existing key.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 							</div>
@@ -821,18 +821,18 @@ class SEO_Agent_AI_Admin_Page {
 					<?php // Content & Analysis ?>
 					<?php // ------------------------------------------------------------------ ?>
 					<div class="sai-settings-section">
-						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Content &amp; Analysis', 'seo-agent-ai' ); ?></h2>
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Content &amp; Analysis', 'ariham-seoagent' ); ?></h2>
 						<div class="sai-card" style="margin-bottom:16px">
 							<div class="sai-card-body">
 								<div class="sai-field">
-									<label class="sai-field-label" for="score_target"><?php esc_html_e( 'Score Target', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="score_target"><?php esc_html_e( 'Score Target', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<input type="number" id="score_target" name="score_target" value="<?php echo esc_attr( (string) $score_target ); ?>" min="1" max="100" style="width:80px">
-										<p class="description"><?php esc_html_e( 'Posts scoring below this threshold (1–100) are queued for improvement.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Posts scoring below this threshold (1–100) are queued for improvement.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 								<div class="sai-field">
-									<span class="sai-field-label"><?php esc_html_e( 'Post Types to Scan', 'seo-agent-ai' ); ?></span>
+									<span class="sai-field-label"><?php esc_html_e( 'Post Types to Scan', 'ariham-seoagent' ); ?></span>
 									<div class="sai-field-control">
 										<?php
 										$all_post_types   = get_post_types( array( 'public' => true ), 'objects' );
@@ -848,7 +848,7 @@ class SEO_Agent_AI_Admin_Page {
 												<code style="font-size:11px;color:#888;margin-left:4px"><?php echo esc_html( $pt->name ); ?></code>
 											</label>
 										<?php endforeach; ?>
-										<p class="description"><?php esc_html_e( 'Only selected post types are included in scans and scoring.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Only selected post types are included in scans and scoring.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 							</div>
@@ -859,7 +859,7 @@ class SEO_Agent_AI_Admin_Page {
 					<?php // Autopilot ?>
 					<?php // ------------------------------------------------------------------ ?>
 					<div class="sai-settings-section">
-						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Autopilot Mode', 'seo-agent-ai' ); ?></h2>
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Autopilot Mode', 'ariham-seoagent' ); ?></h2>
 						<div class="sai-card" style="margin-bottom:16px">
 							<div class="sai-card-body">
 								<div class="sai-toggle-wrap">
@@ -868,22 +868,22 @@ class SEO_Agent_AI_Admin_Page {
 										<span class="sai-toggle-slider"></span>
 									</label>
 									<div class="sai-toggle-info">
-										<strong><?php esc_html_e( 'Enable Autopilot', 'seo-agent-ai' ); ?></strong>
-										<span><?php esc_html_e( 'Allow the agent to apply safe, high-confidence changes automatically during scheduled analysis.', 'seo-agent-ai' ); ?></span>
+										<strong><?php esc_html_e( 'Enable Autopilot', 'ariham-seoagent' ); ?></strong>
+										<span><?php esc_html_e( 'Allow the agent to apply safe, high-confidence changes automatically during scheduled analysis.', 'ariham-seoagent' ); ?></span>
 									</div>
 								</div>
 								<div class="sai-field" style="margin-top:16px">
-									<label class="sai-field-label" for="autopilot_max_daily"><?php esc_html_e( 'Max Changes Per Day', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="autopilot_max_daily"><?php esc_html_e( 'Max Changes Per Day', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<input type="number" id="autopilot_max_daily" name="autopilot_max_daily" value="<?php echo esc_attr( (string) $max_daily ); ?>" min="1" max="50" style="width:80px">
-										<p class="description"><?php esc_html_e( 'Hard safety limit. Recommended: 5.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Hard safety limit. Recommended: 5.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 								<div class="sai-field">
-									<label class="sai-field-label" for="autopilot_min_confidence"><?php esc_html_e( 'Minimum Confidence', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="autopilot_min_confidence"><?php esc_html_e( 'Minimum Confidence', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<input type="number" id="autopilot_min_confidence" name="autopilot_min_confidence" value="<?php echo esc_attr( (string) $min_confidence ); ?>" min="0.1" max="1.0" step="0.05" style="width:80px">
-										<p class="description"><?php esc_html_e( 'Only apply changes at or above this score (0.0–1.0). Recommended: 0.70.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Only apply changes at or above this score (0.0–1.0). Recommended: 0.70.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 							</div>
@@ -894,21 +894,21 @@ class SEO_Agent_AI_Admin_Page {
 					<?php // Maintenance ?>
 					<?php // ------------------------------------------------------------------ ?>
 					<div class="sai-settings-section">
-						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Maintenance', 'seo-agent-ai' ); ?></h2>
+						<h2 class="sai-settings-section-title"><?php esc_html_e( 'Maintenance', 'ariham-seoagent' ); ?></h2>
 						<div class="sai-card" style="margin-bottom:16px">
 							<div class="sai-card-body">
 								<div class="sai-field">
-									<label class="sai-field-label" for="log_retention_days"><?php esc_html_e( 'Log Retention (days)', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="log_retention_days"><?php esc_html_e( 'Log Retention (days)', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<input type="number" id="log_retention_days" name="log_retention_days" value="<?php echo esc_attr( (string) $log_retention ); ?>" min="7" max="730" style="width:80px">
-										<p class="description"><?php esc_html_e( 'Log entries older than this many days are deleted automatically.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Log entries older than this many days are deleted automatically.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 								<div class="sai-field" style="margin-top:16px">
-									<label class="sai-field-label" for="email_address"><?php esc_html_e( 'Report Email Address', 'seo-agent-ai' ); ?></label>
+									<label class="sai-field-label" for="email_address"><?php esc_html_e( 'Report Email Address', 'ariham-seoagent' ); ?></label>
 									<div class="sai-field-control">
 										<input type="email" id="email_address" name="email_address" value="<?php echo esc_attr( $email_address ); ?>" class="regular-text" placeholder="<?php echo esc_attr( get_option( 'admin_email', '' ) ); ?>">
-										<p class="description"><?php esc_html_e( 'Destination for daily and weekly reports. Defaults to the WordPress admin email when left blank.', 'seo-agent-ai' ); ?></p>
+										<p class="description"><?php esc_html_e( 'Destination for daily and weekly reports. Defaults to the WordPress admin email when left blank.', 'ariham-seoagent' ); ?></p>
 									</div>
 								</div>
 								<div class="sai-toggle-wrap" style="margin-top:12px">
@@ -917,8 +917,8 @@ class SEO_Agent_AI_Admin_Page {
 										<span class="sai-toggle-slider"></span>
 									</label>
 									<div class="sai-toggle-info">
-										<strong><?php esc_html_e( 'Email Daily Reports', 'seo-agent-ai' ); ?></strong>
-										<span><?php esc_html_e( 'Send a rich HTML daily SEO report and a weekly rankings summary to the address above.', 'seo-agent-ai' ); ?></span>
+										<strong><?php esc_html_e( 'Email Daily Reports', 'ariham-seoagent' ); ?></strong>
+										<span><?php esc_html_e( 'Send a rich HTML daily SEO report and a weekly rankings summary to the address above.', 'ariham-seoagent' ); ?></span>
 									</div>
 								</div>
 							</div>
@@ -926,7 +926,7 @@ class SEO_Agent_AI_Admin_Page {
 					</div>
 
 					<div style="margin-top:8px">
-						<button type="submit" class="sai-btn sai-btn-primary"><span class="btn-label"><?php esc_html_e( 'Save Settings', 'seo-agent-ai' ); ?></span></button>
+						<button type="submit" class="sai-btn sai-btn-primary"><span class="btn-label"><?php esc_html_e( 'Save Settings', 'ariham-seoagent' ); ?></span></button>
 					</div>
 				</form>
 			</div>
@@ -959,28 +959,28 @@ class SEO_Agent_AI_Admin_Page {
 				function loadGSCSites() {
 					var $wrap = $('#seo-gsc-property-wrap');
 					var currentVal = <?php echo wp_json_encode( $gsc_site_url ); ?>;
-					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Search Console properties…', 'seo-agent-ai' ) ); ?>'));
+					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Search Console properties…', 'ariham-seoagent' ) ); ?>'));
 
 					$.post(ajaxurl, { action: 'seo_agent_ai_list_gsc_sites', _ajax_nonce: nonce })
 						.done(function(response) {
 							if (response.success && response.data && response.data.length) {
 								var html = '<select name="gsc_site_url" id="gsc_site_url" class="regular-text">';
-								html += '<option value="">&mdash; <?php echo esc_js( __( 'Select property', 'seo-agent-ai' ) ); ?> &mdash;</option>';
+								html += '<option value="">&mdash; <?php echo esc_js( __( 'Select property', 'ariham-seoagent' ) ); ?> &mdash;</option>';
 								$.each(response.data, function(_, site) {
 									var url = site.siteUrl || '';
 									var sel = (url === currentVal) ? ' selected="selected"' : '';
 									html += '<option value="' + escHtml(url) + '"' + sel + '>' + escHtml(url) + '</option>';
 								});
 								html += '</select>';
-								html += '<p class="description"><?php echo esc_js( __( 'Select your verified Search Console property.', 'seo-agent-ai' ) ); ?></p>';
+								html += '<p class="description"><?php echo esc_js( __( 'Select your verified Search Console property.', 'ariham-seoagent' ) ); ?></p>';
 								$wrap.html(html);
 							} else {
 								var err = (response.data && typeof response.data === 'string') ? response.data : '';
 								$wrap.html(
 									fallbackInput('gsc_site_url', currentVal) +
 									'<p class="description"' + (err ? ' style="color:#c5221f;"' : '') + '>' +
-									(err ? '<?php echo esc_js( __( 'Could not load properties: ', 'seo-agent-ai' ) ); ?>' + escHtml(err)
-										: '<?php echo esc_js( __( 'Full URL, sc-domain:example.com, or bare domain.', 'seo-agent-ai' ) ); ?>') +
+									(err ? '<?php echo esc_js( __( 'Could not load properties: ', 'ariham-seoagent' ) ); ?>' + escHtml(err)
+										: '<?php echo esc_js( __( 'Full URL, sc-domain:example.com, or bare domain.', 'ariham-seoagent' ) ); ?>') +
 									'</p>'
 								);
 							}
@@ -988,7 +988,7 @@ class SEO_Agent_AI_Admin_Page {
 						.fail(function() {
 							$wrap.html(
 								fallbackInput('gsc_site_url', currentVal) +
-								'<p class="description"><?php echo esc_js( __( 'Full URL, sc-domain:example.com, or bare domain.', 'seo-agent-ai' ) ); ?></p>'
+								'<p class="description"><?php echo esc_js( __( 'Full URL, sc-domain:example.com, or bare domain.', 'ariham-seoagent' ) ); ?></p>'
 							);
 						});
 				}
@@ -996,26 +996,26 @@ class SEO_Agent_AI_Admin_Page {
 				function loadGA4Properties() {
 					var $wrap = $('#seo-ga4-property-wrap');
 					var currentVal = <?php echo wp_json_encode( $ga4_property_id ); ?>;
-					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Analytics properties…', 'seo-agent-ai' ) ); ?>'));
+					$wrap.html(spinnerHtml('<?php echo esc_js( __( 'Loading Analytics properties…', 'ariham-seoagent' ) ); ?>'));
 
 					$.post(ajaxurl, { action: 'seo_agent_ai_list_ga4_properties', _ajax_nonce: nonce })
 						.done(function(response) {
 							if (response.success && response.data && response.data.length) {
 								var html = '<select name="ga4_property_id" id="ga4_property_id" class="regular-text">';
-								html += '<option value="">&mdash; <?php echo esc_js( __( 'Select property', 'seo-agent-ai' ) ); ?> &mdash;</option>';
+								html += '<option value="">&mdash; <?php echo esc_js( __( 'Select property', 'ariham-seoagent' ) ); ?> &mdash;</option>';
 								$.each(response.data, function(_, prop) {
 									var sel = (prop.id === currentVal) ? ' selected="selected"' : '';
 									html += '<option value="' + escHtml(prop.id) + '"' + sel + '>' + escHtml(prop.name) + '</option>';
 								});
 								html += '</select>';
-								html += '<p class="description"><?php echo esc_js( __( 'Select your GA4 Analytics property.', 'seo-agent-ai' ) ); ?></p>';
+								html += '<p class="description"><?php echo esc_js( __( 'Select your GA4 Analytics property.', 'ariham-seoagent' ) ); ?></p>';
 								$wrap.html(html);
 							} else {
 								var err = (response.data && typeof response.data === 'string') ? response.data : '';
 								var hint = err
-									? '<?php echo esc_js( __( 'Could not load properties: ', 'seo-agent-ai' ) ); ?>' + escHtml(err) +
-										' &mdash; <a href="https://console.cloud.google.com/apis/library/analyticsadmin.googleapis.com" target="_blank"><?php echo esc_js( __( 'Enable Analytics Admin API', 'seo-agent-ai' ) ); ?></a>'
-									: '<?php echo esc_js( __( 'Numeric GA4 property ID.', 'seo-agent-ai' ) ); ?>';
+									? '<?php echo esc_js( __( 'Could not load properties: ', 'ariham-seoagent' ) ); ?>' + escHtml(err) +
+										' &mdash; <a href="https://console.cloud.google.com/apis/library/analyticsadmin.googleapis.com" target="_blank"><?php echo esc_js( __( 'Enable Analytics Admin API', 'ariham-seoagent' ) ); ?></a>'
+									: '<?php echo esc_js( __( 'Numeric GA4 property ID.', 'ariham-seoagent' ) ); ?>';
 								$wrap.html(
 									fallbackInput('ga4_property_id', currentVal) +
 									'<p class="description"' + (err ? ' style="color:#c5221f;"' : '') + '>' + hint + '</p>'
@@ -1025,7 +1025,7 @@ class SEO_Agent_AI_Admin_Page {
 						.fail(function() {
 							$wrap.html(
 								fallbackInput('ga4_property_id', currentVal) +
-								'<p class="description"><?php echo esc_js( __( 'Numeric GA4 property ID.', 'seo-agent-ai' ) ); ?></p>'
+								'<p class="description"><?php echo esc_js( __( 'Numeric GA4 property ID.', 'ariham-seoagent' ) ); ?></p>'
 							);
 						});
 				}
@@ -1047,23 +1047,23 @@ class SEO_Agent_AI_Admin_Page {
 	private function format_signals( array $signals ) {
 		$labels = array(
 			// Original signals.
-			'content_refresh_needed'  => __( 'Content refresh needed', 'seo-agent-ai' ),
-			'title_meta_optimization' => __( 'Title/meta optimization', 'seo-agent-ai' ),
-			'intent_mismatch'         => __( 'Intent mismatch', 'seo-agent-ai' ),
-			'declining_performance'   => __( 'Declining performance', 'seo-agent-ai' ),
-			'thin_content'            => __( 'Thin content', 'seo-agent-ai' ),
-			'missing_meta_basics'     => __( 'Missing meta basics', 'seo-agent-ai' ),
+			'content_refresh_needed'  => __( 'Content refresh needed', 'ariham-seoagent' ),
+			'title_meta_optimization' => __( 'Title/meta optimization', 'ariham-seoagent' ),
+			'intent_mismatch'         => __( 'Intent mismatch', 'ariham-seoagent' ),
+			'declining_performance'   => __( 'Declining performance', 'ariham-seoagent' ),
+			'thin_content'            => __( 'Thin content', 'ariham-seoagent' ),
+			'missing_meta_basics'     => __( 'Missing meta basics', 'ariham-seoagent' ),
 			// New v3.0 signals.
-			'page_two_opportunity'    => __( 'Page-2 opportunity', 'seo-agent-ai' ),
-			'ctr_anomaly'             => __( 'CTR below expected', 'seo-agent-ai' ),
-			'cannibalization_risk'    => __( 'Keyword cannibalization', 'seo-agent-ai' ),
-			'content_decay'           => __( 'Content decay', 'seo-agent-ai' ),
-			'orphan_page'             => __( 'Orphan page', 'seo-agent-ai' ),
-			'missing_schema'          => __( 'Missing schema', 'seo-agent-ai' ),
-			'weak_engagement'         => __( 'Weak engagement', 'seo-agent-ai' ),
-			'title_ctr_mismatch'      => __( 'Title/CTR mismatch', 'seo-agent-ai' ),
-			'missing_faq'             => __( 'FAQ opportunity', 'seo-agent-ai' ),
-			'index_anomaly'           => __( 'Index anomaly', 'seo-agent-ai' ),
+			'page_two_opportunity'    => __( 'Page-2 opportunity', 'ariham-seoagent' ),
+			'ctr_anomaly'             => __( 'CTR below expected', 'ariham-seoagent' ),
+			'cannibalization_risk'    => __( 'Keyword cannibalization', 'ariham-seoagent' ),
+			'content_decay'           => __( 'Content decay', 'ariham-seoagent' ),
+			'orphan_page'             => __( 'Orphan page', 'ariham-seoagent' ),
+			'missing_schema'          => __( 'Missing schema', 'ariham-seoagent' ),
+			'weak_engagement'         => __( 'Weak engagement', 'ariham-seoagent' ),
+			'title_ctr_mismatch'      => __( 'Title/CTR mismatch', 'ariham-seoagent' ),
+			'missing_faq'             => __( 'FAQ opportunity', 'ariham-seoagent' ),
+			'index_anomaly'           => __( 'Index anomaly', 'ariham-seoagent' ),
 		);
 
 		$active = array();
@@ -1074,24 +1074,24 @@ class SEO_Agent_AI_Admin_Page {
 		}
 
 		return empty( $active )
-			? '<span class="seo-agent-muted">' . esc_html__( 'No active signals.', 'seo-agent-ai' ) . '</span>'
+			? '<span class="seo-agent-muted">' . esc_html__( 'No active signals.', 'ariham-seoagent' ) . '</span>'
 			: implode( ' ', $active );
 	}
 
 	private function render_notice( $notice ) {
 		$map = array(
-			'analysis_complete'        => array( 'success', __( 'Analysis completed.', 'seo-agent-ai' ) ),
-			'analysis_scheduled'       => array( 'info', __( 'Analysis scheduled. WP-Cron will run it shortly; reload this page in a minute or two for results.', 'seo-agent-ai' ) ),
-			'fix_applied'              => array( 'success', __( 'Safe metadata fix applied.', 'seo-agent-ai' ) ),
-			'apply_failed'             => array( 'error', __( 'Could not apply fix. Check recommendation risk and payload.', 'seo-agent-ai' ) ),
-			'invalid_input'            => array( 'error', __( 'Invalid input provided.', 'seo-agent-ai' ) ),
-			'recommendation_not_found' => array( 'error', __( 'Recommendation no longer exists.', 'seo-agent-ai' ) ),
-			'settings_saved'           => array( 'success', __( 'Settings saved.', 'seo-agent-ai' ) ),
-			'connection_tested'        => array( 'info', __( 'Connection test completed. See results below.', 'seo-agent-ai' ) ),
-			'rollback_done'            => array( 'success', __( 'Rollback applied. Previous metadata restored.', 'seo-agent-ai' ) ),
-			'rollback_failed'          => array( 'error', __( 'Rollback failed. No backup found for this post.', 'seo-agent-ai' ) ),
-			'google_disconnected'      => array( 'success', __( 'Google account disconnected.', 'seo-agent-ai' ) ),
-			'google_connected'         => array( 'success', __( 'Google account connected.', 'seo-agent-ai' ) ),
+			'analysis_complete'        => array( 'success', __( 'Analysis completed.', 'ariham-seoagent' ) ),
+			'analysis_scheduled'       => array( 'info', __( 'Analysis scheduled. WP-Cron will run it shortly; reload this page in a minute or two for results.', 'ariham-seoagent' ) ),
+			'fix_applied'              => array( 'success', __( 'Safe metadata fix applied.', 'ariham-seoagent' ) ),
+			'apply_failed'             => array( 'error', __( 'Could not apply fix. Check recommendation risk and payload.', 'ariham-seoagent' ) ),
+			'invalid_input'            => array( 'error', __( 'Invalid input provided.', 'ariham-seoagent' ) ),
+			'recommendation_not_found' => array( 'error', __( 'Recommendation no longer exists.', 'ariham-seoagent' ) ),
+			'settings_saved'           => array( 'success', __( 'Settings saved.', 'ariham-seoagent' ) ),
+			'connection_tested'        => array( 'info', __( 'Connection test completed. See results below.', 'ariham-seoagent' ) ),
+			'rollback_done'            => array( 'success', __( 'Rollback applied. Previous metadata restored.', 'ariham-seoagent' ) ),
+			'rollback_failed'          => array( 'error', __( 'Rollback failed. No backup found for this post.', 'ariham-seoagent' ) ),
+			'google_disconnected'      => array( 'success', __( 'Google account disconnected.', 'ariham-seoagent' ) ),
+			'google_connected'         => array( 'success', __( 'Google account connected.', 'ariham-seoagent' ) ),
 		);
 
 		if ( ! isset( $map[ $notice ] ) ) {
@@ -1104,8 +1104,8 @@ class SEO_Agent_AI_Admin_Page {
 
 	private function render_connection_results( array $result ) {
 		$services = array(
-			'gsc'       => __( 'Search Console', 'seo-agent-ai' ),
-			'analytics' => __( 'Google Analytics', 'seo-agent-ai' ),
+			'gsc'       => __( 'Search Console', 'ariham-seoagent' ),
+			'analytics' => __( 'Google Analytics', 'ariham-seoagent' ),
 		);
 
 		echo '<div style="margin:16px 0;max-width:700px;">';

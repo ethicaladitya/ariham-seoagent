@@ -56,36 +56,36 @@ class SEO_Agent_AI_Report_Page {
 		<div class="wrap sai-page">
 			<div class="sai-header">
 				<div class="sai-header-left">
-					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'seo-agent-ai' ); ?></p>
-					<h1 class="sai-header-title"><?php esc_html_e( 'Analysis Report', 'seo-agent-ai' ); ?></h1>
+					<p class="sai-header-eyebrow"><span class="sai-dot"></span><?php esc_html_e( 'SEO Agent AI', 'ariham-seoagent' ); ?></p>
+					<h1 class="sai-header-title"><?php esc_html_e( 'Analysis Report', 'ariham-seoagent' ); ?></h1>
 				</div>
 			</div>
 
 			<div class="sai-body">
 				<?php if ( 'rollback_done' === $notice ) : ?>
-					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php esc_html_e( 'Change rolled back successfully.', 'seo-agent-ai' ); ?></p></div>
+					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php esc_html_e( 'Change rolled back successfully.', 'ariham-seoagent' ); ?></p></div>
 				<?php endif; ?>
 
 				<!-- Metrics row -->
 				<div class="sai-metrics" style="margin-bottom:20px">
 					<div class="sai-metric m-neutral">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Total Changes', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Total Changes', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value"><?php echo esc_html( (string) $total ); ?></div>
 					</div>
 					<div class="sai-metric m-success">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Active', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Active', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value"><?php echo esc_html( (string) $applied_count ); ?></div>
 					</div>
 					<div class="sai-metric m-primary">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Autopilot', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Autopilot', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value"><?php echo esc_html( (string) $autopilot_count ); ?></div>
 					</div>
 					<div class="sai-metric m-warning">
 						<div class="sai-metric-stripe"></div>
-						<div class="sai-metric-label"><?php esc_html_e( 'Rolled Back', 'seo-agent-ai' ); ?></div>
+						<div class="sai-metric-label"><?php esc_html_e( 'Rolled Back', 'ariham-seoagent' ); ?></div>
 						<div class="sai-metric-value"><?php echo esc_html( (string) $rolled_back ); ?></div>
 					</div>
 				</div>
@@ -96,7 +96,7 @@ class SEO_Agent_AI_Report_Page {
 
 					<label>
 						<select name="change_type">
-							<option value=""><?php esc_html_e( 'All Types', 'seo-agent-ai' ); ?></option>
+							<option value=""><?php esc_html_e( 'All Types', 'ariham-seoagent' ); ?></option>
 							<?php foreach ( $this->get_change_type_options() as $val => $label ) : ?>
 								<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $filters['change_type'] ?? '', $val ); ?>>
 									<?php echo esc_html( $label ); ?>
@@ -107,39 +107,39 @@ class SEO_Agent_AI_Report_Page {
 
 					<label>
 						<select name="triggered_by">
-							<option value=""><?php esc_html_e( 'Any Source', 'seo-agent-ai' ); ?></option>
-							<option value="manual" <?php selected( $filters['triggered_by'] ?? '', 'manual' ); ?>><?php esc_html_e( 'Manual', 'seo-agent-ai' ); ?></option>
-							<option value="autopilot" <?php selected( $filters['triggered_by'] ?? '', 'autopilot' ); ?>><?php esc_html_e( 'Autopilot', 'seo-agent-ai' ); ?></option>
+							<option value=""><?php esc_html_e( 'Any Source', 'ariham-seoagent' ); ?></option>
+							<option value="manual" <?php selected( $filters['triggered_by'] ?? '', 'manual' ); ?>><?php esc_html_e( 'Manual', 'ariham-seoagent' ); ?></option>
+							<option value="autopilot" <?php selected( $filters['triggered_by'] ?? '', 'autopilot' ); ?>><?php esc_html_e( 'Autopilot', 'ariham-seoagent' ); ?></option>
 						</select>
 					</label>
 
 					<label>
 						<select name="status">
-							<option value=""><?php esc_html_e( 'Any Status', 'seo-agent-ai' ); ?></option>
-							<option value="applied" <?php selected( $filters['status'] ?? '', 'applied' ); ?>><?php esc_html_e( 'Active', 'seo-agent-ai' ); ?></option>
-							<option value="rolled_back" <?php selected( $filters['status'] ?? '', 'rolled_back' ); ?>><?php esc_html_e( 'Rolled Back', 'seo-agent-ai' ); ?></option>
+							<option value=""><?php esc_html_e( 'Any Status', 'ariham-seoagent' ); ?></option>
+							<option value="applied" <?php selected( $filters['status'] ?? '', 'applied' ); ?>><?php esc_html_e( 'Active', 'ariham-seoagent' ); ?></option>
+							<option value="rolled_back" <?php selected( $filters['status'] ?? '', 'rolled_back' ); ?>><?php esc_html_e( 'Rolled Back', 'ariham-seoagent' ); ?></option>
 						</select>
 					</label>
 
 					<label>
-						<?php esc_html_e( 'From', 'seo-agent-ai' ); ?>
+						<?php esc_html_e( 'From', 'ariham-seoagent' ); ?>
 						<input type="date" name="date_from" value="<?php echo esc_attr( $filters['date_from'] ?? '' ); ?>">
 					</label>
 
 					<label>
-						<?php esc_html_e( 'To', 'seo-agent-ai' ); ?>
+						<?php esc_html_e( 'To', 'ariham-seoagent' ); ?>
 						<input type="date" name="date_to" value="<?php echo esc_attr( $filters['date_to'] ?? '' ); ?>">
 					</label>
 
-					<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Filter', 'seo-agent-ai' ); ?></span></button>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-report' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Reset', 'seo-agent-ai' ); ?></span></a>
+					<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Filter', 'ariham-seoagent' ); ?></span></button>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-report' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Reset', 'ariham-seoagent' ); ?></span></a>
 				</form>
 
 				<?php if ( empty( $entries ) ) : ?>
 					<div class="sai-empty">
 						<div class="sai-empty-icon">&#128203;</div>
-						<h3><?php esc_html_e( 'No activity yet', 'seo-agent-ai' ); ?></h3>
-						<p><?php esc_html_e( 'Run an analysis and apply (or enable autopilot) to see history here.', 'seo-agent-ai' ); ?></p>
+						<h3><?php esc_html_e( 'No activity yet', 'ariham-seoagent' ); ?></h3>
+						<p><?php esc_html_e( 'Run an analysis and apply (or enable autopilot) to see history here.', 'ariham-seoagent' ); ?></p>
 					</div>
 				<?php else : ?>
 
@@ -147,15 +147,15 @@ class SEO_Agent_AI_Report_Page {
 						<table class="sai-table">
 							<thead>
 								<tr>
-									<th><?php esc_html_e( 'Post', 'seo-agent-ai' ); ?></th>
-									<th><?php esc_html_e( 'Change', 'seo-agent-ai' ); ?></th>
-									<th><?php esc_html_e( 'Before / After', 'seo-agent-ai' ); ?></th>
-									<th><?php esc_html_e( 'Why', 'seo-agent-ai' ); ?></th>
-									<th class="col-center"><?php esc_html_e( 'Conf.', 'seo-agent-ai' ); ?></th>
-									<th class="col-center"><?php esc_html_e( 'Source', 'seo-agent-ai' ); ?></th>
-									<th class="col-center"><?php esc_html_e( 'Status', 'seo-agent-ai' ); ?></th>
-									<th><?php esc_html_e( 'Date', 'seo-agent-ai' ); ?></th>
-									<th><?php esc_html_e( 'Actions', 'seo-agent-ai' ); ?></th>
+									<th><?php esc_html_e( 'Post', 'ariham-seoagent' ); ?></th>
+									<th><?php esc_html_e( 'Change', 'ariham-seoagent' ); ?></th>
+									<th><?php esc_html_e( 'Before / After', 'ariham-seoagent' ); ?></th>
+									<th><?php esc_html_e( 'Why', 'ariham-seoagent' ); ?></th>
+									<th class="col-center"><?php esc_html_e( 'Conf.', 'ariham-seoagent' ); ?></th>
+									<th class="col-center"><?php esc_html_e( 'Source', 'ariham-seoagent' ); ?></th>
+									<th class="col-center"><?php esc_html_e( 'Status', 'ariham-seoagent' ); ?></th>
+									<th><?php esc_html_e( 'Date', 'ariham-seoagent' ); ?></th>
+									<th><?php esc_html_e( 'Actions', 'ariham-seoagent' ); ?></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -216,7 +216,7 @@ class SEO_Agent_AI_Report_Page {
 		$signal_data  = is_array( $entry['signal_data'] ) ? $entry['signal_data'] : array();
 
 		$post       = $entry_post ? get_post( $entry_post ) : null;
-		$post_title = $post instanceof WP_Post ? get_the_title( $entry_post ) : __( '(deleted)', 'seo-agent-ai' );
+		$post_title = $post instanceof WP_Post ? get_the_title( $entry_post ) : __( '(deleted)', 'ariham-seoagent' );
 		$edit_link  = $post instanceof WP_Post ? get_edit_post_link( $entry_post ) : '';
 		$is_applied = $status === SEO_Agent_AI_Activity_Log::STATUS_APPLIED;
 
@@ -245,8 +245,8 @@ class SEO_Agent_AI_Report_Page {
 		echo '<td>';
 		if ( $before !== '' || $after !== '' ) {
 			echo '<div class="sai-timeline-diff">';
-			echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $before, 10, '…' ) ?: '—' ) . '</div>';
-			echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'seo-agent-ai' ) . '</span>' . esc_html( wp_trim_words( $after, 10, '…' ) ?: '—' ) . '</div>';
+			echo '<div class="sai-diff-before"><span class="sai-diff-label">' . esc_html__( 'Before', 'ariham-seoagent' ) . '</span>' . esc_html( wp_trim_words( $before, 10, '…' ) ?: '—' ) . '</div>';
+			echo '<div class="sai-diff-after"><span class="sai-diff-label">' . esc_html__( 'After', 'ariham-seoagent' ) . '</span>' . esc_html( wp_trim_words( $after, 10, '…' ) ?: '—' ) . '</div>';
 			echo '</div>';
 		} else {
 			echo '<span style="color:#787c82">—</span>';
@@ -259,13 +259,13 @@ class SEO_Agent_AI_Report_Page {
 		if ( ! empty( $signal_data['evidence'] ) && is_array( $signal_data['evidence'] ) ) {
 			echo '<ul style="margin:0;padding:0 0 0 14px;font-size:11px;color:#646970">';
 			$evidence_labels = array(
-				'impressions_total'         => __( 'Impressions', 'seo-agent-ai' ),
-				'ctr_avg'                   => __( 'CTR', 'seo-agent-ai' ),
-				'position_avg'              => __( 'Avg Position', 'seo-agent-ai' ),
-				'engagement_rate'           => __( 'Engagement Rate', 'seo-agent-ai' ),
-				'avg_time_on_page_sec'      => __( 'Avg Time on Page', 'seo-agent-ai' ),
-				'impressions_trend_28d_pct' => __( 'Impressions Trend (28d)', 'seo-agent-ai' ),
-				'sessions_trend_28d_pct'    => __( 'Sessions Trend (28d)', 'seo-agent-ai' ),
+				'impressions_total'         => __( 'Impressions', 'ariham-seoagent' ),
+				'ctr_avg'                   => __( 'CTR', 'ariham-seoagent' ),
+				'position_avg'              => __( 'Avg Position', 'ariham-seoagent' ),
+				'engagement_rate'           => __( 'Engagement Rate', 'ariham-seoagent' ),
+				'avg_time_on_page_sec'      => __( 'Avg Time on Page', 'ariham-seoagent' ),
+				'impressions_trend_28d_pct' => __( 'Impressions Trend (28d)', 'ariham-seoagent' ),
+				'sessions_trend_28d_pct'    => __( 'Sessions Trend (28d)', 'ariham-seoagent' ),
 			);
 			foreach ( $evidence_labels as $key => $label ) {
 				if ( isset( $signal_data['evidence'][ $key ] ) ) {
@@ -294,9 +294,9 @@ class SEO_Agent_AI_Report_Page {
 		// Source.
 		echo '<td class="col-center">';
 		$source_labels = array(
-			'manual'    => __( 'Manual', 'seo-agent-ai' ),
-			'autopilot' => __( 'Autopilot', 'seo-agent-ai' ),
-			'rollback'  => __( 'Rollback', 'seo-agent-ai' ),
+			'manual'    => __( 'Manual', 'ariham-seoagent' ),
+			'autopilot' => __( 'Autopilot', 'ariham-seoagent' ),
+			'rollback'  => __( 'Rollback', 'ariham-seoagent' ),
 		);
 		$source_badge = 'autopilot' === $triggered_by ? 'b-purple' : 'b-neutral';
 		echo '<span class="sai-badge ' . esc_attr( $source_badge ) . '">';
@@ -307,9 +307,9 @@ class SEO_Agent_AI_Report_Page {
 		// Status.
 		echo '<td class="col-center"><span class="sai-status s-' . esc_attr( $status ) . '">';
 		$status_labels = array(
-			'applied'     => __( 'Active', 'seo-agent-ai' ),
-			'rolled_back' => __( 'Rolled back', 'seo-agent-ai' ),
-			'skipped'     => __( 'Skipped', 'seo-agent-ai' ),
+			'applied'     => __( 'Active', 'ariham-seoagent' ),
+			'rolled_back' => __( 'Rolled back', 'ariham-seoagent' ),
+			'skipped'     => __( 'Skipped', 'ariham-seoagent' ),
 		);
 		echo esc_html( $status_labels[ $status ] ?? $status );
 		echo '</span></td>';
@@ -326,8 +326,8 @@ class SEO_Agent_AI_Report_Page {
 			echo '<input type="hidden" name="log_id" value="' . esc_attr( (string) $entry_id ) . '">';
 			echo '<input type="hidden" name="post_id" value="' . esc_attr( (string) $entry_post ) . '">';
 			echo '<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"'
-				. ' onclick="return confirm(\'' . esc_js( __( 'Roll back this change?', 'seo-agent-ai' ) ) . '\')">'
-				. '<span class="btn-label">' . esc_html__( 'Rollback', 'seo-agent-ai' ) . '</span>'
+				. ' onclick="return confirm(\'' . esc_js( __( 'Roll back this change?', 'ariham-seoagent' ) ) . '\')">'
+				. '<span class="btn-label">' . esc_html__( 'Rollback', 'ariham-seoagent' ) . '</span>'
 				. '</button>';
 			echo '</form>';
 		}
@@ -374,11 +374,11 @@ class SEO_Agent_AI_Report_Page {
 
 	private function get_change_type_options() {
 		return array(
-			'meta_update'          => __( 'Meta Update', 'seo-agent-ai' ),
-			'monitor_decline'      => __( 'Decline Monitor', 'seo-agent-ai' ),
-			'content_refresh_plan' => __( 'Content Refresh', 'seo-agent-ai' ),
-			'intent_alignment'     => __( 'Intent Alignment', 'seo-agent-ai' ),
-			'rollback'             => __( 'Rollback', 'seo-agent-ai' ),
+			'meta_update'          => __( 'Meta Update', 'ariham-seoagent' ),
+			'monitor_decline'      => __( 'Decline Monitor', 'ariham-seoagent' ),
+			'content_refresh_plan' => __( 'Content Refresh', 'ariham-seoagent' ),
+			'intent_alignment'     => __( 'Intent Alignment', 'ariham-seoagent' ),
+			'rollback'             => __( 'Rollback', 'ariham-seoagent' ),
 		);
 	}
 

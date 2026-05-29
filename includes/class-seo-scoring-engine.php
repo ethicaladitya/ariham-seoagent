@@ -430,20 +430,20 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 			$score -= 4;
 			$i[]    = sprintf(
 				/* translators: %d: LCP time in milliseconds. */
-				__( 'LCP is poor (%dms — threshold 4,000ms). Optimise largest image or text block above the fold.', 'seo-agent-ai' ),
+				__( 'LCP is poor (%dms — threshold 4,000ms). Optimise largest image or text block above the fold.', 'ariham-seoagent' ),
 				$lcp
 			);
 		} elseif ( $lcp >= 2500 ) {
 			$score -= 2;
 			$i[]    = sprintf(
 				/* translators: %d: LCP time in milliseconds. */
-				__( 'LCP needs improvement (%dms — threshold 2,500ms). Consider lazy-loading below-fold images and preloading the LCP element.', 'seo-agent-ai' ),
+				__( 'LCP needs improvement (%dms — threshold 2,500ms). Consider lazy-loading below-fold images and preloading the LCP element.', 'ariham-seoagent' ),
 				$lcp
 			);
 		} else {
 			$s[] = sprintf(
 				/* translators: %d: LCP time in milliseconds. */
-				__( 'Good LCP (%dms).', 'seo-agent-ai' ),
+				__( 'Good LCP (%dms).', 'ariham-seoagent' ),
 				$lcp
 			);
 		}
@@ -453,20 +453,20 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 			$score -= 3;
 			$i[]    = sprintf(
 				/* translators: %.2f: CLS score. */
-				__( 'CLS is poor (%.2f — threshold 0.25). Reserve space for ads and images to prevent layout shifts.', 'seo-agent-ai' ),
+				__( 'CLS is poor (%.2f — threshold 0.25). Reserve space for ads and images to prevent layout shifts.', 'ariham-seoagent' ),
 				$cls
 			);
 		} elseif ( $cls >= 0.1 ) {
 			$score -= 1;
 			$i[]    = sprintf(
 				/* translators: %.2f: CLS score. */
-				__( 'CLS needs improvement (%.2f — threshold 0.1). Ensure embedded media has explicit width/height attributes.', 'seo-agent-ai' ),
+				__( 'CLS needs improvement (%.2f — threshold 0.1). Ensure embedded media has explicit width/height attributes.', 'ariham-seoagent' ),
 				$cls
 			);
 		} else {
 			$s[] = sprintf(
 				/* translators: %.2f: CLS score. */
-				__( 'Good CLS (%.2f).', 'seo-agent-ai' ),
+				__( 'Good CLS (%.2f).', 'ariham-seoagent' ),
 				$cls
 			);
 		}
@@ -474,13 +474,13 @@ class SEO_Agent_AI_SEO_Scoring_Engine {
 		if ( $perf >= 90 ) {
 			$s[] = sprintf(
 				/* translators: %d: Lighthouse performance score. */
-				__( 'Excellent Lighthouse performance score (%d/100).', 'seo-agent-ai' ),
+				__( 'Excellent Lighthouse performance score (%d/100).', 'ariham-seoagent' ),
 				$perf
 			);
 		} elseif ( $perf < 50 ) {
 			$i[] = sprintf(
 				/* translators: %d: Lighthouse performance score. */
-				__( 'Low Lighthouse performance score (%d/100). Review PageSpeed Insights for actionable opportunities.', 'seo-agent-ai' ),
+				__( 'Low Lighthouse performance score (%d/100). Review PageSpeed Insights for actionable opportunities.', 'ariham-seoagent' ),
 				$perf
 			);
 		}

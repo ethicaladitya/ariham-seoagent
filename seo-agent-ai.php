@@ -9,7 +9,7 @@
  * Author URI:        https://adityashah.blog/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       seo-agent-ai
+ * Text Domain:       ariham-seoagent
  *
  * @package SEO_Agent_AI
  */

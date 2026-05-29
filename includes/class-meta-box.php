@@ -51,7 +51,7 @@ class SEO_Agent_AI_Meta_Box {
 		foreach ( $post_types as $post_type ) {
 			add_meta_box(
 				'seo_agent_ai_meta_box',
-				__( 'SEO Agent AI', 'seo-agent-ai' ),
+				__( 'SEO Agent AI', 'ariham-seoagent' ),
 				array( $this, 'render_meta_box' ),
 				sanitize_key( $post_type ),
 				'normal',
@@ -90,32 +90,32 @@ class SEO_Agent_AI_Meta_Box {
 			$badge_color = '#dc3232';
 		}
 
-		$score_label = $score ? (string) $score : __( 'N/A', 'seo-agent-ai' );
+		$score_label = $score ? (string) $score : __( 'N/A', 'ariham-seoagent' );
 		?>
 		<div class="sai-tabs">
-			<button type="button" class="sai-tab-btn active" data-tab="sai-tab-score"><?php esc_html_e( 'Focus & Score', 'seo-agent-ai' ); ?></button>
-			<button type="button" class="sai-tab-btn" data-tab="sai-tab-meta"><?php esc_html_e( 'Meta', 'seo-agent-ai' ); ?></button>
-			<button type="button" class="sai-tab-btn" data-tab="sai-tab-advanced"><?php esc_html_e( 'Advanced', 'seo-agent-ai' ); ?></button>
+			<button type="button" class="sai-tab-btn active" data-tab="sai-tab-score"><?php esc_html_e( 'Focus & Score', 'ariham-seoagent' ); ?></button>
+			<button type="button" class="sai-tab-btn" data-tab="sai-tab-meta"><?php esc_html_e( 'Meta', 'ariham-seoagent' ); ?></button>
+			<button type="button" class="sai-tab-btn" data-tab="sai-tab-advanced"><?php esc_html_e( 'Advanced', 'ariham-seoagent' ); ?></button>
 		</div>
 
 		<div id="sai-tab-score" class="sai-tab-panel active">
 			<div class="sai-row">
-				<label><?php esc_html_e( 'SEO Score', 'seo-agent-ai' ); ?></label>
+				<label><?php esc_html_e( 'SEO Score', 'ariham-seoagent' ); ?></label>
 				<span class="sai-score-badge" style="background:<?php echo esc_attr( $badge_color ); ?>"><?php echo esc_html( $score_label ); ?></span>
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_focus_keyword"><?php esc_html_e( 'Focus Keyword', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_focus_keyword"><?php esc_html_e( 'Focus Keyword', 'ariham-seoagent' ); ?></label>
 				<input type="text" id="seo_agent_ai_focus_keyword" name="seo_agent_ai_focus_keyword" value="<?php echo esc_attr( $keyword ); ?>" />
 			</div>
 			<?php if ( $last_analyzed ) : ?>
 			<div class="sai-row">
-				<label><?php esc_html_e( 'Last Analyzed', 'seo-agent-ai' ); ?></label>
+				<label><?php esc_html_e( 'Last Analyzed', 'ariham-seoagent' ); ?></label>
 				<span><?php echo esc_html( $last_analyzed ); ?></span>
 			</div>
 			<?php endif; ?>
 			<div class="sai-row">
 				<button type="button" id="sai-analyze-btn" class="button button-secondary" data-post-id="<?php echo esc_attr( $post->ID ); ?>">
-					<?php esc_html_e( 'Analyze Now', 'seo-agent-ai' ); ?>
+					<?php esc_html_e( 'Analyze Now', 'ariham-seoagent' ); ?>
 				</button>
 				<span id="sai-analyze-status" style="margin-left:8px;"></span>
 			</div>
@@ -123,18 +123,18 @@ class SEO_Agent_AI_Meta_Box {
 
 		<div id="sai-tab-meta" class="sai-tab-panel">
 			<div class="sai-row">
-				<label for="seo_agent_ai_custom_title"><?php esc_html_e( 'SEO Title Override', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_custom_title"><?php esc_html_e( 'SEO Title Override', 'ariham-seoagent' ); ?></label>
 				<input type="text" id="seo_agent_ai_custom_title" name="seo_agent_ai_custom_title"
 					value="<?php echo esc_attr( $custom_title ); ?>"
 					placeholder="<?php echo esc_attr( get_the_title( $post->ID ) ); ?>" />
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_custom_description"><?php esc_html_e( 'Meta Description', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_custom_description"><?php esc_html_e( 'Meta Description', 'ariham-seoagent' ); ?></label>
 				<textarea id="seo_agent_ai_custom_description" name="seo_agent_ai_custom_description" rows="3"><?php echo esc_textarea( $custom_desc ); ?></textarea>
 				<span class="sai-char-count" id="sai-desc-count"><?php echo esc_html( mb_strlen( $custom_desc ) ); ?> / 160</span>
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_canonical"><?php esc_html_e( 'Canonical URL', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_canonical"><?php esc_html_e( 'Canonical URL', 'ariham-seoagent' ); ?></label>
 				<input type="url" id="seo_agent_ai_canonical" name="seo_agent_ai_canonical"
 					value="<?php echo esc_url( $canonical ); ?>"
 					placeholder="<?php echo esc_attr( get_permalink( $post->ID ) ); ?>" />
@@ -143,18 +143,18 @@ class SEO_Agent_AI_Meta_Box {
 
 		<div id="sai-tab-advanced" class="sai-tab-panel">
 			<div class="sai-row">
-				<label><?php esc_html_e( 'Robots Directives', 'seo-agent-ai' ); ?></label>
-				<label><input type="checkbox" name="seo_agent_ai_robots_noindex"   value="1" <?php checked( $noindex ); ?>> <?php esc_html_e( 'noindex', 'seo-agent-ai' ); ?></label><br>
-				<label><input type="checkbox" name="seo_agent_ai_robots_nofollow"  value="1" <?php checked( $nofollow ); ?>> <?php esc_html_e( 'nofollow', 'seo-agent-ai' ); ?></label><br>
-				<label><input type="checkbox" name="seo_agent_ai_robots_noarchive" value="1" <?php checked( $noarchive ); ?>> <?php esc_html_e( 'noarchive', 'seo-agent-ai' ); ?></label><br>
-				<label><input type="checkbox" name="seo_agent_ai_robots_nosnippet" value="1" <?php checked( $nosnippet ); ?>> <?php esc_html_e( 'nosnippet', 'seo-agent-ai' ); ?></label>
+				<label><?php esc_html_e( 'Robots Directives', 'ariham-seoagent' ); ?></label>
+				<label><input type="checkbox" name="seo_agent_ai_robots_noindex"   value="1" <?php checked( $noindex ); ?>> <?php esc_html_e( 'noindex', 'ariham-seoagent' ); ?></label><br>
+				<label><input type="checkbox" name="seo_agent_ai_robots_nofollow"  value="1" <?php checked( $nofollow ); ?>> <?php esc_html_e( 'nofollow', 'ariham-seoagent' ); ?></label><br>
+				<label><input type="checkbox" name="seo_agent_ai_robots_noarchive" value="1" <?php checked( $noarchive ); ?>> <?php esc_html_e( 'noarchive', 'ariham-seoagent' ); ?></label><br>
+				<label><input type="checkbox" name="seo_agent_ai_robots_nosnippet" value="1" <?php checked( $nosnippet ); ?>> <?php esc_html_e( 'nosnippet', 'ariham-seoagent' ); ?></label>
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_og_title"><?php esc_html_e( 'Social OG Title Override', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_og_title"><?php esc_html_e( 'Social OG Title Override', 'ariham-seoagent' ); ?></label>
 				<input type="text" id="seo_agent_ai_og_title" name="seo_agent_ai_og_title" value="<?php echo esc_attr( $og_title ); ?>" />
 			</div>
 			<div class="sai-row">
-				<label for="seo_agent_ai_og_description"><?php esc_html_e( 'Social OG Description Override', 'seo-agent-ai' ); ?></label>
+				<label for="seo_agent_ai_og_description"><?php esc_html_e( 'Social OG Description Override', 'ariham-seoagent' ); ?></label>
 				<textarea id="seo_agent_ai_og_description" name="seo_agent_ai_og_description" rows="2"><?php echo esc_textarea( $og_desc ); ?></textarea>
 			</div>
 		</div>
@@ -183,7 +183,7 @@ class SEO_Agent_AI_Meta_Box {
 			if(analyzeBtn){
 				analyzeBtn.addEventListener('click', function(){
 					var status = document.getElementById('sai-analyze-status');
-					status.textContent = '<?php echo esc_js( __( 'Analyzing…', 'seo-agent-ai' ) ); ?>';
+					status.textContent = '<?php echo esc_js( __( 'Analyzing…', 'ariham-seoagent' ) ); ?>';
 					analyzeBtn.disabled = true;
 					var data = new FormData();
 					data.append('action', 'seo_agent_ai_analyze_single_post');
@@ -193,13 +193,13 @@ class SEO_Agent_AI_Meta_Box {
 						.then(function(r){ return r.json(); })
 						.then(function(resp){
 							if(resp.success){
-								status.textContent = '<?php echo esc_js( __( 'Done! Score: ', 'seo-agent-ai' ) ); ?>' + (resp.data.score || '?');
+								status.textContent = '<?php echo esc_js( __( 'Done! Score: ', 'ariham-seoagent' ) ); ?>' + (resp.data.score || '?');
 								setTimeout(function(){ location.reload(); }, 1500);
 							} else {
-								status.textContent = resp.data || '<?php echo esc_js( __( 'Error.', 'seo-agent-ai' ) ); ?>';
+								status.textContent = resp.data || '<?php echo esc_js( __( 'Error.', 'ariham-seoagent' ) ); ?>';
 							}
 						})
-						.catch(function(){ status.textContent = '<?php echo esc_js( __( 'Network error.', 'seo-agent-ai' ) ); ?>'; })
+						.catch(function(){ status.textContent = '<?php echo esc_js( __( 'Network error.', 'ariham-seoagent' ) ); ?>'; })
 						.finally(function(){ analyzeBtn.disabled = false; });
 				});
 			}
@@ -278,12 +278,12 @@ class SEO_Agent_AI_Meta_Box {
 
 		$post_id = absint( wp_unslash( $_POST['post_id'] ?? 0 ) );
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_send_json_error( __( 'Unauthorized or invalid post.', 'seo-agent-ai' ), 403 );
+			wp_send_json_error( __( 'Unauthorized or invalid post.', 'ariham-seoagent' ), 403 );
 		}
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
-			wp_send_json_error( __( 'Post not found.', 'seo-agent-ai' ) );
+			wp_send_json_error( __( 'Post not found.', 'ariham-seoagent' ) );
 		}
 
 		$result = SEO_Agent_AI_Plugin::instance()->analyze_post_for_cli( $post, false, true );

@@ -144,23 +144,23 @@ class SEO_Agent_AI_Internal_Link_Engine {
 	 */
 	public function insert_link( WP_Post $source_post, WP_Post $target_post, $anchor, $context_snippet, $dry_run = false ) {
 		if ( $source_post->post_status !== 'publish' ) {
-			return new WP_Error( 'seo_agent_ai_il_not_published', __( 'Source post is not published.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_il_not_published', __( 'Source post is not published.', 'ariham-seoagent' ) );
 		}
 
 		// Safety: never link to the same post.
 		if ( $source_post->ID === $target_post->ID ) {
-			return new WP_Error( 'seo_agent_ai_il_self_link', __( 'Cannot link a post to itself.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_il_self_link', __( 'Cannot link a post to itself.', 'ariham-seoagent' ) );
 		}
 
 		// Safety: check per-post plugin link cap.
 		$existing = SEO_Agent_AI_DB_Manager::get_post_links( $source_post->ID, 'source' );
 		if ( count( $existing ) >= self::MAX_LINKS_PER_POST ) {
-			return new WP_Error( 'seo_agent_ai_il_cap_reached', __( 'Maximum plugin links already added to this post.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_il_cap_reached', __( 'Maximum plugin links already added to this post.', 'ariham-seoagent' ) );
 		}
 
 		// Safety: ensure the link does not already exist.
 		if ( $this->link_already_exists( $source_post->ID, $target_post->ID ) ) {
-			return new WP_Error( 'seo_agent_ai_il_duplicate', __( 'A link from this source to this target already exists.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_il_duplicate', __( 'A link from this source to this target already exists.', 'ariham-seoagent' ) );
 		}
 
 		$target_url  = get_permalink( $target_post );
@@ -169,7 +169,7 @@ class SEO_Agent_AI_Internal_Link_Engine {
 		// Find and replace the first natural occurrence of the anchor text in content.
 		$new_content = $this->inject_link( $source_post->post_content, $anchor, $target_url );
 		if ( $new_content === null ) {
-			return new WP_Error( 'seo_agent_ai_il_anchor_not_found', __( 'Anchor text not found naturally in post content.', 'seo-agent-ai' ) );
+			return new WP_Error( 'seo_agent_ai_il_anchor_not_found', __( 'Anchor text not found naturally in post content.', 'ariham-seoagent' ) );
 		}
 
 		if ( $dry_run ) {
