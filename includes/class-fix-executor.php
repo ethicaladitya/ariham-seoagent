@@ -194,6 +194,15 @@ class SEO_Agent_AI_Fix_Executor {
 
 		update_post_meta( $post_id, '_seo_agent_ai_last_applied_at', current_time( 'mysql' ) );
 
+		/**
+		 * Fires after a fix has been successfully applied to a post.
+		 * Hooked by IndexNow to submit the URL for instant re-indexing.
+		 *
+		 * @param int    $post_id      The post that was changed.
+		 * @param string $triggered_by Who triggered the fix (e.g. 'auto', 'manual').
+		 */
+		do_action( 'seo_agent_ai_fix_applied', $post_id, $triggered_by );
+
 		return true;
 	}
 

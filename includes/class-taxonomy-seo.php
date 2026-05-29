@@ -115,6 +115,12 @@ class SEO_Agent_AI_Taxonomy_SEO {
 
 	/**
 	 * Output custom title / description / robots for term archives.
+	 *
+	 * Auto-noindex logic:
+	 *   - Tag archives with fewer posts than the threshold are noindexed automatically
+	 *     to prevent Google from discovering hundreds of thin tag pages.
+	 *   - Threshold defaults to 5 and is filterable via `seo_agent_ai_thin_tag_threshold`.
+	 *   - An explicit per-term noindex checkbox always takes precedence.
 	 */
 	public function output_term_meta() {
 		if ( ! is_category() && ! is_tag() && ! is_tax() ) {
@@ -130,6 +136,14 @@ class SEO_Agent_AI_Taxonomy_SEO {
 		$seo_desc  = (string) get_term_meta( $term->term_id, '_seo_agent_ai_term_description', true );
 		$noindex   = (bool) get_term_meta( $term->term_id, '_seo_agent_ai_term_noindex', true );
 
+		// Auto-noindex thin tag archives (not manually overridden to index).
+		if ( ! $noindex && is_tag() ) {
+			$threshold = (int) apply_filters( 'seo_agent_ai_thin_tag_threshold', 5 );
+			if ( $threshold > 0 && $term->count < $threshold ) {
+				$noindex = true;
+			}
+		}
+
 		if ( $seo_title ) {
 			echo '<title>' . esc_html( $seo_title ) . '</title>' . "\n";
 		}
@@ -139,7 +153,7 @@ class SEO_Agent_AI_Taxonomy_SEO {
 		}
 
 		if ( $noindex ) {
-			echo '<meta name="robots" content="noindex" />' . "\n";
+			echo '<meta name="robots" content="noindex,follow" />' . "\n";
 		}
 	}
 

@@ -44,6 +44,9 @@ require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-pagespeed-client.
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-gemini-client.php';
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/clients/class-openai-client.php';
 
+// Indexing utilities.
+require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-indexnow.php';
+
 // SEO plugin integration bridge.
 require_once SEO_AGENT_AI_PLUGIN_DIR . 'includes/class-seo-plugin-bridge.php';
 

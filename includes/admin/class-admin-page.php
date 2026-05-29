@@ -224,10 +224,17 @@ class SEO_Agent_AI_Admin_Page {
 		if ( strpos( $hook, 'seo-agent' ) === false ) {
 			return;
 		}
+		// Google Fonts: Syne (display) + Plus Jakarta Sans (body) + JetBrains Mono (data).
+		wp_enqueue_style(
+			'seo-agent-ai-fonts',
+			'https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap',
+			array(),
+			null // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+		);
 		wp_enqueue_style(
 			'seo-agent-ai-admin',
 			SEO_AGENT_AI_PLUGIN_URL . 'assets/css/admin.css',
-			array(),
+			array( 'seo-agent-ai-fonts' ),
 			SEO_AGENT_AI_VERSION
 		);
 		wp_enqueue_script(

@@ -31,8 +31,9 @@ class SEO_Agent_AI_OpenAI_Client {
 	const OPTION_MODEL        = 'seo_agent_ai_openai_model';
 	const OPTION_API_VERSION  = 'seo_agent_ai_openai_api_version';
 
-	// Azure legacy GA api-version (2024-02-01 was retired 2025-03-31).
-	const AZURE_LEGACY_API_VERSION  = '2024-10-21';
+	// Azure legacy GA api-version. Override via seo_agent_ai_azure_api_version filter,
+	// SEO_AGENT_AI_OPENAI_API_VERSION constant, or seo_agent_ai_openai_api_version option.
+	const AZURE_LEGACY_API_VERSION  = '2025-01-01-preview';
 	const AZURE_FOUNDRY_API_VERSION = '2025-01-01';
 
 	const DEFAULT_BASE_URL = 'https://api.openai.com/v1';
@@ -448,9 +449,17 @@ class SEO_Agent_AI_OpenAI_Client {
 	 */
 	private function build_endpoint() {
 		if ( $this->is_azure_foundry ) {
+			// Skip api-version if the base URL already supplies it.
+			if ( strpos( $this->base_url, 'api-version=' ) !== false ) {
+				return $this->base_url . '/chat/completions';
+			}
 			return $this->base_url . '/chat/completions?api-version=' . self::AZURE_FOUNDRY_API_VERSION;
 		}
 		if ( $this->is_azure && ! $this->is_azure_v1 ) {
+			// Skip api-version if already present in the base URL (e.g. set by mu-plugin).
+			if ( strpos( $this->base_url, 'api-version=' ) !== false ) {
+				return $this->base_url . '/chat/completions';
+			}
 			$api_version = $this->resolve_azure_api_version();
 			return $this->base_url . '/chat/completions?api-version=' . rawurlencode( $api_version );
 		}
@@ -459,7 +468,11 @@ class SEO_Agent_AI_OpenAI_Client {
 	}
 
 	/**
-	 * Resolve the Azure legacy api-version, with constant → option → default fallback.
+	 * Resolve the Azure legacy api-version.
+	 *
+	 * Priority: constant → wp option → filter → default.
+	 * The `seo_agent_ai_azure_api_version` filter lets mu-plugins override the
+	 * version without knowing the constant name.
 	 *
 	 * @return string
 	 */
@@ -471,7 +484,8 @@ class SEO_Agent_AI_OpenAI_Client {
 			}
 		}
 		$stored = trim( (string) get_option( self::OPTION_API_VERSION, '' ) );
-		return $stored !== '' ? $stored : self::AZURE_LEGACY_API_VERSION;
+		$default = $stored !== '' ? $stored : self::AZURE_LEGACY_API_VERSION;
+		return (string) apply_filters( 'seo_agent_ai_azure_api_version', $default );
 	}
 
 	/**

@@ -158,6 +158,27 @@ class SEO_Agent_AI_Schema_Engine {
 			}
 		}
 
+		// --- JobPosting ---
+		// SmartCrawl / Yoast / RankMath do not emit JobPosting schema for custom
+		// post types — they fall back to Article/WebPage. We output JobPosting
+		// whenever the post type is "job" (Content Engine Pro convention) or is
+		// registered with the "job_listing" capability group (WP Job Manager).
+		$job_post_types = (array) apply_filters( 'seo_agent_ai_job_post_types', array( 'job', 'job_listing' ) );
+		if ( in_array( $post_type, $job_post_types, true ) ) {
+			$has_job_schema = array_filter(
+				$existing_types,
+				static function ( $t ) {
+					return false !== strpos( $t, 'jobposting' );
+				}
+			);
+			if ( empty( $has_job_schema ) ) {
+				$job_block = $this->build_job_posting( $post );
+				if ( $job_block ) {
+					$blocks[] = $job_block;
+				}
+			}
+		}
+
 		// --- FAQPage ---
 		// No major SEO plugin auto-detects FAQ pairs in post content; this is unique
 		// value seo-agent-ai adds regardless of which SEO plugin is active.
@@ -344,6 +365,102 @@ class SEO_Agent_AI_Schema_Engine {
 			'@type'      => 'FAQPage',
 			'mainEntity' => $entities,
 		);
+	}
+
+	/**
+	 * Build a JobPosting schema block.
+	 *
+	 * Reads from common meta keys used by Content Engine Pro and WP Job Manager.
+	 * All values fall back gracefully when meta is absent.
+	 *
+	 * @param WP_Post $post
+	 * @return array|null
+	 */
+	private function build_job_posting( WP_Post $post ) {
+		$title       = wp_strip_all_tags( $post->post_title );
+		$description = wp_strip_all_tags( $post->post_content );
+		$date_posted = get_the_date( 'c', $post->ID );
+		$url         = (string) get_permalink( $post->ID );
+
+		// Company name — try common meta keys from CE Pro and WP Job Manager.
+		$meta_company_keys = array( 'company_name', '_company_name', 'job_company', '_job_company', '_ce_company' );
+		$company           = '';
+		foreach ( $meta_company_keys as $key ) {
+			$val = (string) get_post_meta( $post->ID, $key, true );
+			if ( $val !== '' ) {
+				$company = $val;
+				break;
+			}
+		}
+		if ( $company === '' ) {
+			$company = get_bloginfo( 'name' );
+		}
+
+		// Location — try common meta keys; default to "Remote".
+		$meta_location_keys = array( 'job_location', '_job_location', '_ce_location', 'location' );
+		$location           = '';
+		foreach ( $meta_location_keys as $key ) {
+			$val = (string) get_post_meta( $post->ID, $key, true );
+			if ( $val !== '' ) {
+				$location = $val;
+				break;
+			}
+		}
+		if ( $location === '' ) {
+			$location = 'Remote';
+		}
+
+		// Employment type (FULL_TIME, PART_TIME, CONTRACT, FREELANCE, etc.)
+		$employment_type_keys = array( 'employment_type', '_employment_type', '_ce_employment_type', 'job_type' );
+		$employment_type      = '';
+		foreach ( $employment_type_keys as $key ) {
+			$val = strtoupper( (string) get_post_meta( $post->ID, $key, true ) );
+			if ( $val !== '' ) {
+				$employment_type = $val;
+				break;
+			}
+		}
+
+		// Expiry date.
+		$expiry_keys = array( 'job_expires', '_job_expires', '_ce_expires', 'expiry_date' );
+		$valid_through = '';
+		foreach ( $expiry_keys as $key ) {
+			$val = (string) get_post_meta( $post->ID, $key, true );
+			if ( $val !== '' ) {
+				$valid_through = $val;
+				break;
+			}
+		}
+
+		$schema = array(
+			'@context'   => 'https://schema.org',
+			'@type'      => 'JobPosting',
+			'title'      => $title,
+			'description' => wp_trim_words( $description, 200, '...' ),
+			'datePosted' => $date_posted,
+			'url'        => $url,
+			'hiringOrganization' => array(
+				'@type' => 'Organization',
+				'name'  => $company,
+			),
+			'jobLocation' => array(
+				'@type'   => 'Place',
+				'address' => array(
+					'@type'           => 'PostalAddress',
+					'addressLocality' => $location,
+				),
+			),
+		);
+
+		if ( $employment_type !== '' ) {
+			$schema['employmentType'] = $employment_type;
+		}
+
+		if ( $valid_through !== '' ) {
+			$schema['validThrough'] = $valid_through;
+		}
+
+		return $schema;
 	}
 
 	private function build_breadcrumb( WP_Post $post ) {
