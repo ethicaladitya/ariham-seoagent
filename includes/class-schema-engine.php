@@ -160,7 +160,7 @@ class SEO_Agent_AI_Schema_Engine {
 
 		// --- FAQPage ---
 		// No major SEO plugin auto-detects FAQ pairs in post content; this is unique
-		// value seo-agent-ai adds regardless of which SEO plugin is active.
+		// value ariham-seoagent adds regardless of which SEO plugin is active.
 		$has_faq_schema = array_filter(
 			$existing_types,
 			static function ( $t ) {

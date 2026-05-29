@@ -208,7 +208,7 @@ class SEO_Agent_AI_Image_SEO_Page {
 				next();
 			});
 		}(jQuery));
-		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
+		<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
 		<?php
 	}
 }

@@ -22,7 +22,7 @@ class SEO_Agent_AI_Logger {
 	const LEVEL_WARNING = 'WARNING';
 	const LEVEL_ERROR   = 'ERROR';
 
-	const LOG_BASENAME = 'seo-agent-ai-debug.log';
+	const LOG_BASENAME = 'ariham-seoagent-debug.log';
 	const MAX_BYTES    = 5242880; // 5 MB
 
 	/** @var bool */

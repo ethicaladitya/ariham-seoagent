@@ -125,7 +125,7 @@ class SEO_Agent_AI_Admin_Page {
 			__( 'Connect Google', 'ariham-seoagent' ),
 			__( 'Connect Google', 'ariham-seoagent' ),
 			'manage_options',
-			'seo-agent-ai-connect',
+			'ariham-seoagent-connect',
 			array( $this->connect_page, 'render' )
 		);
 
@@ -134,7 +134,7 @@ class SEO_Agent_AI_Admin_Page {
 			__( 'Analysis', 'ariham-seoagent' ),
 			__( 'Analysis', 'ariham-seoagent' ),
 			'manage_options',
-			'seo-agent-ai-report',
+			'ariham-seoagent-report',
 			array( $this->report_page, 'render' )
 		);
 
@@ -215,7 +215,7 @@ class SEO_Agent_AI_Admin_Page {
 			__( 'Settings', 'ariham-seoagent' ),
 			__( 'Settings', 'ariham-seoagent' ),
 			'manage_options',
-			'seo-agent-ai-settings',
+			'ariham-seoagent-settings',
 			array( $this, 'render_settings_page' )
 		);
 	}
@@ -225,20 +225,20 @@ class SEO_Agent_AI_Admin_Page {
 			return;
 		}
 		wp_enqueue_style(
-			'seo-agent-ai-admin',
+			'ariham-seoagent-admin',
 			SEO_AGENT_AI_PLUGIN_URL . 'assets/css/admin.css',
 			array(),
 			SEO_AGENT_AI_VERSION
 		);
 		wp_enqueue_script(
-			'seo-agent-ai-admin',
+			'ariham-seoagent-admin',
 			SEO_AGENT_AI_PLUGIN_URL . 'assets/js/admin.js',
 			array( 'jquery' ),
 			SEO_AGENT_AI_VERSION,
 			true
 		);
 		wp_localize_script(
-			'seo-agent-ai-admin',
+			'ariham-seoagent-admin',
 			'seoAgentAI',
 			array(
 				'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
@@ -291,7 +291,7 @@ class SEO_Agent_AI_Admin_Page {
 						printf(
 							/* translators: %s: Connect Google page link */
 							esc_html__( 'Google account not connected. %s to enable live data analysis.', 'ariham-seoagent' ),
-							'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'ariham-seoagent' ) . '</a>'
+							'<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) . '">' . esc_html__( 'Connect Google', 'ariham-seoagent' ) . '</a>'
 						);
 						?>
 					</p>
@@ -413,7 +413,7 @@ class SEO_Agent_AI_Admin_Page {
 					$('#seo-run-analysis').prop('disabled', false).text(strings.retry);
 				}
 			})(jQuery);
-			<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
+			<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
 
 			<?php if ( empty( $post_ids ) ) : ?>
 				<p><em><?php esc_html_e( 'No recommendations yet. Run an analysis to populate insights.', 'ariham-seoagent' ); ?></em></p>
@@ -705,7 +705,7 @@ class SEO_Agent_AI_Admin_Page {
 										printf(
 											/* translators: %s: HTML link to the Connect Google page. */
 											esc_html__( 'Connect your Google account to load available properties automatically. %s', 'ariham-seoagent' ),
-											'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">' . esc_html__( 'Connect Google', 'ariham-seoagent' ) . '</a>'
+											'<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) . '">' . esc_html__( 'Connect Google', 'ariham-seoagent' ) . '</a>'
 										);
 										?>
 									</p>
@@ -1034,7 +1034,7 @@ class SEO_Agent_AI_Admin_Page {
 				loadGA4Properties();
 			});
 		})(jQuery);
-		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
+		<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
 		<?php endif; ?>
 		<?php
 	}

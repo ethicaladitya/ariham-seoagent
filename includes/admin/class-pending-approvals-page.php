@@ -368,7 +368,7 @@ class SEO_Agent_AI_Pending_Approvals_Page {
 				body.style.display = (body.style.display === 'none' || body.style.display === '') ? 'block' : 'none';
 			}
 		});
-		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
+		<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
 		<?php
 	}
 

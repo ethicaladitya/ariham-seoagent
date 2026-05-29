@@ -107,7 +107,7 @@ class SEO_Agent_AI_Rankings_Page {
 			echo '<p style="margin:0">';
 			echo '<strong>' . esc_html__( 'Google Search Console not connected.', 'ariham-seoagent' ) . '</strong> ';
 			esc_html_e( 'Keyword ranking data comes from GSC. Connect it first, then fetch data.', 'ariham-seoagent' );
-			echo ' <a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '" class="sai-btn sai-btn-sm sai-btn-ghost" style="margin-left:8px">';
+			echo ' <a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) . '" class="sai-btn sai-btn-sm sai-btn-ghost" style="margin-left:8px">';
 			esc_html_e( 'Connect Google', 'ariham-seoagent' );
 			echo '</a>';
 			echo '</p></div>';

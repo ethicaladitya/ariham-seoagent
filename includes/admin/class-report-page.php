@@ -92,7 +92,7 @@ class SEO_Agent_AI_Report_Page {
 
 				<!-- Filters -->
 				<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="sai-filters" style="margin-bottom:16px">
-					<input type="hidden" name="page" value="seo-agent-ai-report">
+					<input type="hidden" name="page" value="ariham-seoagent-report">
 
 					<label>
 						<select name="change_type">
@@ -132,7 +132,7 @@ class SEO_Agent_AI_Report_Page {
 					</label>
 
 					<button type="submit" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Filter', 'ariham-seoagent' ); ?></span></button>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-report' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Reset', 'ariham-seoagent' ); ?></span></a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-report' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm"><span class="btn-label"><?php esc_html_e( 'Reset', 'ariham-seoagent' ); ?></span></a>
 				</form>
 
 				<?php if ( empty( $entries ) ) : ?>
@@ -170,7 +170,7 @@ class SEO_Agent_AI_Report_Page {
 						<div class="sai-pagination" style="margin-top:12px">
 							<?php
 							$base_url = add_query_arg(
-								array_merge( $filters, array( 'page' => 'seo-agent-ai-report' ) ),
+								array_merge( $filters, array( 'page' => 'ariham-seoagent-report' ) ),
 								admin_url( 'admin.php' )
 							);
 							$paginate = paginate_links( array(

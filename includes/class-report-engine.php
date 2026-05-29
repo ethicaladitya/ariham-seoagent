@@ -392,7 +392,7 @@ class SEO_Agent_AI_Report_Engine {
 		$approvals     = (int) ( $summary['pending_approvals'] ?? 0 );
 		$site_name     = esc_html( get_bloginfo( 'name' ) );
 		$approvals_url = esc_url( admin_url( 'admin.php?page=seo-agent-approvals' ) );
-		$dashboard_url = esc_url( admin_url( 'admin.php?page=seo-agent-ai' ) );
+		$dashboard_url = esc_url( admin_url( 'admin.php?page=ariham-seoagent' ) );
 
 		$stats = array(
 			__( 'Pages Analyzed', 'ariham-seoagent' ) => absint( $summary['pages_analyzed'] ?? 0 ),

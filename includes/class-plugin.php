@@ -1016,7 +1016,7 @@ class SEO_Agent_AI_Plugin {
 			wp_schedule_single_event( time() + 5, self::CRON_HOOK_MANUAL );
 		}
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'analysis_scheduled', admin_url( 'admin.php?page=seo-agent-ai' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'analysis_scheduled', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 		exit;
 	}
 
@@ -1697,13 +1697,13 @@ class SEO_Agent_AI_Plugin {
 		$rec_index = isset( $_POST['rec_index'] ) ? absint( $_POST['rec_index'] ) : -1;
 
 		if ( ! $post_id || $rec_index < 0 || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=seo-agent-ai' ) ) );
+			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 			exit;
 		}
 
 		$recommendations = $this->data_store->get_recommendations( $post_id );
 		if ( ! isset( $recommendations[ $rec_index ] ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'recommendation_not_found', admin_url( 'admin.php?page=seo-agent-ai' ) ) );
+			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'recommendation_not_found', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 			exit;
 		}
 
@@ -1722,7 +1722,7 @@ class SEO_Agent_AI_Plugin {
 		);
 
 		$notice = is_wp_error( $result ) ? 'apply_failed' : 'fix_applied';
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', $notice, admin_url( 'admin.php?page=seo-agent-ai' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', $notice, admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 		exit;
 	}
 
@@ -1738,13 +1738,13 @@ class SEO_Agent_AI_Plugin {
 
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=seo-agent-ai' ) ) );
+			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 			exit;
 		}
 
 		$result = $this->fix_executor->rollback( $post_id );
 		$notice = is_wp_error( $result ) ? 'rollback_failed' : 'rollback_done';
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', $notice, admin_url( 'admin.php?page=seo-agent-ai' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', $notice, admin_url( 'admin.php?page=ariham-seoagent' ) ) );
 		exit;
 	}
 
@@ -1762,13 +1762,13 @@ class SEO_Agent_AI_Plugin {
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 
 		if ( ! $log_id || ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=seo-agent-ai-report' ) ) );
+			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'invalid_input', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
 			exit;
 		}
 
 		$entry = $this->activity_log->get_entry( $log_id );
 		if ( ! $entry || (int) $entry['post_id'] !== $post_id ) {
-			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'rollback_failed', admin_url( 'admin.php?page=seo-agent-ai-report' ) ) );
+			wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'rollback_failed', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
 			exit;
 		}
 
@@ -1802,7 +1802,7 @@ class SEO_Agent_AI_Plugin {
 			$this->activity_log->update_status( $log_id, SEO_Agent_AI_Activity_Log::STATUS_ROLLED_BACK );
 		}
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'rollback_done', admin_url( 'admin.php?page=seo-agent-ai-report' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'rollback_done', admin_url( 'admin.php?page=ariham-seoagent-report' ) ) );
 		exit;
 	}
 
@@ -1883,7 +1883,7 @@ class SEO_Agent_AI_Plugin {
 		update_option( 'seo_agent_ai_email_reports', $email_reports, false );
 		update_option( 'seo_agent_ai_email_address', $email_address, false );
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'settings_saved', admin_url( 'admin.php?page=seo-agent-ai-settings' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'settings_saved', admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) );
 		exit;
 	}
 
@@ -1931,7 +1931,7 @@ class SEO_Agent_AI_Plugin {
 			5 * MINUTE_IN_SECONDS
 		);
 
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'connection_tested', admin_url( 'admin.php?page=seo-agent-ai-settings' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'connection_tested', admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) );
 		exit;
 	}
 
@@ -1945,7 +1945,7 @@ class SEO_Agent_AI_Plugin {
 		}
 		check_admin_referer( 'seo_agent_ai_google_disconnect' );
 		$this->oauth->disconnect();
-		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'google_disconnected', admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) );
+		wp_safe_redirect( add_query_arg( 'seo_agent_ai_notice', 'google_disconnected', admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) );
 		exit;
 	}
 
@@ -1959,7 +1959,7 @@ class SEO_Agent_AI_Plugin {
 		}
 
 		$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( 'seo-agent-ai-connect' !== $page ) {
+		if ( 'ariham-seoagent-connect' !== $page ) {
 			return;
 		}
 
@@ -1977,7 +1977,7 @@ class SEO_Agent_AI_Plugin {
 				add_query_arg(
 					'seo_agent_ai_oauth_error',
 					rawurlencode( $msg ),
-					admin_url( 'admin.php?page=seo-agent-ai-connect' )
+					admin_url( 'admin.php?page=ariham-seoagent-connect' )
 				)
 			);
 			exit;
@@ -1993,7 +1993,7 @@ class SEO_Agent_AI_Plugin {
 				add_query_arg(
 					'seo_agent_ai_oauth_error',
 					rawurlencode( $result->get_error_message() ),
-					admin_url( 'admin.php?page=seo-agent-ai-connect' )
+					admin_url( 'admin.php?page=ariham-seoagent-connect' )
 				)
 			);
 		} else {
@@ -2001,7 +2001,7 @@ class SEO_Agent_AI_Plugin {
 				add_query_arg(
 					'seo_agent_ai_notice',
 					'google_connected',
-					admin_url( 'admin.php?page=seo-agent-ai-connect' )
+					admin_url( 'admin.php?page=ariham-seoagent-connect' )
 				)
 			);
 		}
@@ -2102,7 +2102,7 @@ class SEO_Agent_AI_Plugin {
 		printf(
 			/* translators: 1: opening anchor for Connect page, 2: closing anchor. */
 			esc_html__( 'Reconnect your Google account on the %1$sConnect page%2$s, or check Settings for property selection.', 'ariham-seoagent' ),
-			'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ) . '">',
+			'<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ) . '">',
 			'</a>'
 		);
 		if ( $msg !== '' ) {

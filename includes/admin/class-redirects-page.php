@@ -270,7 +270,7 @@ class SEO_Agent_AI_Redirects_Page {
 				$('input[name="source_url"]').val(decodeURIComponent(prefill));
 			}
 		}(jQuery));
-		<?php wp_add_inline_script( 'seo-agent-ai-admin', ob_get_clean() ); ?>
+		<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
 		<?php
 	}
 }

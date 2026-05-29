@@ -236,14 +236,14 @@ class SEO_Agent_AI_Connect_Page {
 											printf(
 												/* translators: %s: settings page link */
 												esc_html__( 'Save your OAuth Client ID and Client Secret in %s first, then return here to sign in.', 'ariham-seoagent' ),
-												'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-settings' ) ) . '">' . esc_html__( 'Settings', 'ariham-seoagent' ) . '</a>'
+												'<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) . '">' . esc_html__( 'Settings', 'ariham-seoagent' ) . '</a>'
 											);
 											?>
 										</span>
 									</div>
 								</div>
 							</div>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-settings' ) ); ?>" class="sai-btn sai-btn-ghost">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-settings' ) ); ?>" class="sai-btn sai-btn-ghost">
 								<span class="btn-label"><?php esc_html_e( 'Open Settings', 'ariham-seoagent' ); ?></span>
 							</a>
 						<?php endif; ?>
@@ -265,7 +265,7 @@ class SEO_Agent_AI_Connect_Page {
 									printf(
 										/* translators: %s: settings page link */
 										esc_html__( 'Paste the Client ID and Client Secret into %s.', 'ariham-seoagent' ),
-										'<a href="' . esc_url( admin_url( 'admin.php?page=seo-agent-ai-settings' ) ) . '">' . esc_html__( 'Settings', 'ariham-seoagent' ) . '</a>'
+										'<a href="' . esc_url( admin_url( 'admin.php?page=ariham-seoagent-settings' ) ) . '">' . esc_html__( 'Settings', 'ariham-seoagent' ) . '</a>'
 									);
 									?>
 								</li>

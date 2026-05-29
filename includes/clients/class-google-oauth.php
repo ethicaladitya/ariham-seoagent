@@ -71,7 +71,7 @@ class SEO_Agent_AI_Google_OAuth {
 	 * Return the redirect URI that must be registered in Google Cloud Console.
 	 */
 	public function get_redirect_uri() {
-		return admin_url( 'admin.php?page=seo-agent-ai-connect' );
+		return admin_url( 'admin.php?page=ariham-seoagent-connect' );
 	}
 
 	/**

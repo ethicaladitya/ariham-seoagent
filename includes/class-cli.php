@@ -558,7 +558,7 @@ class SEO_Agent_AI_CLI {
 				$all_ok = false;
 			}
 		}
-		WP_CLI::log( 'DB Tables:     ' . ( $all_ok ? WP_CLI::colorize( '%G6/6 OK%n' ) : WP_CLI::colorize( '%Rmissing tables — run: wp plugin deactivate seo-agent-ai && wp plugin activate seo-agent-ai%n' ) ) );
+		WP_CLI::log( 'DB Tables:     ' . ( $all_ok ? WP_CLI::colorize( '%G6/6 OK%n' ) : WP_CLI::colorize( '%Rmissing tables — run: wp plugin deactivate ariham-seoagent && wp plugin activate ariham-seoagent%n' ) ) );
 
 		// Cron hooks.
 		$cron_hooks = array( 'seo_agent_ai_daily_analysis', 'seo_agent_fetch_gsc_data', 'seo_agent_fetch_ga4_data', 'seo_agent_generate_report', 'seo_agent_score_pages', 'seo_agent_detect_decay', 'seo_agent_run_internal_links', 'seo_agent_purge_old_data' );

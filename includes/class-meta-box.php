@@ -35,7 +35,7 @@ class SEO_Agent_AI_Meta_Box {
 			return;
 		}
 		wp_enqueue_style(
-			'seo-agent-ai-admin',
+			'ariham-seoagent-admin',
 			SEO_AGENT_AI_PLUGIN_URL . 'assets/css/admin.css',
 			array(),
 			SEO_AGENT_AI_VERSION

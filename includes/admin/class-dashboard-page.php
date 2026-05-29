@@ -314,7 +314,7 @@ class SEO_Agent_AI_Dashboard_Page {
 								<?php esc_html_e( 'Google Search Console connected', 'ariham-seoagent' ); ?>
 							</span>
 						<?php else : ?>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ); ?>" class="sai-btn sai-btn-ghost sai-btn-sm">
 								<span class="btn-label"><?php esc_html_e( 'Connect Google Search Console', 'ariham-seoagent' ); ?></span>
 							</a>
 							<span class="sai-step-hint"><?php esc_html_e( '— optional, unlocks keyword & traffic data', 'ariham-seoagent' ); ?></span>
@@ -471,7 +471,7 @@ class SEO_Agent_AI_Dashboard_Page {
 				</div>
 				<h3><?php esc_html_e( 'No trend data yet', 'ariham-seoagent' ); ?></h3>
 				<p><?php esc_html_e( 'Connect Google Search Console and wait for the daily GSC sync to populate this panel.', 'ariham-seoagent' ); ?></p>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=seo-agent-ai-connect' ) ); ?>" class="sai-btn sai-btn-primary">
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ariham-seoagent-connect' ) ); ?>" class="sai-btn sai-btn-primary">
 					<span class="btn-label"><?php esc_html_e( 'Connect Google →', 'ariham-seoagent' ); ?></span>
 				</a>
 			</div>
