@@ -45,7 +45,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 			array(
 				'post_type'      => 'post',
 				'post_status'    => 'publish',
-				'posts_per_page' => 500,
+				'posts_per_page' => 500, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- bulk orphan scan needs all published posts.
 				'fields'         => 'ids',
 			)
 		);
@@ -92,7 +92,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 			array(
 				'post_type'      => 'post',
 				'post_status'    => 'publish',
-				'posts_per_page' => 200,
+				'posts_per_page' => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- scanning candidate sources for internal link opportunities.
 				'fields'         => 'ids',
 				'exclude'        => array( $target_post->ID ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			)
@@ -383,7 +383,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 	 * @param string   $target_url
 	 * @return array|null  ['anchor' => string, 'snippet' => string] or null.
 	 */
-	private function find_anchor_in_content( $content, array $anchors, $target_url ) {
+	private function find_anchor_in_content( $content, array $anchors, $_target_url ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- reserved for future use (e.g. excluding self-referential links).
 		// Sort anchors longest-first for greedy matching.
 		usort( $anchors, fn( $a, $b ) => strlen( $b ) - strlen( $a ) );
 
