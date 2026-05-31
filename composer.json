@@ -4,5 +4,10 @@
         "wp-coding-standards/wpcs": "^3.3",
         "phpcsstandards/phpcsutils": "^1.2",
         "phpcsstandards/phpcsextra": "^1.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

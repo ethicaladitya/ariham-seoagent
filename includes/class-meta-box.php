@@ -159,8 +159,23 @@ class Ariham_SEOAgent_Meta_Box {
 			</div>
 		</div>
 
-		<?php ob_start(); ?>
-		(function(){
+		<?php
+		// Build inline script data as a JSON object — no output buffering needed.
+		$metabox_data = wp_json_encode(
+			array(
+				'postId' => (int) $post->ID,
+				'nonce'  => wp_create_nonce( 'ariham_seoagent_analyze_post' ),
+				'i18n'   => array(
+					'analyzing'    => __( 'Analyzing\u2026', 'ariham-seoagent' ),
+					'done'         => __( 'Done! Score: ', 'ariham-seoagent' ),
+					'error'        => __( 'Error.', 'ariham-seoagent' ),
+					'networkError' => __( 'Network error.', 'ariham-seoagent' ),
+				),
+			),
+			JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT
+		);
+		$inline_js    = '(function(){
+			var sai = ' . $metabox_data . ";
 			var tabs = document.querySelectorAll('.sai-tab-btn');
 			tabs.forEach(function(btn){
 				btn.addEventListener('click', function(){
@@ -183,29 +198,28 @@ class Ariham_SEOAgent_Meta_Box {
 			if(analyzeBtn){
 				analyzeBtn.addEventListener('click', function(){
 					var status = document.getElementById('sai-analyze-status');
-					status.textContent = '<?php echo esc_js( __( 'Analyzing…', 'ariham-seoagent' ) ); ?>';
+					status.textContent = sai.i18n.analyzing;
 					analyzeBtn.disabled = true;
 					var data = new FormData();
 					data.append('action', 'ariham_seoagent_analyze_single_post');
-					data.append('post_id', analyzeBtn.dataset.postId);
-					data.append('nonce', '<?php echo esc_js( wp_create_nonce( 'ariham_seoagent_analyze_post' ) ); ?>');
+					data.append('post_id', sai.postId);
+					data.append('nonce', sai.nonce);
 					fetch(ajaxurl, { method:'POST', body:data, credentials:'same-origin' })
 						.then(function(r){ return r.json(); })
 						.then(function(resp){
 							if(resp.success){
-								status.textContent = '<?php echo esc_js( __( 'Done! Score: ', 'ariham-seoagent' ) ); ?>' + (resp.data.score || '?');
+								status.textContent = sai.i18n.done + (resp.data.score || '?');
 								setTimeout(function(){ location.reload(); }, 1500);
 							} else {
-								status.textContent = resp.data || '<?php echo esc_js( __( 'Error.', 'ariham-seoagent' ) ); ?>';
+								status.textContent = resp.data || sai.i18n.error;
 							}
 						})
-						.catch(function(){ status.textContent = '<?php echo esc_js( __( 'Network error.', 'ariham-seoagent' ) ); ?>'; })
+						.catch(function(){ status.textContent = sai.i18n.networkError; })
 						.finally(function(){ analyzeBtn.disabled = false; });
 				});
 			}
-		})();
-		<?php wp_add_inline_script( 'jquery', ob_get_clean() ); ?>
-		<?php
+		})();";
+		wp_add_inline_script( 'jquery', $inline_js );
 	}
 
 	// -------------------------------------------------------------------

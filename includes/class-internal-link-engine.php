@@ -41,12 +41,14 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 	 * @return WP_Post[]
 	 */
 	public function get_orphan_posts( $limit = 50 ) {
-		$all_posts = get_posts( array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => 500,
-			'fields'         => 'ids',
-		) );
+		$all_posts = get_posts(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 500,
+				'fields'         => 'ids',
+			)
+		);
 
 		$orphans = array();
 		foreach ( $all_posts as $post_id ) {
@@ -86,13 +88,15 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		}
 
 		// Get all published posts except the target itself.
-		$source_ids = get_posts( array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => 200,
-			'fields'         => 'ids',
-			'exclude'        => array( $target_post->ID ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
-		) );
+		$source_ids = get_posts(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 200,
+				'fields'         => 'ids',
+				'exclude'        => array( $target_post->ID ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+			)
+		);
 
 		$candidates = array();
 
@@ -178,10 +182,12 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		}
 
 		// Write the updated content.
-		wp_update_post( array(
-			'ID'           => $source_post->ID,
-			'post_content' => $new_content,
-		) );
+		wp_update_post(
+			array(
+				'ID'           => $source_post->ID,
+				'post_content' => $new_content,
+			)
+		);
 
 		// Record in DB.
 		Ariham_SEOAgent_DB_Manager::insert_internal_link(
@@ -212,16 +218,22 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		$errors    = 0;
 
 		foreach ( $orphans as $target ) {
-			$processed++;
+			++$processed;
 
 			// Fetch GSC queries for this post from the keyword_history table (latest snapshot).
 			$gsc_rows = Ariham_SEOAgent_DB_Manager::get_keyword_trend( $target->ID, 90 );
-			$queries  = array_map( fn( $r ) => array( 'query' => $r['keyword'], 'impressions' => $r['impressions'] ), $gsc_rows );
+			$queries  = array_map(
+				fn( $r ) => array(
+					'query'       => $r['keyword'],
+					'impressions' => $r['impressions'],
+				),
+				$gsc_rows
+			);
 
 			$candidates = $this->find_link_opportunities( $target, $queries, self::MAX_LINKS_PER_POST );
 
 			if ( empty( $candidates ) ) {
-				$skipped++;
+				++$skipped;
 				continue;
 			}
 
@@ -241,11 +253,11 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 				);
 
 				if ( is_wp_error( $result ) ) {
-					$errors++;
+					++$errors;
 					$this->logger->warning( 'Internal link insertion failed: ' . $result->get_error_message() );
 				} else {
-					$inserted++;
-					$count++;
+					++$inserted;
+					++$count;
 				}
 			}
 		}
@@ -271,11 +283,22 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 	public function run_for_post( $target_post_id, $dry_run = false ) {
 		$target = get_post( $target_post_id );
 		if ( ! $target instanceof WP_Post || $target->post_status !== 'publish' ) {
-			return array( 'inserted' => 0, 'skipped' => 0, 'errors' => 1, 'message' => 'Post not found or not published.' );
+			return array(
+				'inserted' => 0,
+				'skipped'  => 0,
+				'errors'   => 1,
+				'message'  => 'Post not found or not published.',
+			);
 		}
 
 		$gsc_rows = Ariham_SEOAgent_DB_Manager::get_keyword_trend( $target_post_id, 90 );
-		$queries  = array_map( fn( $r ) => array( 'query' => $r['keyword'], 'impressions' => (int) ( $r['impressions'] ?? 0 ) ), $gsc_rows );
+		$queries  = array_map(
+			fn( $r ) => array(
+				'query'       => $r['keyword'],
+				'impressions' => (int) ( $r['impressions'] ?? 0 ),
+			),
+			$gsc_rows
+		);
 
 		$candidates = $this->find_link_opportunities( $target, $queries, self::MAX_LINKS_PER_POST );
 
@@ -297,10 +320,10 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 			);
 
 			if ( is_wp_error( $result ) ) {
-				$errors++;
+				++$errors;
 				$this->logger->warning( 'run_for_post link error: ' . $result->get_error_message() );
 			} else {
-				$inserted++;
+				++$inserted;
 			}
 		}
 
@@ -309,7 +332,11 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 			$this->logger->info( sprintf( 'run_for_post: no link candidates found for post %d', $target_post_id ) );
 		}
 
-		return array( 'inserted' => $inserted, 'skipped' => $skipped, 'errors' => $errors );
+		return array(
+			'inserted' => $inserted,
+			'skipped'  => $skipped,
+			'errors'   => $errors,
+		);
 	}
 
 	// -------------------------------------------------------------------
@@ -335,7 +362,8 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		$title_words = preg_split( '/\s+/', strtolower( wp_strip_all_tags( $post->post_title ) ) );
 		$title_words = array_values( array_filter( $title_words, fn( $w ) => strlen( $w ) > 3 ) );
 
-		for ( $i = 0; $i < count( $title_words ) - 1; $i++ ) {
+		$title_word_count = count( $title_words ) - 1;
+		for ( $i = 0; $i < $title_word_count; $i++ ) {
 			$phrases[] = $title_words[ $i ] . ' ' . $title_words[ $i + 1 ];
 			if ( isset( $title_words[ $i + 2 ] ) ) {
 				$phrases[] = $title_words[ $i ] . ' ' . $title_words[ $i + 1 ] . ' ' . $title_words[ $i + 2 ];
@@ -418,7 +446,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		// Walk all text nodes NOT inside <a> tags.
 		$text_nodes = $xpath->query( '//text()[not(ancestor::a)]' );
 		foreach ( $text_nodes as $text_node ) {
-			$node_text = $text_node->nodeValue;
+			$node_text = $text_node->nodeValue; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$pos       = mb_stripos( $node_text, $anchor );
 			if ( false === $pos ) {
 				continue;
@@ -429,7 +457,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 			$match  = mb_substr( $node_text, $pos, mb_strlen( $anchor ) );
 			$after  = mb_substr( $node_text, $pos + mb_strlen( $anchor ) );
 
-			$parent = $text_node->parentNode;
+			$parent = $text_node->parentNode; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$frag   = $doc->createDocumentFragment();
 
 			if ( '' !== $before ) {
@@ -461,7 +489,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		}
 
 		$result = '';
-		foreach ( $root->childNodes as $child ) {
+		foreach ( $root->childNodes as $child ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$result .= $doc->saveHTML( $child );
 		}
 
@@ -494,7 +522,7 @@ class Ariham_SEOAgent_Internal_Link_Engine {
 		$xpath = new DOMXPath( $doc );
 		$links = $xpath->query( '//a' );
 		foreach ( $links as $link ) {
-			if ( mb_stripos( $link->textContent, $anchor ) !== false ) {
+			if ( mb_stripos( $link->textContent, $anchor ) !== false ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				return true;
 			}
 		}

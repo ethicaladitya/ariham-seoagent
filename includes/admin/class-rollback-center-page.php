@@ -67,9 +67,12 @@ class Ariham_SEOAgent_Rollback_Center_Page {
 			<div class="sai-body">
 				<?php if ( ! empty( $_GET['rolled_back'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
 					<?php $pid = (int) $_GET['rolled_back']; // phpcs:ignore WordPress.Security.NonceVerification ?>
-					<div class="sai-notice n-success" style="margin-bottom:16px"><p><?php
+					<div class="sai-notice n-success" style="margin-bottom:16px"><p>
+					<?php
 					// translators: %d is the post ID.
-					echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'ariham-seoagent' ), $pid ) ); ?></p></div>
+					echo esc_html( sprintf( __( 'Post #%d rolled back successfully.', 'ariham-seoagent' ), $pid ) );
+					?>
+					</p></div>
 				<?php endif; ?>
 				<?php if ( ! empty( $_GET['error'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
 					<div class="sai-notice n-error" style="margin-bottom:16px"><p><?php echo esc_html( sanitize_text_field( urldecode( wp_unslash( $_GET['error'] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized ?></p></div>
@@ -99,13 +102,15 @@ class Ariham_SEOAgent_Rollback_Center_Page {
 		// Build filters for the activity log. If searching by title, resolve post IDs first.
 		$filters = array();
 		if ( $search !== '' ) {
-			$matching_posts = get_posts( array(
-				'post_type'      => array( 'post', 'page' ),
-				'post_status'    => 'any',
-				'posts_per_page' => 50,
-				's'              => $search,
-				'fields'         => 'ids',
-			) );
+			$matching_posts = get_posts(
+				array(
+					'post_type'      => array( 'post', 'page' ),
+					'post_status'    => 'any',
+					'posts_per_page' => 50,
+					's'              => $search,
+					'fields'         => 'ids',
+				)
+			);
 			if ( empty( $matching_posts ) ) {
 				echo '<div class="sai-empty"><p>' . esc_html__( 'No activity log entries found.', 'ariham-seoagent' ) . '</p></div>';
 				return;
@@ -177,15 +182,17 @@ class Ariham_SEOAgent_Rollback_Center_Page {
 		$pages = (int) ceil( $total / $per_page );
 		if ( $pages > 1 ) {
 			echo '<div class="sai-pagination" style="margin-top:16px">';
-			$paginate = paginate_links( array(
-				'base'      => add_query_arg( 'paged', '%#%' ),
-				'format'    => '',
-				'current'   => $paged,
-				'total'     => $pages,
-				'type'      => 'array',
-				'prev_text' => '&laquo;',
-				'next_text' => '&raquo;',
-			) );
+			$paginate = paginate_links(
+				array(
+					'base'      => add_query_arg( 'paged', '%#%' ),
+					'format'    => '',
+					'current'   => $paged,
+					'total'     => $pages,
+					'type'      => 'array',
+					'prev_text' => '&laquo;',
+					'next_text' => '&raquo;',
+				)
+			);
 			if ( is_array( $paginate ) ) {
 				foreach ( $paginate as $link ) {
 					echo wp_kses_post( '<span class="sai-page-btn">' . $link . '</span>' );

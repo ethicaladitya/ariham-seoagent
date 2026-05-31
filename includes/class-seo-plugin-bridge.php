@@ -25,17 +25,17 @@ class Ariham_SEOAgent_SEO_Plugin_Bridge {
 	 * Each plugin entry may have: title, description, focus_keyword.
 	 */
 	const PLUGIN_META = array(
-		'yoast' => array(
+		'yoast'        => array(
 			'title'         => '_yoast_wpseo_title',
 			'description'   => '_yoast_wpseo_metadesc',
 			'focus_keyword' => '_yoast_wpseo_focuskw',
 		),
-		'rankmath' => array(
+		'rankmath'     => array(
 			'title'         => 'rank_math_title',
 			'description'   => 'rank_math_description',
 			'focus_keyword' => 'rank_math_focus_keyword',
 		),
-		'smartcrawl' => array(
+		'smartcrawl'   => array(
 			'title'         => '_wds_title',
 			'description'   => '_wds_metadesc',
 			'focus_keyword' => '_wds_focus_keywords',
@@ -45,12 +45,12 @@ class Ariham_SEOAgent_SEO_Plugin_Bridge {
 			'description'   => '_genesis_description',
 			'focus_keyword' => '',
 		),
-		'aioseo' => array(
+		'aioseo'       => array(
 			'title'         => '_aioseo_title',
 			'description'   => '_aioseo_description',
 			'focus_keyword' => '_aioseo_keywords',
 		),
-		'seopress' => array(
+		'seopress'     => array(
 			'title'         => '_seopress_titles_title',
 			'description'   => '_seopress_titles_desc',
 			'focus_keyword' => '_seopress_analysis_target_kw',
@@ -240,20 +240,20 @@ class Ariham_SEOAgent_SEO_Plugin_Bridge {
 		$desc_len    = function_exists( 'mb_strlen' ) ? (int) mb_strlen( $description ) : (int) strlen( $description );
 
 		return array(
-			'has_title'           => $title !== '',
-			'has_description'     => $description !== '',
-			'has_focus_keyword'   => $focus_kw !== '',
-			'title'               => $title,
-			'description'         => $description,
-			'focus_keyword'       => $focus_kw,
-			'title_length'        => $title_len,
-			'description_length'  => $desc_len,
-			'word_count'          => $word_count,
-			'title_too_long'      => $title !== '' && $title_len > 60,
-			'title_too_short'     => $title !== '' && $title_len < 30,
-			'desc_too_long'       => $description !== '' && $desc_len > 160,
-			'desc_too_short'      => $description !== '' && $desc_len < 80,
-			'content_thin'        => $word_count > 0 && $word_count < 300,
+			'has_title'          => $title !== '',
+			'has_description'    => $description !== '',
+			'has_focus_keyword'  => $focus_kw !== '',
+			'title'              => $title,
+			'description'        => $description,
+			'focus_keyword'      => $focus_kw,
+			'title_length'       => $title_len,
+			'description_length' => $desc_len,
+			'word_count'         => $word_count,
+			'title_too_long'     => $title !== '' && $title_len > 60,
+			'title_too_short'    => $title !== '' && $title_len < 30,
+			'desc_too_long'      => $description !== '' && $desc_len > 160,
+			'desc_too_short'     => $description !== '' && $desc_len < 80,
+			'content_thin'       => $word_count > 0 && $word_count < 300,
 		);
 	}
 

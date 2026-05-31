@@ -61,44 +61,44 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 
 		// 1. Metadata (0-20)
 		list( $dim_scores['metadata'], $s, $i ) = $this->score_metadata( $seo_audit );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                                = array_merge( $signals, $s );
+		$improvements                           = array_merge( $improvements, $i );
 
 		// 2. Content depth (0-20)
 		list( $dim_scores['content'], $s, $i ) = $this->score_content( $content, $seo_audit );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                               = array_merge( $signals, $s );
+		$improvements                          = array_merge( $improvements, $i );
 
 		// 3. Internal links (0-15)
 		list( $dim_scores['internal_links'], $s, $i ) = $this->score_internal_links( $post->ID, $content );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                                      = array_merge( $signals, $s );
+		$improvements                                 = array_merge( $improvements, $i );
 
 		// 4. Schema (0-10)
 		list( $dim_scores['schema'], $s, $i ) = $this->score_schema( $content );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                              = array_merge( $signals, $s );
+		$improvements                         = array_merge( $improvements, $i );
 
 		// 5. Engagement (0-15)
 		list( $dim_scores['engagement'], $s, $i ) = $this->score_engagement( $ga4_data );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                                  = array_merge( $signals, $s );
+		$improvements                             = array_merge( $improvements, $i );
 
 		// 6. Freshness (0-10)
 		list( $dim_scores['freshness'], $s, $i ) = $this->score_freshness_dim( $content, $post );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                                 = array_merge( $signals, $s );
+		$improvements                            = array_merge( $improvements, $i );
 
 		// 7. CTR (0-10)
 		list( $dim_scores['ctr'], $s, $i ) = $this->score_ctr( $gsc_data );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                           = array_merge( $signals, $s );
+		$improvements                      = array_merge( $improvements, $i );
 
 		// 8. Core Web Vitals (0-10) — reads cached PageSpeed transient only, no live fetch.
-		$cwv_url = get_permalink( $post->ID );
+		$cwv_url                           = get_permalink( $post->ID );
 		list( $dim_scores['cwv'], $s, $i ) = $this->score_cwv( $post->ID, $cwv_url ? $cwv_url : '' );
-		$signals      = array_merge( $signals, $s );
-		$improvements = array_merge( $improvements, $i );
+		$signals                           = array_merge( $signals, $s );
+		$improvements                      = array_merge( $improvements, $i );
 
 		// Raw max is 110 (7 original dims summing to 100 + 10 for CWV).
 		// Normalise to a 0-100 scale so existing score targets remain meaningful.
@@ -138,10 +138,13 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 	 */
 	public function get_trend( $post_id, $limit = 30 ) {
 		$rows = Ariham_SEOAgent_DB_Manager::get_insight_history( $post_id, $limit );
-		return array_map( fn( $r ) => array(
-			'date'    => $r['recorded_at'],
-			'overall' => (int) $r['score_overall'],
-		), $rows );
+		return array_map(
+			fn( $r ) => array(
+				'date'    => $r['recorded_at'],
+				'overall' => (int) $r['score_overall'],
+			),
+			$rows
+		);
 	}
 
 	// -------------------------------------------------------------------
@@ -228,8 +231,8 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 		if ( ( $content['image_count'] ?? 0 ) >= 1 ) {
 			$score += 2;
 			if ( ! empty( $content['images_missing_alt'] ) ) {
-				$score -= 1;
-				$i[]    = 'Some images are missing alt text.';
+				--$score;
+				$i[] = 'Some images are missing alt text.';
 			}
 		}
 
@@ -327,8 +330,8 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 		} elseif ( $time >= 90 ) {
 			$score += 4;
 		} elseif ( $time >= 30 ) {
-			$score += 1;
-			$i[]    = 'Short average time on page (' . $time . 's). Consider improving content depth.';
+			++$score;
+			$i[] = 'Short average time on page (' . $time . 's). Consider improving content depth.';
 		} else {
 			$i[] = 'Users leave quickly (' . $time . 's). Rewrite the introduction to immediately deliver value.';
 		}
@@ -337,11 +340,11 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 	}
 
 	private function score_freshness_dim( array $content, WP_Post $post ) {
-		$score   = 0;
-		$s       = array();
-		$i       = array();
-		$fresh   = $content['freshness_score'] ?? 50;
-		$decay   = $content['content_decay_risk'] ?? false;
+		$score = 0;
+		$s     = array();
+		$i     = array();
+		$fresh = $content['freshness_score'] ?? 50;
+		$decay = $content['content_decay_risk'] ?? false;
 
 		if ( $fresh >= 80 ) {
 			$score += 10;
@@ -457,8 +460,8 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 				$cls
 			);
 		} elseif ( $cls >= 0.1 ) {
-			$score -= 1;
-			$i[]    = sprintf(
+			--$score;
+			$i[] = sprintf(
 				/* translators: %.2f: CLS score. */
 				__( 'CLS needs improvement (%.2f — threshold 0.1). Ensure embedded media has explicit width/height attributes.', 'ariham-seoagent' ),
 				$cls
@@ -493,7 +496,18 @@ class Ariham_SEOAgent_SEO_Scoring_Engine {
 	// -------------------------------------------------------------------
 
 	private function expected_ctr( $position ) {
-		$map = array( 1 => 0.32, 2 => 0.18, 3 => 0.11, 4 => 0.08, 5 => 0.06, 6 => 0.05, 7 => 0.04, 8 => 0.035, 9 => 0.03, 10 => 0.025 );
+		$map = array(
+			1  => 0.32,
+			2  => 0.18,
+			3  => 0.11,
+			4  => 0.08,
+			5  => 0.06,
+			6  => 0.05,
+			7  => 0.04,
+			8  => 0.035,
+			9  => 0.03,
+			10 => 0.025,
+		);
 		$pos = (int) round( $position );
 		return $map[ $pos ] ?? ( $pos <= 20 ? 0.015 : 0.005 );
 	}

@@ -16,27 +16,27 @@ class Ariham_SEOAgent_Cron_Status_Page {
 	 */
 	private static function cron_hooks() {
 		return array(
-			'ariham_seoagent_daily_analysis' => array(
+			'ariham_seoagent_daily_analysis'     => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Main daily analysis: fetch GSC/GA4, analyze posts, apply autopilot.', 'ariham-seoagent' ),
 			),
-			'ariham_seoagent_fetch_gsc_data' => array(
+			'ariham_seoagent_fetch_gsc_data'     => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Dedicated GSC keyword history fetch → keyword_history table.', 'ariham-seoagent' ),
 			),
-			'ariham_seoagent_fetch_ga4_data' => array(
+			'ariham_seoagent_fetch_ga4_data'     => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Dedicated GA4 engagement metrics fetch.', 'ariham-seoagent' ),
 			),
-			'ariham_seoagent_generate_report' => array(
+			'ariham_seoagent_generate_report'    => array(
 				'schedule'    => 'daily',
 				'description' => __( 'Generate and store daily SEO report.', 'ariham-seoagent' ),
 			),
-			'ariham_seoagent_score_pages' => array(
+			'ariham_seoagent_score_pages'        => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Run SEO scoring engine on all published posts.', 'ariham-seoagent' ),
 			),
-			'ariham_seoagent_detect_decay' => array(
+			'ariham_seoagent_detect_decay'       => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Content decay + freshness detection pass.', 'ariham-seoagent' ),
 			),
@@ -44,7 +44,7 @@ class Ariham_SEOAgent_Cron_Status_Page {
 				'schedule'    => 'weekly',
 				'description' => __( 'Internal link opportunity detection and insertion.', 'ariham-seoagent' ),
 			),
-			'ariham_seoagent_purge_old_data' => array(
+			'ariham_seoagent_purge_old_data'     => array(
 				'schedule'    => 'weekly',
 				'description' => __( 'Purge keyword_history and page_insights rows beyond retention window.', 'ariham-seoagent' ),
 			),
@@ -92,7 +92,7 @@ class Ariham_SEOAgent_Cron_Status_Page {
 			$hook = sanitize_key( $_GET['triggered'] ); // phpcs:ignore WordPress.Security.NonceVerification
 			echo '<div class="sai-notice n-success" style="margin-bottom:16px"><p>';
 			// translators: %s is the cron hook name that was triggered.
-		echo esc_html( sprintf( __( 'Hook "%s" triggered manually.', 'ariham-seoagent' ), $hook ) );
+			echo esc_html( sprintf( __( 'Hook "%s" triggered manually.', 'ariham-seoagent' ), $hook ) );
 			echo '</p></div>';
 		}
 

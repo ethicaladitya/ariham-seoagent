@@ -6,8 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Ariham_SEOAgent_GA4_Client {
 
-	const OPTION_ACCESS_TOKEN      = 'ariham_seoagent_google_access_token';
-	const OPTION_GA4_PROPERTY_ID   = 'ariham_seoagent_ga4_property_id';
+	const OPTION_ACCESS_TOKEN       = 'ariham_seoagent_google_access_token';
+	const OPTION_GA4_PROPERTY_ID    = 'ariham_seoagent_ga4_property_id';
 	const PAGE_METRICS_CACHE_TTL    = 15 * MINUTE_IN_SECONDS;
 	const PAGE_METRICS_CACHE_PREFIX = 'ariham_seoagent_ga4_page_';
 
@@ -94,7 +94,10 @@ class Ariham_SEOAgent_GA4_Client {
 
 		$payload = array(
 			'dateRanges'      => array(
-				array( 'startDate' => $days . 'daysAgo', 'endDate' => '1daysAgo' ),
+				array(
+					'startDate' => $days . 'daysAgo',
+					'endDate'   => '1daysAgo',
+				),
 			),
 			'dimensions'      => array(
 				array( 'name' => 'pagePath' ),
@@ -111,13 +114,19 @@ class Ariham_SEOAgent_GA4_Client {
 						array(
 							'filter' => array(
 								'fieldName'    => 'pagePath',
-								'stringFilter' => array( 'matchType' => 'EXACT', 'value' => $page_path ),
+								'stringFilter' => array(
+									'matchType' => 'EXACT',
+									'value'     => $page_path,
+								),
 							),
 						),
 						array(
 							'filter' => array(
 								'fieldName'    => 'sessionDefaultChannelGrouping',
-								'stringFilter' => array( 'matchType' => 'EXACT', 'value' => 'Organic Search' ),
+								'stringFilter' => array(
+									'matchType' => 'EXACT',
+									'value'     => 'Organic Search',
+								),
 							),
 						),
 					),
@@ -158,7 +167,10 @@ class Ariham_SEOAgent_GA4_Client {
 
 		$payload = array(
 			'dateRanges' => array(
-				array( 'startDate' => $days . 'daysAgo', 'endDate' => '1daysAgo' ),
+				array(
+					'startDate' => $days . 'daysAgo',
+					'endDate'   => '1daysAgo',
+				),
 			),
 			'dimensions' => array( array( 'name' => 'landingPage' ) ),
 			'metrics'    => array(
@@ -168,7 +180,10 @@ class Ariham_SEOAgent_GA4_Client {
 				array( 'name' => 'averageSessionDuration' ),
 			),
 			'orderBys'   => array(
-				array( 'metric' => array( 'metricName' => 'sessions' ), 'desc' => true ),
+				array(
+					'metric' => array( 'metricName' => 'sessions' ),
+					'desc'   => true,
+				),
 			),
 			'limit'      => (string) (int) $limit,
 		);
@@ -217,7 +232,10 @@ class Ariham_SEOAgent_GA4_Client {
 
 		$payload = array(
 			'dateRanges' => array(
-				array( 'startDate' => $days . 'daysAgo', 'endDate' => '1daysAgo' ),
+				array(
+					'startDate' => $days . 'daysAgo',
+					'endDate'   => '1daysAgo',
+				),
 			),
 			'dimensions' => array( array( 'name' => 'pagePath' ) ),
 			'metrics'    => array(
@@ -226,7 +244,10 @@ class Ariham_SEOAgent_GA4_Client {
 				array( 'name' => 'screenPageViews' ),
 			),
 			'orderBys'   => array(
-				array( 'metric' => array( 'metricName' => 'exitRate' ), 'desc' => true ),
+				array(
+					'metric' => array( 'metricName' => 'exitRate' ),
+					'desc'   => true,
+				),
 			),
 			'limit'      => (string) (int) $limit,
 		);
@@ -263,11 +284,19 @@ class Ariham_SEOAgent_GA4_Client {
 		$access_token = $this->get_access_token();
 
 		if ( is_wp_error( $property_id ) || is_wp_error( $access_token ) ) {
-			return array( 'scroll_event_count' => 0, 'sessions' => 0, 'scroll_rate' => 0.0 );
+			return array(
+				'scroll_event_count' => 0,
+				'sessions'           => 0,
+				'scroll_rate'        => 0.0,
+			);
 		}
 
 		if ( $property_id === '' || $access_token === '' ) {
-			return array( 'scroll_event_count' => 0, 'sessions' => 0, 'scroll_rate' => 0.0 );
+			return array(
+				'scroll_event_count' => 0,
+				'sessions'           => 0,
+				'scroll_rate'        => 0.0,
+			);
 		}
 
 		$page_path = wp_parse_url( $page_url, PHP_URL_PATH );
@@ -277,7 +306,10 @@ class Ariham_SEOAgent_GA4_Client {
 
 		$payload = array(
 			'dateRanges'      => array(
-				array( 'startDate' => $days . 'daysAgo', 'endDate' => '1daysAgo' ),
+				array(
+					'startDate' => $days . 'daysAgo',
+					'endDate'   => '1daysAgo',
+				),
 			),
 			'dimensions'      => array(
 				array( 'name' => 'pagePath' ),
@@ -293,13 +325,19 @@ class Ariham_SEOAgent_GA4_Client {
 						array(
 							'filter' => array(
 								'fieldName'    => 'pagePath',
-								'stringFilter' => array( 'matchType' => 'EXACT', 'value' => $page_path ),
+								'stringFilter' => array(
+									'matchType' => 'EXACT',
+									'value'     => $page_path,
+								),
 							),
 						),
 						array(
 							'filter' => array(
 								'fieldName'    => 'eventName',
-								'stringFilter' => array( 'matchType' => 'EXACT', 'value' => 'scroll' ),
+								'stringFilter' => array(
+									'matchType' => 'EXACT',
+									'value'     => 'scroll',
+								),
 							),
 						),
 					),
@@ -310,7 +348,11 @@ class Ariham_SEOAgent_GA4_Client {
 
 		$data = $this->api_post( $endpoint, $access_token, $payload );
 		if ( is_wp_error( $data ) || empty( $data['rows'] ) ) {
-			return array( 'scroll_event_count' => 0, 'sessions' => 0, 'scroll_rate' => 0.0 );
+			return array(
+				'scroll_event_count' => 0,
+				'sessions'           => 0,
+				'scroll_rate'        => 0.0,
+			);
 		}
 
 		$row      = $data['rows'][0];
@@ -356,10 +398,13 @@ class Ariham_SEOAgent_GA4_Client {
 				'body'    => wp_json_encode(
 					array(
 						'dateRanges' => array(
-							array( 'startDate' => '7daysAgo', 'endDate' => 'yesterday' ),
+							array(
+								'startDate' => '7daysAgo',
+								'endDate'   => 'yesterday',
+							),
 						),
-						'metrics' => array( array( 'name' => 'sessions' ) ),
-						'limit'   => '1',
+						'metrics'    => array( array( 'name' => 'sessions' ) ),
+						'limit'      => '1',
 					)
 				),
 			)

@@ -173,15 +173,17 @@ class Ariham_SEOAgent_Report_Page {
 								array_merge( $filters, array( 'page' => 'ariham-seoagent-report' ) ),
 								admin_url( 'admin.php' )
 							);
-							$paginate = paginate_links( array(
-								'base'      => add_query_arg( 'paged', '%#%', $base_url ),
-								'format'    => '',
-								'current'   => $page,
-								'total'     => $pages,
-								'type'      => 'array',
-								'prev_text' => '&laquo;',
-								'next_text' => '&raquo;',
-							) );
+							$paginate = paginate_links(
+								array(
+									'base'      => add_query_arg( 'paged', '%#%', $base_url ),
+									'format'    => '',
+									'current'   => $page,
+									'total'     => $pages,
+									'type'      => 'array',
+									'prev_text' => '&laquo;',
+									'next_text' => '&raquo;',
+								)
+							);
 							if ( is_array( $paginate ) ) {
 								foreach ( $paginate as $link ) {
 									echo wp_kses_post( '<span class="sai-page-btn">' . $link . '</span>' );
@@ -298,7 +300,7 @@ class Ariham_SEOAgent_Report_Page {
 			'autopilot' => __( 'Autopilot', 'ariham-seoagent' ),
 			'rollback'  => __( 'Rollback', 'ariham-seoagent' ),
 		);
-		$source_badge = 'autopilot' === $triggered_by ? 'b-purple' : 'b-neutral';
+		$source_badge  = 'autopilot' === $triggered_by ? 'b-purple' : 'b-neutral';
 		echo '<span class="sai-badge ' . esc_attr( $source_badge ) . '">';
 		echo esc_html( $source_labels[ $triggered_by ] ?? $triggered_by );
 		echo '</span>';

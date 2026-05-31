@@ -4,7 +4,7 @@ Tags: seo, google-search-console, analytics, ai, automation
 Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.0.1
+Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -149,10 +149,21 @@ No user data is sent to any third-party service until you explicitly configure a
 
 == Changelog ==
 
+= 0.1.0 =
+* Version bump: code quality, security hardening, and WordPress Coding Standards compliance pass.
+* Fixed: WP_Filesystem used for all file operations in the logger.
+* Fixed: Eliminated ob_start() pattern in meta-box; JS data injected via wp_json_encode().
+* Fixed: Added JSON_HEX_TAG to JSON-LD output to prevent </script> injection.
+* Fixed: Renamed JavaScript global to arihamSeoagentAdmin (fully plugin-prefixed).
+* Fixed: Text domain corrected to ariham-seoagent across all files.
+
 = 0.0.1 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 0.1.0 =
+Security and code quality improvements. Recommended update for all users.
 
 = 0.0.1 =
 Initial release.

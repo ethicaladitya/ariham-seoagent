@@ -36,11 +36,11 @@ class Ariham_SEOAgent_PageSpeed_Client {
 	/** LCP threshold for a "needs improvement" flag (ms). */
 	const LCP_NEEDS_IMPROVEMENT = 2500;
 	/** LCP threshold for "poor" (ms). */
-	const LCP_POOR              = 4000;
+	const LCP_POOR = 4000;
 	/** CLS threshold for "needs improvement". */
 	const CLS_NEEDS_IMPROVEMENT = 0.1;
 	/** CLS threshold for "poor". */
-	const CLS_POOR              = 0.25;
+	const CLS_POOR = 0.25;
 
 	/**
 	 * Fetch PageSpeed data for a URL.

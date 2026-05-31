@@ -223,7 +223,14 @@ class Ariham_SEOAgent_Redirect_Manager {
 			return (int) $existing_id;
 		}
 
-		$sources = wp_json_encode( array( array( 'pattern' => $path, 'comparison' => 'exact' ) ) );
+		$sources = wp_json_encode(
+			array(
+				array(
+					'pattern'    => $path,
+					'comparison' => 'exact',
+				),
+			)
+		);
 		$now     = current_time( 'mysql' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -331,7 +338,7 @@ class Ariham_SEOAgent_Redirect_Manager {
 
 		// Use the first available group or fall back to 1.
 		$groups_table = esc_sql( $wpdb->prefix . 'redirection_groups' );
-		$group_id = (int) $wpdb->get_var( "SELECT id FROM `{$groups_table}` WHERE status = 'enabled' ORDER BY id ASC LIMIT 1" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$group_id     = (int) $wpdb->get_var( "SELECT id FROM `{$groups_table}` WHERE status = 'enabled' ORDER BY id ASC LIMIT 1" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( ! $group_id ) {
 			$group_id = 1;
 		}
@@ -670,7 +677,7 @@ class Ariham_SEOAgent_Redirect_Manager {
 		$redirects = get_transient( self::REDIRECT_CACHE_KEY );
 
 		if ( false === $redirects ) {
-			$table = esc_sql( $wpdb->prefix . self::TABLE_REDIRECTS );
+			$table     = esc_sql( $wpdb->prefix . self::TABLE_REDIRECTS );
 			$redirects = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 				"SELECT id, source_url, target_url, redirect_type FROM `{$table}` ORDER BY id ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				ARRAY_A
@@ -936,7 +943,7 @@ class Ariham_SEOAgent_Redirect_Manager {
 				$total_redirects = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM `' . $wpdb->prefix . self::TABLE_REDIRECTS . '`' );
 		}
 
-		$total_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$total_404s      = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}`" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$unresolved_404s = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$l_table}` WHERE redirect_created = 0" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		return compact( 'total_redirects', 'total_404s', 'unresolved_404s' );

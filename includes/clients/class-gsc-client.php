@@ -6,9 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Ariham_SEOAgent_GSC_Client {
 
-	const OPTION_ACCESS_TOKEN  = 'ariham_seoagent_google_access_token';
-	const OPTION_GSC_SITE_URL  = 'ariham_seoagent_gsc_site_url';
-	const PAGE_METRICS_CACHE_TTL = 15 * MINUTE_IN_SECONDS;
+	const OPTION_ACCESS_TOKEN       = 'ariham_seoagent_google_access_token';
+	const OPTION_GSC_SITE_URL       = 'ariham_seoagent_gsc_site_url';
+	const PAGE_METRICS_CACHE_TTL    = 15 * MINUTE_IN_SECONDS;
 	const PAGE_METRICS_CACHE_PREFIX = 'ariham_seoagent_gsc_page_';
 
 	private $google_auth;
@@ -151,22 +151,30 @@ class Ariham_SEOAgent_GSC_Client {
 		$prev_start = gmdate( 'Y-m-d', strtotime( '-' . ( (int) $days * 2 ) . ' days' ) );
 		$prev_end   = gmdate( 'Y-m-d', strtotime( '-' . ( (int) $days + 1 ) . ' days' ) );
 
-		$curr_rows = $this->post_search_analytics( $site_url, $access_token, array(
-			'startDate'  => $curr_start,
-			'endDate'    => $curr_end,
-			'dimensions' => array( 'page' ),
-			'rowLimit'   => 500,
-		) );
+		$curr_rows = $this->post_search_analytics(
+			$site_url,
+			$access_token,
+			array(
+				'startDate'  => $curr_start,
+				'endDate'    => $curr_end,
+				'dimensions' => array( 'page' ),
+				'rowLimit'   => 500,
+			)
+		);
 		if ( is_wp_error( $curr_rows ) ) {
 			return $curr_rows;
 		}
 
-		$prev_rows = $this->post_search_analytics( $site_url, $access_token, array(
-			'startDate'  => $prev_start,
-			'endDate'    => $prev_end,
-			'dimensions' => array( 'page' ),
-			'rowLimit'   => 500,
-		) );
+		$prev_rows = $this->post_search_analytics(
+			$site_url,
+			$access_token,
+			array(
+				'startDate'  => $prev_start,
+				'endDate'    => $prev_end,
+				'dimensions' => array( 'page' ),
+				'rowLimit'   => 500,
+			)
+		);
 		if ( is_wp_error( $prev_rows ) ) {
 			return $prev_rows;
 		}
@@ -217,12 +225,16 @@ class Ariham_SEOAgent_GSC_Client {
 		$start_date = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 		$end_date   = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
 
-		$rows = $this->post_search_analytics( $site_url, $access_token, array(
-			'startDate'  => $start_date,
-			'endDate'    => $end_date,
-			'dimensions' => array( 'page' ),
-			'rowLimit'   => 500,
-		) );
+		$rows = $this->post_search_analytics(
+			$site_url,
+			$access_token,
+			array(
+				'startDate'  => $start_date,
+				'endDate'    => $end_date,
+				'dimensions' => array( 'page' ),
+				'rowLimit'   => 500,
+			)
+		);
 		if ( is_wp_error( $rows ) ) {
 			return $rows;
 		}
@@ -271,12 +283,16 @@ class Ariham_SEOAgent_GSC_Client {
 		$start_date = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 		$end_date   = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
 
-		$pages = $this->post_search_analytics( $site_url, $access_token, array(
-			'startDate'  => $start_date,
-			'endDate'    => $end_date,
-			'dimensions' => array( 'page' ),
-			'rowLimit'   => (int) $limit,
-		) );
+		$pages = $this->post_search_analytics(
+			$site_url,
+			$access_token,
+			array(
+				'startDate'  => $start_date,
+				'endDate'    => $end_date,
+				'dimensions' => array( 'page' ),
+				'rowLimit'   => (int) $limit,
+			)
+		);
 
 		if ( is_wp_error( $pages ) || empty( $pages ) ) {
 			return array();
@@ -654,9 +670,15 @@ class Ariham_SEOAgent_GSC_Client {
 
 	private function expected_ctr( $position ) {
 		$map = array(
-			1  => 0.32, 2  => 0.18, 3  => 0.11,
-			4  => 0.08, 5  => 0.06, 6  => 0.05,
-			7  => 0.04, 8  => 0.035, 9  => 0.03,
+			1  => 0.32,
+			2  => 0.18,
+			3  => 0.11,
+			4  => 0.08,
+			5  => 0.06,
+			6  => 0.05,
+			7  => 0.04,
+			8  => 0.035,
+			9  => 0.03,
 			10 => 0.025,
 		);
 		$pos = (int) round( $position );

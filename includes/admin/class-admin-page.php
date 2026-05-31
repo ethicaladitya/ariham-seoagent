@@ -239,7 +239,7 @@ class Ariham_SEOAgent_Admin_Page {
 		);
 		wp_localize_script(
 			'ariham-seoagent-admin',
-			'seoAgentAI',
+			'arihamSeoagentAdmin',
 			array(
 				'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
 				'nonce'        => wp_create_nonce( 'ariham_seoagent_analyze_batch' ),
@@ -944,7 +944,7 @@ class Ariham_SEOAgent_Admin_Page {
 		</div>
 
 		<?php if ( $is_connected && ! $sitekit_active ) : ?>
-		<?php ob_start(); ?>
+			<?php ob_start(); ?>
 		(function($) {
 			'use strict';
 			$(function() {
@@ -1045,7 +1045,7 @@ class Ariham_SEOAgent_Admin_Page {
 				loadGA4Properties();
 			});
 		})(jQuery);
-		<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
+			<?php wp_add_inline_script( 'ariham-seoagent-admin', ob_get_clean() ); ?>
 		<?php endif; ?>
 		<?php
 	}

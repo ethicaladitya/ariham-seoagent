@@ -47,10 +47,10 @@ class Ariham_SEOAgent_SiteKit_Bridge {
 	const OPT_CREDENTIALS = 'googlesitekit_credentials';
 
 	/** User-meta suffix — WP stores user meta with 'wp_' prefix on single sites. */
-	const META_ACCESS_TOKEN    = 'wp_googlesitekit_access_token';
-	const META_TOKEN_EXPIRES   = 'wp_googlesitekit_access_token_expires_in';
-	const META_TOKEN_CREATED   = 'wp_googlesitekit_access_token_created_at';
-	const META_REFRESH_TOKEN   = 'wp_googlesitekit_refresh_token';
+	const META_ACCESS_TOKEN  = 'wp_googlesitekit_access_token';
+	const META_TOKEN_EXPIRES = 'wp_googlesitekit_access_token_expires_in';
+	const META_TOKEN_CREATED = 'wp_googlesitekit_access_token_created_at';
+	const META_REFRESH_TOKEN = 'wp_googlesitekit_refresh_token';
 
 	/** Token refresh endpoint on Site Kit's OAuth proxy. */
 	const PROXY_TOKEN_URL = 'https://sitekit.withgoogle.com/o/oauth2/token/';
@@ -263,7 +263,7 @@ class Ariham_SEOAgent_SiteKit_Bridge {
 			return '';
 		}
 
-		$key    = defined( 'LOGGED_IN_KEY' )  ? LOGGED_IN_KEY  : 'das-ist-kein-geheimer-schluessel';
+		$key    = defined( 'LOGGED_IN_KEY' ) ? LOGGED_IN_KEY : 'das-ist-kein-geheimer-schluessel';
 		$salt   = defined( 'LOGGED_IN_SALT' ) ? LOGGED_IN_SALT : 'das-ist-kein-geheimes-salz';
 		$method = 'aes-256-ctr';
 		$ivlen  = openssl_cipher_iv_length( $method );
@@ -296,7 +296,7 @@ class Ariham_SEOAgent_SiteKit_Bridge {
 			return base64_encode( $value ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 		}
 
-		$key    = defined( 'LOGGED_IN_KEY' )  ? LOGGED_IN_KEY  : 'das-ist-kein-geheimer-schluessel';
+		$key    = defined( 'LOGGED_IN_KEY' ) ? LOGGED_IN_KEY : 'das-ist-kein-geheimer-schluessel';
 		$salt   = defined( 'LOGGED_IN_SALT' ) ? LOGGED_IN_SALT : 'das-ist-kein-geheimes-salz';
 		$method = 'aes-256-ctr';
 		$ivlen  = openssl_cipher_iv_length( $method );

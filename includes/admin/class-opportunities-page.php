@@ -175,10 +175,10 @@ class Ariham_SEOAgent_Opportunities_Page {
 			$prop_val   = (string) ( $dec['proposed_value'] ?? '' );
 			$impact     = (string) ( $dec['expected_impact'] ?? '' );
 
-			$icon_class   = $this->get_icon_class( $dec_type );
-			$type_badge   = $this->get_type_badge_class( $dec_type );
-			$risk_badge   = $is_safe ? 'b-neutral' : 'b-danger';
-			$risk_label   = $is_safe ? __( 'Safe', 'ariham-seoagent' ) : __( 'Risky', 'ariham-seoagent' );
+			$icon_class = $this->get_icon_class( $dec_type );
+			$type_badge = $this->get_type_badge_class( $dec_type );
+			$risk_badge = $is_safe ? 'b-neutral' : 'b-danger';
+			$risk_label = $is_safe ? __( 'Safe', 'ariham-seoagent' ) : __( 'Risky', 'ariham-seoagent' );
 
 			echo '<div class="sai-decision">';
 
@@ -406,7 +406,7 @@ class Ariham_SEOAgent_Opportunities_Page {
 						var pct  = d.percent || 0;
 						var text = d.done
 							? <?php echo wp_json_encode( __( 'Scan complete!', 'ariham-seoagent' ) ); ?> + ' ' +
-							  d.with_recs + ' ' + <?php echo wp_json_encode( __( 'new recommendation(s) found. Reloading…', 'ariham-seoagent' ) ); ?>
+								d.with_recs + ' ' + <?php echo wp_json_encode( __( 'new recommendation(s) found. Reloading…', 'ariham-seoagent' ) ); ?>
 							: <?php echo wp_json_encode( __( 'Scanning', 'ariham-seoagent' ) ); ?> + ' ' + pct + '% — ' + (d.current_title || '');
 						updateProgress(pct, text);
 						if (d.done) {

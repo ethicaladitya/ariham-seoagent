@@ -49,8 +49,8 @@ class Ariham_SEOAgent_Keyword_Cluster {
 
 		usort( $clusters, fn( $a, $b ) => $b['total_impressions'] - $a['total_impressions'] );
 
-		$primary     = $clusters ? ( $clusters[0]['label'] ?? '' ) : '';
-		$opps        = $this->find_opportunities( $clusters );
+		$primary = $clusters ? ( $clusters[0]['label'] ?? '' ) : '';
+		$opps    = $this->find_opportunities( $clusters );
 
 		return array(
 			'clusters'        => $clusters,
@@ -150,10 +150,10 @@ class Ariham_SEOAgent_Keyword_Cluster {
 				$score += 15;
 			}
 
-			$q['opportunity_score']    = (int) min( 100, $score );
-			$q['opportunity_type']     = $position >= 11 ? 'page_2' : 'top_10';
-			$q['expected_ctr']         = $expected_ctr;
-			$opps[] = $q;
+			$q['opportunity_score'] = (int) min( 100, $score );
+			$q['opportunity_type']  = $position >= 11 ? 'page_2' : 'top_10';
+			$q['expected_ctr']      = $expected_ctr;
+			$opps[]                 = $q;
 		}
 
 		usort( $opps, fn( $a, $b ) => $b['opportunity_score'] - $a['opportunity_score'] );
@@ -186,9 +186,9 @@ class Ariham_SEOAgent_Keyword_Cluster {
 				$clusters[ $best_cluster ]['queries'][] = $q;
 			} else {
 				$clusters[] = array(
-					'label'        => $kw,
-					'label_words'  => $words,
-					'queries'      => array( $q ),
+					'label'       => $kw,
+					'label_words' => $words,
+					'queries'     => array( $q ),
 				);
 			}
 		}
@@ -278,9 +278,15 @@ class Ariham_SEOAgent_Keyword_Cluster {
 	 */
 	private function expected_ctr( $position ) {
 		$map = array(
-			1  => 0.32, 2  => 0.18, 3  => 0.11,
-			4  => 0.08, 5  => 0.06, 6  => 0.05,
-			7  => 0.04, 8  => 0.035, 9  => 0.03,
+			1  => 0.32,
+			2  => 0.18,
+			3  => 0.11,
+			4  => 0.08,
+			5  => 0.06,
+			6  => 0.05,
+			7  => 0.04,
+			8  => 0.035,
+			9  => 0.03,
 			10 => 0.025,
 		);
 		$pos = (int) round( $position );

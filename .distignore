@@ -1,0 +1,15 @@
+# Files and directories to exclude from the plugin ZIP submitted to WordPress.org
+# (processed by the wordpress.org SVN deploy workflow — not by Plugin Check itself)
+
+.claude/
+.git/
+.gitignore
+.distignore
+CLAUDE.md
+composer.json
+composer.lock
+phpcs.xml
+vendor/
+node_modules/
+*.log
+.wordpress-org/

@@ -35,10 +35,10 @@ class Ariham_SEOAgent_Google_OAuth {
 	// OAuth parameters
 	// -----------------------------------------------------------------------
 
-	const OAUTH_AUTH_ENDPOINT  = 'https://accounts.google.com/o/oauth2/v2/auth';
-	const TOKEN_ENDPOINT       = 'https://oauth2.googleapis.com/token';
-	const USERINFO_ENDPOINT    = 'https://www.googleapis.com/oauth2/v3/userinfo';
-	const STATE_TTL_SECONDS    = 600; // 10 minutes
+	const OAUTH_AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
+	const TOKEN_ENDPOINT      = 'https://oauth2.googleapis.com/token';
+	const USERINFO_ENDPOINT   = 'https://www.googleapis.com/oauth2/v3/userinfo';
+	const STATE_TTL_SECONDS   = 600; // 10 minutes
 
 	/**
 	 * OAuth scopes required by this plugin.
@@ -254,8 +254,8 @@ class Ariham_SEOAgent_Google_OAuth {
 	 * Persist access + refresh tokens from a token response payload.
 	 */
 	private function store_tokens( array $data ) {
-		$access_token  = sanitize_text_field( (string) $data['access_token'] );
-		$expires_in    = isset( $data['expires_in'] ) ? (int) $data['expires_in'] : 3600;
+		$access_token = sanitize_text_field( (string) $data['access_token'] );
+		$expires_in   = isset( $data['expires_in'] ) ? (int) $data['expires_in'] : 3600;
 
 		update_option( self::OPTION_ACCESS_TOKEN, $this->encrypt( $access_token ), false );
 		update_option( self::OPTION_TOKEN_EXPIRES_AT, time() + max( 60, $expires_in - 60 ), false );

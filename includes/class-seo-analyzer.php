@@ -33,24 +33,24 @@ class Ariham_SEOAgent_SEO_Analyzer {
 	public function analyze( WP_Post $post, array $gsc, array $ga4, array $seo_audit = array(), array $extra = array() ) {
 		$signals = array(
 			// Original 6 signals.
-			'missing_meta_basics'      => false,
-			'thin_content'             => false,
-			'title_meta_optimization'  => false,
-			'content_refresh_needed'   => false,
-			'intent_mismatch'          => false,
-			'declining_performance'    => false,
+			'missing_meta_basics'     => false,
+			'thin_content'            => false,
+			'title_meta_optimization' => false,
+			'content_refresh_needed'  => false,
+			'intent_mismatch'         => false,
+			'declining_performance'   => false,
 
 			// New 10 signals.
-			'page_two_opportunity'     => false, // Ranking pos 11-20 with decent impressions.
-			'ctr_anomaly'              => false, // CTR significantly below position expectation.
-			'cannibalization_risk'     => false, // Multiple pages competing for same keywords.
-			'content_decay'            => false, // Stale content with old years / no recent update.
-			'orphan_page'              => false, // No inbound internal links.
-			'missing_schema'           => false, // No JSON-LD structured data.
-			'weak_engagement'          => false, // Low engagement across all metrics.
-			'title_ctr_mismatch'       => false, // Good position, poor CTR (title not compelling).
-			'missing_faq'              => false, // No FAQ section but keyword likely triggers PAA.
-			'index_anomaly'            => false, // Very high impressions but poor position (≥50).
+			'page_two_opportunity'    => false, // Ranking pos 11-20 with decent impressions.
+			'ctr_anomaly'             => false, // CTR significantly below position expectation.
+			'cannibalization_risk'    => false, // Multiple pages competing for same keywords.
+			'content_decay'           => false, // Stale content with old years / no recent update.
+			'orphan_page'             => false, // No inbound internal links.
+			'missing_schema'          => false, // No JSON-LD structured data.
+			'weak_engagement'         => false, // Low engagement across all metrics.
+			'title_ctr_mismatch'      => false, // Good position, poor CTR (title not compelling).
+			'missing_faq'             => false, // No FAQ section but keyword likely triggers PAA.
+			'index_anomaly'           => false, // Very high impressions but poor position (≥50).
 		);
 
 		// ------------------------------------------------------------------
@@ -222,15 +222,15 @@ class Ariham_SEOAgent_SEO_Analyzer {
 	// -------------------------------------------------------------------
 
 	private function calculate_confidence( array $gsc, array $ga4, array $signals, array $seo_audit = array() ) {
-		$impressions   = isset( $gsc['impressions_total'] ) ? (int) $gsc['impressions_total'] : 0;
-		$has_sessions  = isset( $ga4['sessions_28d'] ) && (int) $ga4['sessions_28d'] > 0;
-		$has_trend_gsc = isset( $gsc['impressions_trend_28d'] ) && (float) $gsc['impressions_trend_28d'] !== 0.0;
-		$has_trend_ga4 = isset( $ga4['sessions_trend_28d'] ) && (float) $ga4['sessions_trend_28d'] !== 0.0;
+		$impressions    = isset( $gsc['impressions_total'] ) ? (int) $gsc['impressions_total'] : 0;
+		$has_sessions   = isset( $ga4['sessions_28d'] ) && (int) $ga4['sessions_28d'] > 0;
+		$has_trend_gsc  = isset( $gsc['impressions_trend_28d'] ) && (float) $gsc['impressions_trend_28d'] !== 0.0;
+		$has_trend_ga4  = isset( $ga4['sessions_trend_28d'] ) && (float) $ga4['sessions_trend_28d'] !== 0.0;
 		$active_signals = count( array_filter( $signals ) );
 
 		// Deterministic baseline checks: always high confidence.
 		if ( ! empty( $signals['missing_meta_basics'] ) && $impressions === 0 ) {
-			$score = 0.90;
+			$score  = 0.90;
 			$score += ! empty( $signals['thin_content'] ) ? 0.05 : 0.0;
 			return (float) round( min( 1.0, $score ), 3 );
 		}
@@ -296,9 +296,15 @@ class Ariham_SEOAgent_SEO_Analyzer {
 
 	private function expected_ctr( $position ) {
 		$map = array(
-			1  => 0.32, 2  => 0.18, 3  => 0.11,
-			4  => 0.08, 5  => 0.06, 6  => 0.05,
-			7  => 0.04, 8  => 0.035, 9  => 0.03,
+			1  => 0.32,
+			2  => 0.18,
+			3  => 0.11,
+			4  => 0.08,
+			5  => 0.06,
+			6  => 0.05,
+			7  => 0.04,
+			8  => 0.035,
+			9  => 0.03,
 			10 => 0.025,
 		);
 		$pos = (int) round( $position );

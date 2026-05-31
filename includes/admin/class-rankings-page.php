@@ -131,13 +131,15 @@ class Ariham_SEOAgent_Rankings_Page {
 	}
 
 	private function render_filters( $search_query, $post_id, $days ) {
-		$posts = get_posts( array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => 100,
-			'orderby'        => 'title',
-			'order'          => 'ASC',
-		) );
+		$posts = get_posts(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 100,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+			)
+		);
 
 		echo '<form method="get" class="sai-filters" style="margin-bottom:16px">';
 		echo '<input type="hidden" name="page" value="ariham-seoagent-rankings">';
@@ -178,14 +180,17 @@ class Ariham_SEOAgent_Rankings_Page {
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare(
-			"SELECT keyword, position, impressions, clicks, recorded_at
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT keyword, position, impressions, clicks, recorded_at
 			 FROM {$table}
 			 WHERE post_id = %d AND recorded_at >= %s
 			 ORDER BY keyword, recorded_at ASC",
-			$post_id,
-			$cutoff
-		), ARRAY_A );
+				$post_id,
+				$cutoff
+			),
+			ARRAY_A
+		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$post  = get_post( $post_id );
@@ -226,15 +231,18 @@ class Ariham_SEOAgent_Rankings_Page {
 		$cutoff = gmdate( 'Y-m-d', strtotime( '-' . (int) $days . ' days' ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results( $wpdb->prepare(
-			"SELECT post_id, keyword, position, impressions, clicks, recorded_at
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, keyword, position, impressions, clicks, recorded_at
 			 FROM {$table}
 			 WHERE keyword LIKE %s AND recorded_at >= %s
 			 ORDER BY post_id, recorded_at ASC
 			 LIMIT 200",
-			'%' . $wpdb->esc_like( $keyword ) . '%',
-			$cutoff
-		), ARRAY_A );
+				'%' . $wpdb->esc_like( $keyword ) . '%',
+				$cutoff
+			),
+			ARRAY_A
+		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		echo '<div class="sai-card">';
@@ -265,7 +273,10 @@ class Ariham_SEOAgent_Rankings_Page {
 		foreach ( $rows as $row ) {
 			$pid = (int) $row['post_id'];
 			if ( ! isset( $by_post[ $pid ] ) ) {
-				$by_post[ $pid ] = array( 'positions' => array(), 'impressions' => 0 );
+				$by_post[ $pid ] = array(
+					'positions'   => array(),
+					'impressions' => 0,
+				);
 			}
 			$by_post[ $pid ]['positions'][]  = (float) $row['position'];
 			$by_post[ $pid ]['impressions'] += (int) $row['impressions'];
@@ -306,8 +317,9 @@ class Ariham_SEOAgent_Rankings_Page {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// Rising — wrap in subquery to avoid HAVING-alias restriction in strict MySQL.
-		$rising = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM (
+		$rising = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM (
 			     SELECT post_id, keyword,
 			         AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,
 			         AVG(CASE WHEN recorded_at < %s AND recorded_at >= %s THEN position END) AS pos_prior
@@ -318,14 +330,17 @@ class Ariham_SEOAgent_Rankings_Page {
 			   AND (pos_prior - pos_recent) >= 1
 			 ORDER BY (pos_prior - pos_recent) DESC
 			 LIMIT 20",
-			$recent_cut,
-			$recent_cut,
-			$prior_cut
-		), ARRAY_A );
+				$recent_cut,
+				$recent_cut,
+				$prior_cut
+			),
+			ARRAY_A
+		);
 
 		// Declining.
-		$declining = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM (
+		$declining = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM (
 			     SELECT post_id, keyword,
 			         AVG(CASE WHEN recorded_at >= %s THEN position END) AS pos_recent,
 			         AVG(CASE WHEN recorded_at < %s AND recorded_at >= %s THEN position END) AS pos_prior
@@ -336,10 +351,12 @@ class Ariham_SEOAgent_Rankings_Page {
 			   AND (pos_recent - pos_prior) >= 1
 			 ORDER BY (pos_recent - pos_prior) DESC
 			 LIMIT 20",
-			$recent_cut,
-			$recent_cut,
-			$prior_cut
-		), ARRAY_A );
+				$recent_cut,
+				$recent_cut,
+				$prior_cut
+			),
+			ARRAY_A
+		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		echo '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';

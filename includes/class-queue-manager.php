@@ -59,8 +59,8 @@ class Ariham_SEOAgent_Queue_Manager {
 				'queued_at'  => time(),
 				'last_error' => '',
 			);
-			$existing_ids[] = $id;
-			$added++;
+			$existing_ids[]   = $id;
+			++$added;
 		}
 
 		$queue['total_queued'] = isset( $queue['total_queued'] ) ? $queue['total_queued'] + $added : $added;
@@ -77,12 +77,13 @@ class Ariham_SEOAgent_Queue_Manager {
 	public function enqueue_all_stale( $stale_days = 7 ) {
 		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( '-' . (int) $stale_days . ' days' ) );
 
-		$post_ids = get_posts( array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => 2000,
-			'fields'         => 'ids',
-			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		$post_ids = get_posts(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 2000,
+				'fields'         => 'ids',
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'relation' => 'OR',
 				array(
 					'key'     => '_ariham_seoagent_last_analyzed',
@@ -94,8 +95,9 @@ class Ariham_SEOAgent_Queue_Manager {
 					'compare' => '<',
 					'type'    => 'DATETIME',
 				),
-			),
-		) );
+				),
+			)
+		);
 
 		if ( ! empty( $post_ids ) ) {
 			$this->enqueue( $post_ids );
@@ -117,12 +119,12 @@ class Ariham_SEOAgent_Queue_Manager {
 	public function status() {
 		$queue = $this->load_queue();
 		return array(
-			'pending'               => count( $queue['items'] ),
-			'total_queued'          => $queue['total_queued'] ?? 0,
-			'total_processed'       => $queue['total_processed'] ?? 0,
-			'total_errors'          => $queue['total_errors'] ?? 0,
-			'last_run'              => $queue['last_run'] ?? '',
-			'last_batch_processed'  => $queue['last_batch_processed'] ?? 0,
+			'pending'              => count( $queue['items'] ),
+			'total_queued'         => $queue['total_queued'] ?? 0,
+			'total_processed'      => $queue['total_processed'] ?? 0,
+			'total_errors'         => $queue['total_errors'] ?? 0,
+			'last_run'             => $queue['last_run'] ?? '',
+			'last_batch_processed' => $queue['last_batch_processed'] ?? 0,
 		);
 	}
 
@@ -144,7 +146,12 @@ class Ariham_SEOAgent_Queue_Manager {
 		$queue = $this->load_queue();
 
 		if ( empty( $queue['items'] ) ) {
-			return array( 'processed' => 0, 'skipped' => 0, 'errors' => 0, 'remaining' => 0 );
+			return array(
+				'processed' => 0,
+				'skipped'   => 0,
+				'errors'    => 0,
+				'remaining' => 0,
+			);
 		}
 
 		$batch     = array_splice( $queue['items'], 0, self::BATCH_SIZE );
@@ -160,7 +167,7 @@ class Ariham_SEOAgent_Queue_Manager {
 			// Skip posts that have been deleted.
 			$post = get_post( $post_id );
 			if ( ! $post instanceof WP_Post || $post->post_status !== 'publish' ) {
-				$skipped++;
+				++$skipped;
 				continue;
 			}
 
@@ -173,7 +180,7 @@ class Ariham_SEOAgent_Queue_Manager {
 
 					// Rate-limited: back off and requeue.
 					if ( $this->is_rate_limit_error( $code, $msg ) ) {
-						$this->logger->warning( "Rate limit hit on post {$post_id} — backing off " . self::BACKOFF_BASE_SEC . "s." );
+						$this->logger->warning( "Rate limit hit on post {$post_id} — backing off " . self::BACKOFF_BASE_SEC . 's.' );
 						$this->backoff();
 						$item['retries']    = $retries + 1;
 						$item['last_error'] = $msg;
@@ -181,23 +188,23 @@ class Ariham_SEOAgent_Queue_Manager {
 							$requeue[] = $item; // Put back for retry.
 						} else {
 							$this->logger->error( "Post {$post_id} exceeded max retries — dropped from queue." );
-							$errors++;
+							++$errors;
 							$queue['total_errors'] = ( $queue['total_errors'] ?? 0 ) + 1;
 						}
 					} else {
 						$this->logger->error( "Processor error on post {$post_id}: {$msg}" );
-						$errors++;
+						++$errors;
 						$queue['total_errors'] = ( $queue['total_errors'] ?? 0 ) + 1;
 					}
 				} else {
 					update_post_meta( $post_id, '_ariham_seoagent_last_analyzed', current_time( 'mysql' ) );
-					$processed++;
+					++$processed;
 					$queue['total_processed'] = ( $queue['total_processed'] ?? 0 ) + 1;
 					$this->logger->debug( "Queue processed post {$post_id}." );
 				}
 			} catch ( Exception $e ) {
 				$this->logger->error( "Exception on post {$post_id}: " . $e->getMessage() );
-				$errors++;
+				++$errors;
 				$queue['total_errors'] = ( $queue['total_errors'] ?? 0 ) + 1;
 			}
 
@@ -208,8 +215,8 @@ class Ariham_SEOAgent_Queue_Manager {
 		// Prepend requeue items back to the front of the queue.
 		$queue['items'] = array_merge( $requeue, $queue['items'] );
 
-		$queue['last_run']              = gmdate( 'Y-m-d H:i:s' );
-		$queue['last_batch_processed']  = $processed;
+		$queue['last_run']             = gmdate( 'Y-m-d H:i:s' );
+		$queue['last_batch_processed'] = $processed;
 
 		$this->save_queue( $queue );
 
@@ -254,11 +261,11 @@ class Ariham_SEOAgent_Queue_Manager {
 
 	private function empty_queue() {
 		return array(
-			'items'               => array(),
-			'total_queued'        => 0,
-			'total_processed'     => 0,
-			'total_errors'        => 0,
-			'last_run'            => '',
+			'items'                => array(),
+			'total_queued'         => 0,
+			'total_processed'      => 0,
+			'total_errors'         => 0,
+			'last_run'             => '',
 			'last_batch_processed' => 0,
 		);
 	}

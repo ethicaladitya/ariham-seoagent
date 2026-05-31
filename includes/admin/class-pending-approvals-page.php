@@ -197,7 +197,7 @@ class Ariham_SEOAgent_Pending_Approvals_Page {
 			<div class="sai-body">
 
 				<?php if ( ! empty( $_GET['updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
-				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Decision updated successfully.', 'ariham-seoagent' ) ; ?></p></div>
+				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Decision updated successfully.', 'ariham-seoagent' ); ?></p></div>
 				<?php endif; ?>
 
 				<?php
@@ -447,13 +447,13 @@ class Ariham_SEOAgent_Pending_Approvals_Page {
 		echo '<table style="width:100%;border-collapse:collapse;font-size:13px">';
 
 		$rows = array(
-			__( 'Decision Type', 'ariham-seoagent' ) => '<code>' . esc_html( $dec_type ) . '</code>',
-			__( 'Field', 'ariham-seoagent' )          => esc_html( $dec['field'] ?? '' ),
+			__( 'Decision Type', 'ariham-seoagent' )   => '<code>' . esc_html( $dec_type ) . '</code>',
+			__( 'Field', 'ariham-seoagent' )           => esc_html( $dec['field'] ?? '' ),
 			__( 'Risk Level', 'ariham-seoagent' )      => '<span class="sai-badge ' . esc_attr( $risk_badge ) . '">' . esc_html( $risk_label ) . '</span>',
 			__( 'Confidence', 'ariham-seoagent' )      => esc_html( $confidence ) . '%',
 			__( 'Expected Impact', 'ariham-seoagent' ) => esc_html( $impact ),
-			__( 'Status', 'ariham-seoagent' )           => '<span class="sai-status s-' . esc_attr( $dec['status'] ?? 'pending' ) . '">' . esc_html( $dec['status'] ?? '' ) . '</span>',
-			__( 'Created', 'ariham-seoagent' )          => esc_html( $dec['created_at'] ?? '' ),
+			__( 'Status', 'ariham-seoagent' )          => '<span class="sai-status s-' . esc_attr( $dec['status'] ?? 'pending' ) . '">' . esc_html( $dec['status'] ?? '' ) . '</span>',
+			__( 'Created', 'ariham-seoagent' )         => esc_html( $dec['created_at'] ?? '' ),
 		);
 
 		foreach ( $rows as $label => $value ) {

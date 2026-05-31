@@ -52,7 +52,7 @@ class Ariham_SEOAgent_GSC_Opportunity_Analyzer {
 		$declining = $this->gsc_client->get_declining_pages( 28 );
 
 		$report = array(
-			'page2_pages'     => is_array( $page2 )     ? $page2     : array(),
+			'page2_pages'     => is_array( $page2 ) ? $page2 : array(),
 			'ctr_anomalies'   => is_array( $anomalies ) ? $anomalies : array(),
 			'declining_pages' => is_array( $declining ) ? $declining : array(),
 			'generated_at'    => current_time( 'mysql' ),

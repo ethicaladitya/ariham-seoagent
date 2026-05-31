@@ -44,7 +44,10 @@ class Ariham_SEOAgent_Connect_Page {
 		$sitekit_installed = defined( 'GOOGLESITEKIT_VERSION' );
 
 		// Only probe OAuth health when Site Kit is not handling auth.
-		$health = ! $sitekit_active ? $this->probe_auth_health() : array( 'ok' => true, 'message' => '' );
+		$health = ! $sitekit_active ? $this->probe_auth_health() : array(
+			'ok'      => true,
+			'message' => '',
+		);
 
 		$notice = filter_input( INPUT_GET, 'ariham_seoagent_notice', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$notice = is_string( $notice ) ? sanitize_key( wp_unslash( $notice ) ) : '';
@@ -77,9 +80,11 @@ class Ariham_SEOAgent_Connect_Page {
 					<p><?php esc_html_e( 'Ariham SEOAgent needs access to Google Search Console and Google Analytics to analyze your content performance. Choose one of the two methods below.', 'ariham-seoagent' ); ?></p>
 				</div>
 
-				<?php // ---------------------------------------------------------------
+				<?php
+				// ---------------------------------------------------------------
 				// OPTION A — Google Site Kit (automatic, zero-config)
-				// --------------------------------------------------------------- ?>
+				// ---------------------------------------------------------------
+				?>
 				<div class="sai-card <?php echo $sitekit_active ? 'accent-success' : 'accent-primary'; ?>" style="margin-bottom:20px">
 					<div class="sai-card-header">
 						<h2 class="sai-card-title">
@@ -140,10 +145,12 @@ class Ariham_SEOAgent_Connect_Page {
 					</div>
 				</div>
 
-				<?php // ---------------------------------------------------------------
+				<?php
+				// ---------------------------------------------------------------
 				// OPTION B — Manual OAuth (own Google Cloud credentials)
 				// Hidden if Site Kit is already active to avoid confusion.
-				// --------------------------------------------------------------- ?>
+				// ---------------------------------------------------------------
+				?>
 				<?php if ( ! $sitekit_active ) : ?>
 				<div class="sai-card <?php echo $is_connected ? 'accent-success' : ''; ?>" style="margin-bottom:20px">
 					<div class="sai-card-header">
@@ -326,16 +333,25 @@ class Ariham_SEOAgent_Connect_Page {
 		}
 
 		if ( ! $this->oauth->is_connected() ) {
-			$out = array( 'ok' => false, 'message' => __( 'No refresh token stored. Sign in with Google.', 'ariham-seoagent' ) );
+			$out = array(
+				'ok'      => false,
+				'message' => __( 'No refresh token stored. Sign in with Google.', 'ariham-seoagent' ),
+			);
 			set_transient( $cache_key, $out, 30 );
 			return $out;
 		}
 
 		$token = $this->oauth->get_access_token();
 		if ( is_wp_error( $token ) ) {
-			$out = array( 'ok' => false, 'message' => $token->get_error_message() );
+			$out = array(
+				'ok'      => false,
+				'message' => $token->get_error_message(),
+			);
 		} else {
-			$out = array( 'ok' => true, 'message' => '' );
+			$out = array(
+				'ok'      => true,
+				'message' => '',
+			);
 		}
 		set_transient( $cache_key, $out, 30 );
 		return $out;

@@ -42,7 +42,7 @@ class Ariham_SEOAgent_Activity_Log {
 	public static function create_table() {
 		global $wpdb;
 
-		$table         = self::get_table_name();
+		$table           = self::get_table_name();
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE {$table} (

@@ -46,7 +46,7 @@ class Ariham_SEOAgent_Plugin {
 	 * because it sends published post URLs to Google's PageSpeed Insights API.
 	 * No remote PageSpeed requests are made unless the site owner enables this.
 	 */
-	const OPTION_CWV_ENABLED        = 'ariham_seoagent_cwv_enabled';
+	const OPTION_CWV_ENABLED = 'ariham_seoagent_cwv_enabled';
 
 	private static $instance = null;
 
@@ -690,7 +690,7 @@ class Ariham_SEOAgent_Plugin {
 		$since = gmdate( 'Y-m-d', strtotime( '-28 days' ) );
 
 		// Aggregate impressions per (post_id, keyword) over the last 28 days.
-		$sql = 'SELECT post_id, keyword,
+		$sql  = 'SELECT post_id, keyword,
 		        SUM(impressions) AS total_impressions,
 		        AVG(position) AS avg_position
 		 FROM ' . $table . '

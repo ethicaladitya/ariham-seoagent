@@ -104,10 +104,10 @@ class Ariham_SEOAgent_Content_Expander {
 		$prompt = "You are an expert SEO content writer. A blog post needs a new content section to rank better and satisfy reader intent.{$focus_line}{$intent_line}{$queries_line}\n\n"
 			. "Post title: {$post->post_title}\n"
 			. "Existing content excerpt:\n{$excerpt}\n\n"
-			. "Write a new, well-structured content section (300–600 words) that expands on the topic. "
-			. "Use clear subheadings (H2 or H3). Write in plain HTML using only <h2>, <h3>, <p>, <ul>, <li>, <strong>. "
-			. "Do NOT repeat content already in the excerpt. Do NOT include markdown. "
-			. "Do NOT add an introduction paragraph — jump straight into the new section content.";
+			. 'Write a new, well-structured content section (300–600 words) that expands on the topic. '
+			. 'Use clear subheadings (H2 or H3). Write in plain HTML using only <h2>, <h3>, <p>, <ul>, <li>, <strong>. '
+			. 'Do NOT repeat content already in the excerpt. Do NOT include markdown. '
+			. 'Do NOT add an introduction paragraph — jump straight into the new section content.';
 
 		return $this->ai_complete( $prompt, 800 );
 	}
@@ -129,10 +129,10 @@ class Ariham_SEOAgent_Content_Expander {
 		$prompt = "You are an expert SEO content writer. A blog post has become stale or thin and needs a content refresh.{$intent_line}{$queries_line}\n\n"
 			. "Post title: {$post->post_title}\n"
 			. "Current content (may be outdated or thin):\n{$excerpt}\n\n"
-			. "Rewrite and improve the content to be more comprehensive, up-to-date, and aligned with search intent. "
-			. "Preserve the main topics but expand thin sections. "
-			. "Output ONLY the improved content in plain HTML using <h2>, <h3>, <p>, <ul>, <li>, <strong>. "
-			. "Do NOT include markdown, do NOT add an <h1>, do NOT add meta tags.";
+			. 'Rewrite and improve the content to be more comprehensive, up-to-date, and aligned with search intent. '
+			. 'Preserve the main topics but expand thin sections. '
+			. 'Output ONLY the improved content in plain HTML using <h2>, <h3>, <p>, <ul>, <li>, <strong>. '
+			. 'Do NOT include markdown, do NOT add an <h1>, do NOT add meta tags.';
 
 		return $this->ai_complete( $prompt, 1200 );
 	}

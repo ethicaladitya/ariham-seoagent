@@ -40,7 +40,7 @@ class Ariham_SEOAgent_Logger {
 	 * @param bool|null $verbose Override option.
 	 */
 	public function __construct( $debug = null, $verbose = null ) {
-		$this->debug    = $debug   !== null ? (bool) $debug   : (bool) get_option( self::OPTION_DEBUG_MODE, false );
+		$this->debug    = $debug !== null ? (bool) $debug : (bool) get_option( self::OPTION_DEBUG_MODE, false );
 		$this->verbose  = $verbose !== null ? (bool) $verbose : (bool) get_option( self::OPTION_VERBOSE_MODE, false );
 		$this->log_path = self::resolve_log_path();
 	}
@@ -55,9 +55,10 @@ class Ariham_SEOAgent_Logger {
 	 */
 	private static function resolve_log_path() {
 		$uploads = wp_upload_dir( null, false );
-		$base    = ( is_array( $uploads ) && empty( $uploads['error'] ) && ! empty( $uploads['basedir'] ) )
-			? $uploads['basedir']
-			: WP_CONTENT_DIR . '/uploads';
+		$base    = ! empty( $uploads['basedir'] ) ? $uploads['basedir'] : '';
+		if ( empty( $base ) ) {
+			return '';
+		}
 		return trailingslashit( $base ) . self::LOG_DIRNAME . '/' . self::LOG_BASENAME;
 	}
 
@@ -68,20 +69,28 @@ class Ariham_SEOAgent_Logger {
 	private function ensure_log_dir() {
 		$dir = dirname( $this->log_path );
 
+		if ( empty( $this->log_path ) ) {
+			return;
+		}
+
 		if ( ! is_dir( $dir ) ) {
 			wp_mkdir_p( $dir );
 		}
 
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
 		$htaccess = $dir . '/.htaccess';
-		if ( ! file_exists( $htaccess ) ) {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors
-			@file_put_contents( $htaccess, "Order allow,deny\nDeny from all\n" );
+		if ( ! file_exists( $htaccess ) && ! empty( $wp_filesystem ) ) {
+			$wp_filesystem->put_contents( $htaccess, "Order allow,deny\nDeny from all\n", FS_CHMOD_FILE );
 		}
 
 		$index = $dir . '/index.html';
-		if ( ! file_exists( $index ) ) {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors
-			@file_put_contents( $index, '' );
+		if ( ! file_exists( $index ) && ! empty( $wp_filesystem ) ) {
+			$wp_filesystem->put_contents( $index, '', FS_CHMOD_FILE );
 		}
 	}
 
@@ -129,8 +138,8 @@ class Ariham_SEOAgent_Logger {
 			return array();
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		$raw = @file_get_contents( $this->log_path );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading a local log file, not a remote URL; wp_remote_get() is inappropriate here.
+		$raw = file_get_contents( $this->log_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors -- file_exists checked above.
 		if ( ! $raw ) {
 			return array();
 		}
@@ -139,9 +148,12 @@ class Ariham_SEOAgent_Logger {
 
 		if ( $level_filter ) {
 			$tag = '[' . strtoupper( $level_filter ) . ']';
-			$all = array_filter( $all, function( $l ) use ( $tag ) {
-				return strpos( $l, $tag ) !== false;
-			} );
+			$all = array_filter(
+				$all,
+				function ( $l ) use ( $tag ) {
+					return strpos( $l, $tag ) !== false;
+				}
+			);
 		}
 
 		return array_values( array_slice( array_values( $all ), -$lines ) );
@@ -177,8 +189,17 @@ class Ariham_SEOAgent_Logger {
 			$line .= ' ' . wp_json_encode( $context );
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-		@file_put_contents( $this->log_path, $line . "\n", FILE_APPEND | LOCK_EX );
+		if ( $this->log_path ) {
+			global $wp_filesystem;
+			if ( empty( $wp_filesystem ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				WP_Filesystem();
+			}
+			if ( ! empty( $wp_filesystem ) && $wp_filesystem->is_writable( $this->log_path ) ) {
+				$existing = (string) $wp_filesystem->get_contents( $this->log_path );
+				$wp_filesystem->put_contents( $this->log_path, $existing . $line . "\n", FS_CHMOD_FILE );
+			}
+		}
 
 		// Mirror to native WP debug log.
 		if (
@@ -195,9 +216,16 @@ class Ariham_SEOAgent_Logger {
 		if ( ! file_exists( $this->log_path ) ) {
 			return;
 		}
-		if ( @filesize( $this->log_path ) > self::MAX_BYTES ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
-			@rename( $this->log_path, $this->log_path . '.1' );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions -- filesize/rename on a local log file; WP_Filesystem is inappropriate in a passive write context.
+		if ( filesize( $this->log_path ) > self::MAX_BYTES ) {
+			global $wp_filesystem;
+			if ( empty( $wp_filesystem ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				WP_Filesystem();
+			}
+			if ( ! empty( $wp_filesystem ) && $wp_filesystem->is_writable( $this->log_path ) ) {
+				$wp_filesystem->move( $this->log_path, $this->log_path . '.1', true );
+			}
 		}
 	}
 }

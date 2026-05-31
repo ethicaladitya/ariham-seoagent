@@ -26,10 +26,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Ariham_SEOAgent_OpenAI_Client {
 
-	const OPTION_API_KEY      = 'ariham_seoagent_openai_api_key';
-	const OPTION_BASE_URL     = 'ariham_seoagent_openai_base_url';
-	const OPTION_MODEL        = 'ariham_seoagent_openai_model';
-	const OPTION_API_VERSION  = 'ariham_seoagent_openai_api_version';
+	const OPTION_API_KEY     = 'ariham_seoagent_openai_api_key';
+	const OPTION_BASE_URL    = 'ariham_seoagent_openai_base_url';
+	const OPTION_MODEL       = 'ariham_seoagent_openai_model';
+	const OPTION_API_VERSION = 'ariham_seoagent_openai_api_version';
 
 	// Azure legacy GA api-version (2024-02-01 was retired 2025-03-31).
 	const AZURE_LEGACY_API_VERSION  = '2024-10-21';

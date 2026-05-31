@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Ariham_SEOAgent_Gemini_Client {
 
-	const OPTION_API_KEY      = 'ariham_seoagent_gemini_api_key';
-	const API_ENDPOINT        = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-	const REQUEST_TIMEOUT     = 20;
-	const MAX_OUTPUT_TOKENS   = 256;
-	const IMAGE_SIZE_LIMIT    = 4194304; // 4 MB — Gemini inline_data hard limit.
+	const OPTION_API_KEY    = 'ariham_seoagent_gemini_api_key';
+	const API_ENDPOINT      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+	const REQUEST_TIMEOUT   = 20;
+	const MAX_OUTPUT_TOKENS = 256;
+	const IMAGE_SIZE_LIMIT  = 4194304; // 4 MB — Gemini inline_data hard limit.
 
 	// -----------------------------------------------------------------------
 	// Public API
@@ -262,9 +262,9 @@ class Ariham_SEOAgent_Gemini_Client {
 			return new WP_Error( 'http_error', $response->get_error_message() );
 		}
 
-		$code         = (int) wp_remote_retrieve_response_code( $response );
+		$code          = (int) wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
-		$data         = json_decode( $response_body, true );
+		$data          = json_decode( $response_body, true );
 
 		if ( $code < 200 || $code >= 300 ) {
 			$api_msg = isset( $data['error']['message'] ) ? (string) $data['error']['message'] : "HTTP {$code}";
@@ -334,7 +334,7 @@ class Ariham_SEOAgent_Gemini_Client {
 		$allowed_mimes = array( 'image/jpeg', 'image/png', 'image/webp', 'image/gif' );
 		if ( ! in_array( $mime_type, $allowed_mimes, true ) ) {
 			// Try to infer from URL extension.
-			$ext_map = array(
+			$ext_map   = array(
 				'jpg'  => 'image/jpeg',
 				'jpeg' => 'image/jpeg',
 				'png'  => 'image/png',

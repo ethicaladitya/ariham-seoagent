@@ -43,16 +43,16 @@ class Ariham_SEOAgent_Dashboard_Page {
 		$trends        = $report ? ( $report['trends'] ?? array() ) : array();
 		$summary       = $report ? ( $report['summary'] ?? array() ) : array();
 
-		$recent_changes = $this->activity_log->get_entries( array(), 1, 15 );
-		$total_changes  = $this->activity_log->get_count( array() );
-		$sitekit_active = class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active();
+		$recent_changes  = $this->activity_log->get_entries( array(), 1, 15 );
+		$total_changes   = $this->activity_log->get_count( array() );
+		$sitekit_active  = class_exists( 'Ariham_SEOAgent_SiteKit_Bridge' ) && Ariham_SEOAgent_SiteKit_Bridge::is_active();
 		$oauth_connected = class_exists( 'Ariham_SEOAgent_Google_OAuth' ) && ( new Ariham_SEOAgent_Google_OAuth() )->is_connected();
-		$gsc_connected  = $sitekit_active
+		$gsc_connected   = $sitekit_active
 			|| $oauth_connected
 			|| '' !== (string) get_option( 'ariham_seoagent_gsc_site_url', '' )
 			|| '' !== (string) get_option( 'ariham_seoagent_gsc_site', '' );
-		$is_first_run   = 0 === $total_changes && empty( $report ) && ! $gsc_connected;
-		$autopilot      = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
+		$is_first_run    = 0 === $total_changes && empty( $report ) && ! $gsc_connected;
+		$autopilot       = (bool) get_option( 'ariham_seoagent_autopilot_enabled', false );
 
 		$today_changes = $this->activity_log->get_count(
 			array( 'date_from' => gmdate( 'Y-m-d' ) . ' 00:00:00' )

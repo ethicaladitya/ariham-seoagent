@@ -196,7 +196,7 @@ class Ariham_SEOAgent_Content_Analyzer {
 				$items = isset( $data['@graph'] ) ? $data['@graph'] : array( $data );
 				foreach ( $items as $item ) {
 					if ( ! empty( $item['@type'] ) ) {
-						$type = is_array( $item['@type'] ) ? implode( ',', $item['@type'] ) : $item['@type'];
+						$type    = is_array( $item['@type'] ) ? implode( ',', $item['@type'] ) : $item['@type'];
 						$types[] = $type;
 					}
 				}
@@ -225,14 +225,17 @@ class Ariham_SEOAgent_Content_Analyzer {
 				}
 				$host = wp_parse_url( $href, PHP_URL_HOST );
 				if ( ! $host || $host === $site_host ) {
-					$internal++;
+					++$internal;
 				} else {
-					$external++;
+					++$external;
 				}
 			}
 		}
 
-		return array( 'internal' => $internal, 'external' => $external );
+		return array(
+			'internal' => $internal,
+			'external' => $external,
+		);
 	}
 
 	// -------------------------------------------------------------------
@@ -253,7 +256,10 @@ class Ariham_SEOAgent_Content_Analyzer {
 			}
 		}
 
-		return array( 'count' => $count, 'missing_alt' => $missing_alt );
+		return array(
+			'count'       => $count,
+			'missing_alt' => $missing_alt,
+		);
 	}
 
 	// -------------------------------------------------------------------
@@ -335,10 +341,10 @@ class Ariham_SEOAgent_Content_Analyzer {
 
 		// Penalise by how old the last modification is.
 		if ( $age_days > 730 ) {        // > 2 years
-			$score -= 40;
+			$score     -= 40;
 			$decay_risk = true;
 		} elseif ( $age_days > 365 ) {  // > 1 year
-			$score -= 20;
+			$score     -= 20;
 			$decay_risk = true;
 		} elseif ( $age_days > 180 ) {  // > 6 months
 			$score -= 10;
@@ -347,7 +353,7 @@ class Ariham_SEOAgent_Content_Analyzer {
 		// Old years in content are a staleness signal.
 		$old_years = array_filter( $years, fn( $y ) => ( $current_year - $y ) >= 2 );
 		if ( count( $old_years ) >= 3 ) {
-			$score -= 20;
+			$score     -= 20;
 			$decay_risk = true;
 		} elseif ( count( $old_years ) >= 1 ) {
 			$score -= 10;
@@ -380,10 +386,10 @@ class Ariham_SEOAgent_Content_Analyzer {
 	 * @return array Heading text strings of thin sections.
 	 */
 	private function find_thin_sections( $html, array $headings, $min_words = 60 ) {
-		$thin    = array();
-		$h2h3    = array_filter( $headings, fn( $h ) => in_array( $h['tag'], array( 'h2', 'h3' ), true ) );
-		$h2h3    = array_values( $h2h3 );
-		$count   = count( $h2h3 );
+		$thin  = array();
+		$h2h3  = array_filter( $headings, fn( $h ) => in_array( $h['tag'], array( 'h2', 'h3' ), true ) );
+		$h2h3  = array_values( $h2h3 );
+		$count = count( $h2h3 );
 
 		if ( $count < 2 ) {
 			return $thin;
@@ -453,7 +459,7 @@ class Ariham_SEOAgent_Content_Analyzer {
 		if ( $sentences === 0 ) {
 			return 50;
 		}
-		$asl   = $words / $sentences; // Average sentence length.
+		$asl = $words / $sentences; // Average sentence length.
 		// Simplified Flesch: 206.835 − (1.015 × ASL) − assume avg syllables ≈ 1.5 per word.
 		$score = 206.835 - ( 1.015 * $asl ) - ( 84.6 * 1.5 );
 		return (int) max( 0, min( 100, $score ) );

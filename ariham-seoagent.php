@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Ariham SEOAgent
  * Description:       Autonomous SEO growth engine — continuously analyzes Search Console and GA4 signals, then proposes prioritized SEO recommendations with full audit trail, optional autopilot, and AI-powered content intelligence.
- * Version:           0.0.1
+ * Version:           0.1.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Aditya Shah
@@ -14,14 +14,14 @@
  * @package Ariham_SEOAgent
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define('ARIHAM_SEOAGENT_VERSION', '0.0.1');
-define('ARIHAM_SEOAGENT_PLUGIN_FILE', __FILE__);
-define('ARIHAM_SEOAGENT_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('ARIHAM_SEOAGENT_PLUGIN_URL', plugin_dir_url(__FILE__));
+define( 'ARIHAM_SEOAGENT_VERSION', '0.1.0' );
+define( 'ARIHAM_SEOAGENT_PLUGIN_FILE', __FILE__ );
+define( 'ARIHAM_SEOAGENT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'ARIHAM_SEOAGENT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 // Shared helpers.
 require_once ARIHAM_SEOAGENT_PLUGIN_DIR . 'includes/class-crypto.php';
@@ -89,15 +89,15 @@ require_once ARIHAM_SEOAGENT_PLUGIN_DIR . 'includes/class-redirect-manager.php';
 // Plugin orchestrator.
 require_once ARIHAM_SEOAGENT_PLUGIN_DIR . 'includes/class-plugin.php';
 
-register_activation_hook(__FILE__, array('Ariham_SEOAgent_Plugin', 'activate'));
-register_deactivation_hook(__FILE__, array('Ariham_SEOAgent_Plugin', 'deactivate'));
+register_activation_hook( __FILE__, array( 'Ariham_SEOAgent_Plugin', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Ariham_SEOAgent_Plugin', 'deactivate' ) );
 
-add_action('plugins_loaded', array('Ariham_SEOAgent_Plugin', 'maybe_upgrade'));
+add_action( 'plugins_loaded', array( 'Ariham_SEOAgent_Plugin', 'maybe_upgrade' ) );
 
 Ariham_SEOAgent_Plugin::instance();
 
 // WP-CLI command registration.
-if (defined('WP_CLI') && WP_CLI) {
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once ARIHAM_SEOAGENT_PLUGIN_DIR . 'includes/class-cli.php';
-	WP_CLI::add_command('ariham-seoagent', 'Ariham_SEOAgent_CLI');
+	WP_CLI::add_command( 'ariham-seoagent', 'Ariham_SEOAgent_CLI' );
 }
