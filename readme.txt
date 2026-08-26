@@ -2,9 +2,9 @@
 Contributors: ethicaladitya
 Tags: seo, google-search-console, analytics, ai, automation
 Requires at least: 6.4
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -149,6 +149,10 @@ No user data is sent to any third-party service until you explicitly configure a
 
 == Changelog ==
 
+= 1.0.0 =
+* First stable release.
+* Tested with WordPress 7.1.
+
 = 0.1.0 =
 * Version bump: code quality, security hardening, and WordPress Coding Standards compliance pass.
 * Fixed: WP_Filesystem used for all file operations in the logger.
@@ -161,6 +165,9 @@ No user data is sent to any third-party service until you explicitly configure a
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+First stable release. Tested with WordPress 7.1.
 
 = 0.1.0 =
 Security and code quality improvements. Recommended update for all users.

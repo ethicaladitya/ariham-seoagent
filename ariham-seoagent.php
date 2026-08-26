@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Ariham SEOAgent
  * Description:       Autonomous SEO growth engine — continuously analyzes Search Console and GA4 signals, then proposes prioritized SEO recommendations with full audit trail, optional autopilot, and AI-powered content intelligence.
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Aditya Shah
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ARIHAM_SEOAGENT_VERSION', '0.1.0' );
+define( 'ARIHAM_SEOAGENT_VERSION', '1.0.0' );
 define( 'ARIHAM_SEOAGENT_PLUGIN_FILE', __FILE__ );
 define( 'ARIHAM_SEOAGENT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ARIHAM_SEOAGENT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
